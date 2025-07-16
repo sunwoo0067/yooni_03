@@ -1,0 +1,141 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: yooini_db_prod
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-yooini_03}
+      POSTGRES_USER: ${POSTGRES_USER:-yooini_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_password}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - yooini_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-yooini_user} -d ${POSTGRES_DB:-yooini_03}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: yooini_redis_prod
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-secure_redis_password}
+    volumes:
+      - redis_data_prod:/data
+    networks:
+      - yooini_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-secure_redis_password}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: yooini_web_prod
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4
+    volumes:
+      - static_volume:/code/staticfiles
+      - media_volume:/code/media
+    expose:
+      - 8000
+    env_file:
+      - .env.production
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - yooini_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/admin/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:alpine
+    container_name: yooini_nginx_prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - static_volume:/code/staticfiles
+      - media_volume:/code/media
+    depends_on:
+      - web
+    networks:
+      - yooini_network
+    restart: unless-stopped
+
+  celery_worker:
+    build: 
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: yooini_celery_worker_prod
+    command: celery -A config worker -l info --concurrency=4
+    volumes:
+      - media_volume:/code/media
+    env_file:
+      - .env.production
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - yooini_network
+    restart: unless-stopped
+
+  celery_beat:
+    build: 
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: yooini_celery_beat_prod
+    command: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - media_volume:/code/media
+    env_file:
+      - .env.production
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - yooini_network
+    restart: unless-stopped
+
+  flower:
+    build: 
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: yooini_flower_prod
+    command: celery -A config flower --port=5555
+    ports:
+      - "5555:5555"
+    env_file:
+      - .env.production
+    depends_on:
+      - redis
+    networks:
+      - yooini_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data_prod:
+  redis_data_prod:
+  static_volume:
+  media_volume:
+
+networks:
+  yooini_network:
+    driver: bridge

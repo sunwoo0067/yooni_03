@@ -36,6 +36,7 @@ class SupplierConnectorBase(ABC):
         self._credentials = None
         self._connection = None
         self._last_sync = None
+        self.logger = logging.getLogger(f"{self.__class__.__module__}.{self.__class__.__name__}")
     
     @property
     def credentials(self) -> Dict[str, Any]:

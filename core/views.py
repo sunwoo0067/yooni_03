@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.db.models import Count, Q, Sum
 from django.utils import timezone
+from django.http import JsonResponse
 from datetime import timedelta
 
 from source_data.models import SourceData
@@ -94,3 +95,34 @@ def dashboard(request):
     }
     
     return render(request, 'dashboard.html', context)
+
+
+def health_check(request):
+    """헬스체크 엔드포인트"""
+    try:
+        # 데이터베이스 연결 확인
+        SourceData.objects.exists()
+        
+        # Redis 연결 확인 (Celery 통해)
+        from django.core.cache import cache
+        cache.set('health_check', 'ok', 30)
+        cache_status = cache.get('health_check') == 'ok'
+        
+        # 기본 상태 정보
+        status = {
+            'status': 'healthy',
+            'database': 'connected',
+            'cache': 'connected' if cache_status else 'disconnected',
+            'timestamp': timezone.now().isoformat(),
+            'version': '1.0.0'
+        }
+        
+        return JsonResponse(status, status=200)
+        
+    except Exception as e:
+        status = {
+            'status': 'unhealthy',
+            'error': str(e),
+            'timestamp': timezone.now().isoformat()
+        }
+        return JsonResponse(status, status=503)

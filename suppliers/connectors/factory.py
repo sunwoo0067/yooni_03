@@ -7,11 +7,13 @@ from django.core.exceptions import ImproperlyConfigured
 
 from .base import SupplierConnectorBase
 from .example_api import ExampleAPIConnector
+from .alibaba_1688 import Alibaba1688Connector
 
 
 # Registry of available connectors
 CONNECTOR_REGISTRY: Dict[str, Type[SupplierConnectorBase]] = {
     'example_api': ExampleAPIConnector,
+    'alibaba_1688': Alibaba1688Connector,
     # Add more connectors here as they are implemented:
     # 'shopify': ShopifyConnector,
     # 'woocommerce': WooCommerceConnector,
@@ -85,6 +87,8 @@ def _determine_connector_type(supplier) -> str:
     # Map based on known supplier codes or patterns
     supplier_code_mapping = {
         'example': 'example_api',
+        'alibaba': 'alibaba_1688',
+        '1688': 'alibaba_1688',
         # Add more mappings as needed
     }
     
