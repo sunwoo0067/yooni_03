@@ -1,0 +1,61 @@
+# Core Framework
+Django==5.1.5
+psycopg2-binary==2.9.10
+celery==5.5.3
+redis==5.2.1
+django-environ==0.12.0
+djangorestframework==3.15.2
+django-cors-headers==4.5.0
+
+# AI & LLM
+openai==1.58.1
+anthropic==0.40.0
+langchain==0.3.12
+langchain-community==0.3.12
+
+# Upstash Integration
+upstash-redis==1.1.0
+upstash-vector==0.6.0
+langchain-upstash==0.2.0
+
+# Data Processing
+pandas==2.2.3
+numpy==2.2.0
+openpyxl==3.1.5
+Pillow==11.0.0
+
+# Task Orchestration
+prefect==3.1.5
+dramatiq==1.18.0
+flower==2.0.1  # Celery monitoring
+django-celery-beat==2.7.0  # Celery Beat scheduler
+django-celery-results==2.5.1  # Celery result backend
+psutil==6.1.0  # System monitoring
+
+# Database
+django-jsonfield==1.4.1
+django-bulk-update==2.2.0
+
+# API & Webhooks
+httpx==0.28.1
+requests==2.32.3
+pydantic==2.10.3
+
+# Monitoring & Logging
+prometheus-client==0.21.0
+sentry-sdk==2.19.0
+django-prometheus==2.3.1
+
+# Development & Testing
+pytest==8.3.4
+pytest-django==4.10.0
+pytest-asyncio==0.25.0
+factory-boy==3.3.1
+coverage==7.6.8
+
+# Utilities
+python-dotenv==1.0.1
+pendulum==3.0.0  # Better datetime handling
+tenacity==9.0.0  # Retry logic
+cachetools==5.5.0  # Caching utilities
+cryptography==44.0.0  # For encrypting supplier API credentials
