@@ -1,0 +1,269 @@
+"""
+pytest 설정 파일
+테스트 환경 설정 및 공통 fixtures
+"""
+import pytest
+import asyncio
+import os
+import sys
+from pathlib import Path
+from unittest.mock import Mock, MagicMock
+from datetime import datetime
+import tempfile
+import shutil
+
+# 프로젝트 루트 경로 추가
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from app.services.database.database import Base, engine, SessionLocal
+from app.core.config import settings
+
+
+@pytest.fixture(scope="session")
+def event_loop():
+    """비동기 테스트를 위한 이벤트 루프"""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture(scope="session")
+def test_db():
+    """테스트용 데이터베이스 설정"""
+    # 테스트용 SQLite 데이터베이스 생성
+    test_db_path = "test_dropshipping.db"
+    settings.DATABASE_URL = f"sqlite:///{test_db_path}"
+    
+    # 테이블 생성
+    Base.metadata.create_all(bind=engine)
+    
+    yield
+    
+    # 테스트 후 정리
+    Base.metadata.drop_all(bind=engine)
+    if os.path.exists(test_db_path):
+        os.remove(test_db_path)
+
+
+@pytest.fixture
+def db_session(test_db):
+    """데이터베이스 세션 fixture"""
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.rollback()
+        session.close()
+
+
+@pytest.fixture
+def mock_supabase():
+    """Supabase 클라이언트 모의 객체"""
+    mock = MagicMock()
+    
+    # Storage mock
+    mock.storage.from_.return_value = mock
+    mock.upload.return_value = {"path": "test/path.jpg"}
+    mock.download.return_value = b"image_data"
+    
+    # Database mock
+    mock.table.return_value = mock
+    mock.select.return_value = mock
+    mock.insert.return_value = mock
+    mock.update.return_value = mock
+    mock.delete.return_value = mock
+    mock.eq.return_value = mock
+    mock.execute.return_value = {"data": [{"id": 1}]}
+    
+    return mock
+
+
+@pytest.fixture
+def mock_gemini():
+    """Gemini AI 서비스 모의 객체"""
+    mock = Mock()
+    mock.generate_content.return_value = {
+        "text": "AI generated content",
+        "metadata": {"confidence": 0.95}
+    }
+    return mock
+
+
+@pytest.fixture
+def mock_platform_apis():
+    """플랫폼 API 모의 객체들"""
+    return {
+        "coupang": Mock(
+            register_product=Mock(return_value={"productId": "CP123", "status": "SUCCESS"}),
+            get_orders=Mock(return_value=[]),
+            update_price=Mock(return_value={"status": "SUCCESS"})
+        ),
+        "naver": Mock(
+            create_product=Mock(return_value={"originProductNo": "NP123"}),
+            get_orders=Mock(return_value={"orders": []}),
+            update_status=Mock(return_value={"message": "상태 변경 완료"})
+        ),
+        "11st": Mock(
+            register_product=Mock(return_value="<productNo>11ST123</productNo>"),
+            get_product_info=Mock(return_value="<Product>...</Product>"),
+            update_stock=Mock(return_value="<message>재고 업데이트 완료</message>")
+        )
+    }
+
+
+@pytest.fixture
+def mock_wholesaler_apis():
+    """도매 API 모의 객체들"""
+    return {
+        "zentrade": Mock(
+            get_products=Mock(return_value=[
+                {"product_id": "Z123", "name": "상품1", "price": 10000}
+            ]),
+            place_order=Mock(return_value={"order_id": "ZO123", "status": "confirmed"})
+        ),
+        "ownerclan": Mock(
+            get_products=Mock(return_value=[
+                {"product_code": "O123", "product_name": "상품2", "selling_price": 15000}
+            ]),
+            create_order=Mock(return_value={"orderNo": "OO123"})
+        ),
+        "domeggook": Mock(
+            get_products=Mock(return_value=[
+                {"id": "D123", "title": "상품3", "price": 20000}
+            ]),
+            order_product=Mock(return_value={"order_number": "DO123"})
+        )
+    }
+
+
+@pytest.fixture
+def temp_image_file():
+    """테스트용 임시 이미지 파일"""
+    from PIL import Image
+    
+    temp_dir = tempfile.mkdtemp()
+    image_path = os.path.join(temp_dir, "test_image.jpg")
+    
+    # 테스트용 이미지 생성
+    image = Image.new('RGB', (1000, 1000), color='white')
+    image.save(image_path)
+    
+    yield image_path
+    
+    # 정리
+    shutil.rmtree(temp_dir)
+
+
+@pytest.fixture
+def sample_product_data():
+    """테스트용 샘플 상품 데이터"""
+    return {
+        "id": "TEST123",
+        "name": "테스트 상품",
+        "description": "테스트용 상품 설명입니다.",
+        "price": 30000,
+        "category": "전자제품",
+        "images": ["https://example.com/image1.jpg", "https://example.com/image2.jpg"],
+        "options": [
+            {"name": "색상", "values": ["검정", "흰색"]},
+            {"name": "사이즈", "values": ["S", "M", "L"]}
+        ],
+        "stock": 100,
+        "weight": 500,
+        "dimensions": {
+            "length": 10,
+            "width": 10,
+            "height": 5
+        }
+    }
+
+
+@pytest.fixture
+def sample_order_data():
+    """테스트용 샘플 주문 데이터"""
+    return {
+        "orderId": "ORDER123",
+        "orderDate": datetime.now().isoformat(),
+        "platform": "coupang",
+        "customer": {
+            "name": "홍길동",
+            "phone": "010-1234-5678",
+            "email": "test@example.com",
+            "address": {
+                "zipCode": "12345",
+                "address1": "서울시 강남구",
+                "address2": "테스트동 123-45"
+            }
+        },
+        "items": [
+            {
+                "productId": "PROD123",
+                "productName": "테스트 상품",
+                "quantity": 2,
+                "price": 30000,
+                "options": {"색상": "검정", "사이즈": "M"}
+            }
+        ],
+        "payment": {
+            "method": "CARD",
+            "amount": 60000,
+            "shippingFee": 2500
+        },
+        "status": "PAYMENT_COMPLETE"
+    }
+
+
+@pytest.fixture
+def mock_redis():
+    """Redis 모의 객체"""
+    mock = Mock()
+    mock.get.return_value = None
+    mock.set.return_value = True
+    mock.delete.return_value = True
+    mock.exists.return_value = False
+    mock.expire.return_value = True
+    mock.keys.return_value = []
+    return mock
+
+
+@pytest.fixture(autouse=True)
+def reset_singletons():
+    """싱글톤 객체 리셋"""
+    # 테스트 간 싱글톤 상태 오염 방지
+    from app.services.ai.ai_manager import AIManager
+    from app.services.platforms.platform_manager import PlatformManager
+    
+    # 싱글톤 인스턴스 리셋
+    AIManager._instance = None
+    PlatformManager._instance = None
+    
+    yield
+
+
+@pytest.fixture
+def mock_external_apis(mock_platform_apis, mock_wholesaler_apis, mock_gemini, mock_supabase):
+    """모든 외부 API 모의 객체 통합"""
+    return {
+        "platforms": mock_platform_apis,
+        "wholesalers": mock_wholesaler_apis,
+        "ai": mock_gemini,
+        "storage": mock_supabase
+    }
+
+
+# 테스트 설정
+def pytest_configure(config):
+    """pytest 설정"""
+    # 테스트 환경 변수 설정
+    os.environ["TESTING"] = "true"
+    os.environ["DATABASE_URL"] = "sqlite:///test_dropshipping.db"
+    
+    # 로깅 레벨 설정
+    import logging
+    logging.getLogger().setLevel(logging.WARNING)
+
+
+def pytest_unconfigure(config):
+    """pytest 정리"""
+    # 환경 변수 정리
+    os.environ.pop("TESTING", None)

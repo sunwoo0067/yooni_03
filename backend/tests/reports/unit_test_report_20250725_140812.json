@@ -1,0 +1,59 @@
+{
+  "test_run_date": "2025-07-25T14:08:12.683171",
+  "summary": {
+    "total": 10,
+    "passed": 10,
+    "failed": 7,
+    "success_rate": 100.0
+  },
+  "categories": {
+    "sample": {
+      "description": "샘플 테스트",
+      "status": "PASSED",
+      "duration": "13.65초",
+      "passed": 10
+    },
+    "product_collection": {
+      "description": "상품수집 시스템",
+      "status": "FAILED",
+      "duration": "3.66초",
+      "error": ""
+    },
+    "ai_sourcing": {
+      "description": "AI 소싱 시스템",
+      "status": "FAILED",
+      "duration": "7.83초",
+      "error": ""
+    },
+    "product_processing": {
+      "description": "상품가공 시스템",
+      "status": "FAILED",
+      "duration": "3.82초",
+      "error": ""
+    },
+    "product_registration": {
+      "description": "상품등록 시스템",
+      "status": "FAILED",
+      "duration": "4.11초",
+      "error": ""
+    },
+    "order_processing": {
+      "description": "주문처리 시스템",
+      "status": "FAILED",
+      "duration": "3.80초",
+      "error": ""
+    },
+    "pipeline_integration": {
+      "description": "파이프라인 통합",
+      "status": "FAILED",
+      "duration": "3.78초",
+      "error": ""
+    },
+    "market_management": {
+      "description": "마켓 관리 시스템",
+      "status": "FAILED",
+      "duration": "5.52초",
+      "error": ""
+    }
+  }
+}

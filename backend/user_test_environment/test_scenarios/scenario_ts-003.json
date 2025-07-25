@@ -1,0 +1,46 @@
+{
+  "id": "TS-003",
+  "name": "주문 처리 워크플로우 테스트",
+  "description": "주문 접수부터 완료까지의 전체 프로세스를 테스트합니다.",
+  "priority": "HIGH",
+  "estimated_time": "60분",
+  "prerequisites": [
+    "상품 등록",
+    "고객 정보 준비"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "action": "테스트 주문 생성",
+      "method": "POST",
+      "endpoint": "/api/orders",
+      "expected_result": "주문이 생성되고 주문번호가 발급됨"
+    },
+    {
+      "step": 2,
+      "action": "주문 상태 조회",
+      "method": "GET",
+      "endpoint": "/api/orders/{order_id}",
+      "expected_result": "주문 상세 정보와 현재 상태가 반환됨"
+    },
+    {
+      "step": 3,
+      "action": "배송 정보 업데이트",
+      "method": "PUT",
+      "endpoint": "/api/orders/{order_id}/shipping",
+      "expected_result": "배송 정보가 업데이트됨"
+    },
+    {
+      "step": 4,
+      "action": "주문 완료 처리",
+      "method": "PUT",
+      "endpoint": "/api/orders/{order_id}/complete",
+      "expected_result": "주문 상태가 '완료'로 변경됨"
+    }
+  ],
+  "acceptance_criteria": [
+    "주문 상태가 정확히 추적됨",
+    "재고가 자동으로 차감됨",
+    "고객에게 알림이 발송됨"
+  ]
+}

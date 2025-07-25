@@ -1,0 +1,196 @@
+version: '3.8'
+
+services:
+  # 백엔드 애플리케이션
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # 데이터베이스 연결
+      - DATABASE_URL=postgresql://dropshipping:dropshipping123@db:5432/dropshipping_db
+      - REDIS_URL=redis://redis:6379/0
+      
+      # JWT 설정
+      - SECRET_KEY=your-super-secret-key-for-jwt-token-generation-must-be-at-least-32-characters-long
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      
+      # 환경 설정
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      
+      # Rate Limiting
+      - RATE_LIMIT_ENABLED=true
+      - RATE_LIMIT_DEFAULT=100/minute
+      - RATE_LIMIT_STORAGE_URL=redis://redis:6379/1
+      
+      # 모니터링
+      - PROMETHEUS_ENABLED=true
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      
+      # 외부 API
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_TRENDS_API_KEY=${GOOGLE_TRENDS_API_KEY:-}
+      - NAVER_API_CLIENT_ID=${NAVER_API_CLIENT_ID:-}
+      - NAVER_API_CLIENT_SECRET=${NAVER_API_CLIENT_SECRET:-}
+      
+      # 마켓 API 키들
+      - COUPANG_API_KEY=${COUPANG_API_KEY:-}
+      - COUPANG_SECRET_KEY=${COUPANG_SECRET_KEY:-}
+      - GMARKET_API_KEY=${GMARKET_API_KEY:-}
+      - AUCTION_API_KEY=${AUCTION_API_KEY:-}
+      - INTERPARK_API_KEY=${INTERPARK_API_KEY:-}
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    networks:
+      - dropshipping_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # PostgreSQL 데이터베이스
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: dropshipping_db
+      POSTGRES_USER: dropshipping
+      POSTGRES_PASSWORD: dropshipping123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+    networks:
+      - dropshipping_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dropshipping -d dropshipping_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 캐시 및 세션 스토어
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - dropshipping_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Nginx 리버스 프록시
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - backend
+    networks:
+      - dropshipping_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Prometheus 모니터링
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - dropshipping_network
+    restart: unless-stopped
+
+  # Grafana 대시보드
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    networks:
+      - dropshipping_network
+    restart: unless-stopped
+
+  # 백업 서비스
+  backup:
+    image: postgres:15-alpine
+    environment:
+      - PGPASSWORD=dropshipping123
+    volumes:
+      - ./backups:/backups
+      - ./scripts/backup.sh:/backup.sh:ro
+    command: sh -c "chmod +x /backup.sh && /backup.sh"
+    depends_on:
+      - db
+    networks:
+      - dropshipping_network
+    restart: "no"
+    profiles:
+      - backup
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  nginx_logs:
+    driver: local
+
+networks:
+  dropshipping_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

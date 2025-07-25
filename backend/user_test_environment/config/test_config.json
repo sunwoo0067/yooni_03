@@ -1,0 +1,30 @@
+{
+  "environment": "UAT",
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "name": "dropshipping_test",
+    "user": "test_user",
+    "password": "test_password"
+  },
+  "api": {
+    "base_url": "http://localhost:8000",
+    "timeout": 30,
+    "retry_count": 3
+  },
+  "test_data": {
+    "cleanup_after_test": true,
+    "use_sample_data": true,
+    "data_seed": 12345
+  },
+  "notifications": {
+    "email_enabled": false,
+    "slack_enabled": false,
+    "webhook_url": ""
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "logs/test.log",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  }
+}

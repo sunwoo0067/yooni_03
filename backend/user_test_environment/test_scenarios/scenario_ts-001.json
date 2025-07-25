@@ -1,0 +1,51 @@
+{
+  "id": "TS-001",
+  "name": "도매상품 관리 테스트",
+  "description": "도매상품의 등록, 조회, 수정, 삭제 기능을 테스트합니다.",
+  "priority": "HIGH",
+  "estimated_time": "30분",
+  "prerequisites": [
+    "테스트 데이터 준비",
+    "API 서버 실행"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "action": "도매상품 목록 조회",
+      "method": "GET",
+      "endpoint": "/api/wholesaler/products",
+      "expected_result": "상품 목록이 JSON 형태로 반환됨"
+    },
+    {
+      "step": 2,
+      "action": "새 상품 등록",
+      "method": "POST",
+      "endpoint": "/api/wholesaler/products",
+      "payload": {
+        "name": "테스트 상품",
+        "wholesale_price": 10000,
+        "stock_quantity": 100
+      },
+      "expected_result": "상품이 성공적으로 등록되고 ID가 반환됨"
+    },
+    {
+      "step": 3,
+      "action": "상품 정보 수정",
+      "method": "PUT",
+      "endpoint": "/api/wholesaler/products/{id}",
+      "expected_result": "상품 정보가 업데이트됨"
+    },
+    {
+      "step": 4,
+      "action": "상품 삭제",
+      "method": "DELETE",
+      "endpoint": "/api/wholesaler/products/{id}",
+      "expected_result": "상품이 삭제됨"
+    }
+  ],
+  "acceptance_criteria": [
+    "모든 CRUD 작업이 정상 동작",
+    "응답 시간이 1초 이내",
+    "적절한 HTTP 상태 코드 반환"
+  ]
+}

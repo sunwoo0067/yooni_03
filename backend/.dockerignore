@@ -1,0 +1,99 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# 가상환경
+venv/
+env/
+ENV/
+.venv/
+.ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 로그
+*.log
+logs/
+
+# 데이터베이스
+*.db
+*.sqlite3
+
+# 환경변수
+.env*
+!.env.production
+
+# 테스트
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# 시스템 파일
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# 문서
+README.md
+docs/
+
+# 임시 파일
+tmp/
+temp/
+uploads/
+backups/
+
+# 설정 파일
+config/
+ssl/
+
+# Node.js (프론트엔드가 있는 경우)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 배포 관련
+deployment/
+scripts/
+Makefile
+
+# 개발 도구
+.mypy_cache/
+.black
+.flake8
+.isort.cfg
+pyproject.toml

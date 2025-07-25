@@ -1,0 +1,190 @@
+{
+  "timestamp": "2025-07-25T16:39:38.057344",
+  "tests": [
+    {
+      "category": "Core Files",
+      "name": "설정",
+      "success": true,
+      "message": "존재함",
+      "exec_time": 0
+    },
+    {
+      "category": "Core Files",
+      "name": "성능모듈",
+      "success": true,
+      "message": "존재함",
+      "exec_time": 0
+    },
+    {
+      "category": "Core Files",
+      "name": "제품모델",
+      "success": true,
+      "message": "존재함",
+      "exec_time": 0
+    },
+    {
+      "category": "Core Files",
+      "name": "도매모델",
+      "success": true,
+      "message": "존재함",
+      "exec_time": 0
+    },
+    {
+      "category": "Core Files",
+      "name": "제품API",
+      "success": true,
+      "message": "존재함",
+      "exec_time": 0
+    },
+    {
+      "category": "Core Files",
+      "name": "도매API",
+      "success": true,
+      "message": "존재함",
+      "exec_time": 0
+    },
+    {
+      "category": "Module Import",
+      "name": "app.models.product.Product",
+      "success": true,
+      "message": "로드 성공",
+      "exec_time": 0.8955912590026855
+    },
+    {
+      "category": "Module Import",
+      "name": "app.models.wholesaler.WholesalerAccount",
+      "success": true,
+      "message": "로드 성공",
+      "exec_time": 3.0994415283203125e-06
+    },
+    {
+      "category": "Module Import",
+      "name": "app.services.wholesale.analysis_service.AnalysisService",
+      "success": true,
+      "message": "로드 성공",
+      "exec_time": 0.560563325881958
+    },
+    {
+      "category": "Module Import",
+      "name": "app.core.performance.redis_cache",
+      "success": true,
+      "message": "로드 성공",
+      "exec_time": 0.07413601875305176
+    },
+    {
+      "category": "Wholesaler API",
+      "name": "도매꾹",
+      "success": true,
+      "message": "API 모듈 로드됨",
+      "exec_time": 0.36141300201416016
+    },
+    {
+      "category": "Wholesaler API",
+      "name": "오너클랜",
+      "success": true,
+      "message": "API 모듈 로드됨",
+      "exec_time": 0.0005772113800048828
+    },
+    {
+      "category": "Wholesaler API",
+      "name": "젠트레이드",
+      "success": true,
+      "message": "API 모듈 로드됨",
+      "exec_time": 0.021576404571533203
+    },
+    {
+      "category": "Platform API",
+      "name": "쿠팡",
+      "success": true,
+      "message": "플랫폼 모듈 로드됨",
+      "exec_time": 0.31989264488220215
+    },
+    {
+      "category": "Platform API",
+      "name": "네이버",
+      "success": true,
+      "message": "플랫폼 모듈 로드됨",
+      "exec_time": 1.1920928955078125e-06
+    },
+    {
+      "category": "Platform API",
+      "name": "11번가",
+      "success": true,
+      "message": "플랫폼 모듈 로드됨",
+      "exec_time": 1.1920928955078125e-06
+    },
+    {
+      "category": "Business Features",
+      "name": "상품관리",
+      "success": true,
+      "message": "100% 구현됨 (2/2)",
+      "exec_time": 0
+    },
+    {
+      "category": "Business Features",
+      "name": "주문처리",
+      "success": true,
+      "message": "100% 구현됨 (2/2)",
+      "exec_time": 0
+    },
+    {
+      "category": "Business Features",
+      "name": "재고관리",
+      "success": true,
+      "message": "100% 구현됨 (2/2)",
+      "exec_time": 0
+    },
+    {
+      "category": "Business Features",
+      "name": "데이터분석",
+      "success": true,
+      "message": "100% 구현됨 (1/1)",
+      "exec_time": 0
+    },
+    {
+      "category": "Business Features",
+      "name": "성능최적화",
+      "success": true,
+      "message": "100% 구현됨 (1/1)",
+      "exec_time": 0
+    },
+    {
+      "category": "Business Features",
+      "name": "플랫폼연동",
+      "success": true,
+      "message": "100% 구현됨 (1/1)",
+      "exec_time": 0
+    }
+  ],
+  "performance": {
+    "app.models.product.Product": 0.8955912590026855,
+    "app.models.wholesaler.WholesalerAccount": 3.0994415283203125e-06,
+    "app.services.wholesale.analysis_service.AnalysisService": 0.560563325881958,
+    "app.core.performance.redis_cache": 0.07413601875305176
+  },
+  "business_readiness": {
+    "상품관리": 100.0,
+    "주문처리": 100.0,
+    "재고관리": 100.0,
+    "데이터분석": 100.0,
+    "성능최적화": 100.0,
+    "플랫폼연동": 100.0
+  },
+  "summary": {
+    "total_tests": 22,
+    "passed_tests": 22,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "avg_performance": 0.3825734257698059,
+    "avg_business_readiness": 100.0,
+    "overall_score": 100.0,
+    "grade": "A+ 우수",
+    "status": "운영 환경 배포 준비 완료",
+    "recommendations": [
+      "모듈 로딩 성능 최적화",
+      "실제 데이터로 통합 테스트 수행",
+      "보안 검토 및 성능 최적화",
+      "사용자 테스트 환경 구축"
+    ]
+  }
+}

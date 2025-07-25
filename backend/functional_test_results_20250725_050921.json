@@ -1,0 +1,91 @@
+{
+  "test_run": "2025-07-25T05:09:21.925104",
+  "base_url": "http://localhost:8000",
+  "results": [
+    {
+      "category": "시스템",
+      "test_name": "헬스 체크",
+      "status": "PASS",
+      "message": "",
+      "duration": 0,
+      "timestamp": "2025-07-25T05:09:21.909743"
+    },
+    {
+      "category": "API",
+      "test_name": "상태 확인",
+      "status": "PASS",
+      "message": "",
+      "duration": 0,
+      "timestamp": "2025-07-25T05:09:21.911413"
+    },
+    {
+      "category": "데이터베이스",
+      "test_name": "연결 상태",
+      "status": "FAIL",
+      "message": "HTTP 404",
+      "duration": 0,
+      "timestamp": "2025-07-25T05:09:21.912922"
+    },
+    {
+      "category": "플랫폼 계정",
+      "test_name": "목록 조회 API",
+      "status": "FAIL",
+      "message": "HTTP 404",
+      "duration": 0,
+      "timestamp": "2025-07-25T05:09:21.914509"
+    },
+    {
+      "category": "상품 관리",
+      "test_name": "상품 목록 조회",
+      "status": "FAIL",
+      "message": "HTTP 404",
+      "duration": 0,
+      "timestamp": "2025-07-25T05:09:21.916266"
+    },
+    {
+      "category": "상품 관리",
+      "test_name": "상품 검색",
+      "status": "FAIL",
+      "message": "HTTP 404",
+      "duration": 0,
+      "timestamp": "2025-07-25T05:09:21.918089"
+    },
+    {
+      "category": "주문 관리",
+      "test_name": "주문 목록 조회",
+      "status": "FAIL",
+      "message": "HTTP 404",
+      "duration": 0,
+      "timestamp": "2025-07-25T05:09:21.919624"
+    },
+    {
+      "category": "도매처 관리",
+      "test_name": "도매처 목록 조회",
+      "status": "FAIL",
+      "message": "HTTP 404",
+      "duration": 0,
+      "timestamp": "2025-07-25T05:09:21.921233"
+    },
+    {
+      "category": "분석",
+      "test_name": "대시보드 데이터",
+      "status": "FAIL",
+      "message": "HTTP 404",
+      "duration": 0,
+      "timestamp": "2025-07-25T05:09:21.922704"
+    },
+    {
+      "category": "AI 서비스",
+      "test_name": "상태 확인",
+      "status": "FAIL",
+      "message": "HTTP 404",
+      "duration": 0,
+      "timestamp": "2025-07-25T05:09:21.924269"
+    }
+  ],
+  "summary": {
+    "total": 10,
+    "passed": 2,
+    "failed": 8
+  }
+}

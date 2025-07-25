@@ -1,0 +1,64 @@
+{
+  "test_session": {
+    "tester_name": "",
+    "role": "",
+    "experience_level": "",
+    "test_date": ""
+  },
+  "usability_metrics": {
+    "ease_of_use": {
+      "rating": 0,
+      "comments": ""
+    },
+    "navigation": {
+      "rating": 0,
+      "comments": ""
+    },
+    "visual_design": {
+      "rating": 0,
+      "comments": ""
+    },
+    "response_time": {
+      "rating": 0,
+      "comments": ""
+    },
+    "error_handling": {
+      "rating": 0,
+      "comments": ""
+    }
+  },
+  "feature_feedback": [
+    {
+      "feature": "상품 관리",
+      "usefulness": 0,
+      "ease_of_use": 0,
+      "suggestions": ""
+    },
+    {
+      "feature": "수익성 분석",
+      "usefulness": 0,
+      "ease_of_use": 0,
+      "suggestions": ""
+    },
+    {
+      "feature": "주문 처리",
+      "usefulness": 0,
+      "ease_of_use": 0,
+      "suggestions": ""
+    },
+    {
+      "feature": "리포트 생성",
+      "usefulness": 0,
+      "ease_of_use": 0,
+      "suggestions": ""
+    }
+  ],
+  "general_feedback": {
+    "most_liked_features": [],
+    "most_problematic_features": [],
+    "missing_features": [],
+    "overall_satisfaction": 0,
+    "recommendation_score": 0,
+    "would_use_in_production": ""
+  }
+}

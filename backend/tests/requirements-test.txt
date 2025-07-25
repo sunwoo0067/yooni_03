@@ -1,0 +1,31 @@
+# 테스트 전용 의존성
+
+# 테스트 프레임워크
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-html==4.1.1
+pytest-json-report==1.5.0
+pytest-timeout==2.2.0
+pytest-mock==3.12.0
+pytest-xdist==3.5.0  # 병렬 테스트 실행
+
+# 모킹 및 테스트 유틸리티
+faker==20.1.0  # 가짜 데이터 생성
+factory-boy==3.3.0  # 테스트 데이터 팩토리
+responses==0.24.1  # HTTP 요청 모킹
+freezegun==1.4.0  # 시간 고정
+
+# 코드 품질
+black==23.12.1
+flake8==7.0.0
+isort==5.13.2
+mypy==1.8.0
+
+# 성능 테스트
+locust==2.20.0  # 부하 테스트
+memory-profiler==0.61.0  # 메모리 프로파일링
+
+# 테스트 리포팅
+coverage[toml]==7.4.0
+pytest-benchmark==4.0.0  # 벤치마크 테스트

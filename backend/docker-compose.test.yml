@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # 테스트용 백엔드
+  backend-test:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://test_user:test_pass@db-test:5432/test_db
+      - REDIS_URL=redis://redis-test:6379/0
+      - SECRET_KEY=test-super-secret-key-for-jwt-token-generation-must-be-at-least-32-characters-long
+      - ENVIRONMENT=test
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+      - RATE_LIMIT_ENABLED=false
+      - PROMETHEUS_ENABLED=false
+    depends_on:
+      - db-test
+      - redis-test
+    networks:
+      - test_network
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  # 테스트용 PostgreSQL
+  db-test:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: test_db
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_pass
+    ports:
+      - "5433:5432"
+    networks:
+      - test_network
+    tmpfs:
+      - /var/lib/postgresql/data  # 메모리에 데이터 저장 (빠른 테스트)
+
+  # 테스트용 Redis
+  redis-test:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    networks:
+      - test_network
+    tmpfs:
+      - /data  # 메모리에 데이터 저장
+
+networks:
+  test_network:
+    driver: bridge

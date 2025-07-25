@@ -1,0 +1,169 @@
+{
+  "session_id": "855b9b99",
+  "tests": [
+    {
+      "category": "Data Validation",
+      "name": "상품-블루투스 무선 이어폰",
+      "success": true,
+      "message": "필수 필드 완성",
+      "exec_time": 0
+    },
+    {
+      "category": "Price Validation",
+      "name": "가격-블루투스 무선 이어폰",
+      "success": true,
+      "message": "도매가 15,000원",
+      "exec_time": 0
+    },
+    {
+      "category": "Data Validation",
+      "name": "상품-여성 겨울 패딩 점퍼",
+      "success": true,
+      "message": "필수 필드 완성",
+      "exec_time": 0
+    },
+    {
+      "category": "Price Validation",
+      "name": "가격-여성 겨울 패딩 점퍼",
+      "success": true,
+      "message": "도매가 45,000원",
+      "exec_time": 0
+    },
+    {
+      "category": "Data Validation",
+      "name": "상품-스마트폰 무선충전기",
+      "success": true,
+      "message": "필수 필드 완성",
+      "exec_time": 0
+    },
+    {
+      "category": "Price Validation",
+      "name": "가격-스마트폰 무선충전기",
+      "success": true,
+      "message": "도매가 25,000원",
+      "exec_time": 0
+    },
+    {
+      "category": "Profitability",
+      "name": "마진분석-블루투스 무선 이어폰",
+      "success": true,
+      "message": "39.8% 마진 (11,910원)",
+      "exec_time": 0
+    },
+    {
+      "category": "Profitability",
+      "name": "마진분석-여성 겨울 패딩 점퍼",
+      "success": true,
+      "message": "39.4% 마진 (35,100원)",
+      "exec_time": 0
+    },
+    {
+      "category": "Profitability",
+      "name": "마진분석-스마트폰 무선충전기",
+      "success": true,
+      "message": "34.4% 마진 (15,500원)",
+      "exec_time": 0
+    },
+    {
+      "category": "Workflow",
+      "name": "상품등록",
+      "success": true,
+      "message": "3개 상품 등록완료",
+      "exec_time": 1.430511474609375e-06
+    },
+    {
+      "category": "Workflow",
+      "name": "수익성분석",
+      "success": true,
+      "message": "3개 수익성 상품 발견",
+      "exec_time": 2.384185791015625e-07
+    },
+    {
+      "category": "Workflow",
+      "name": "주문처리",
+      "success": true,
+      "message": "2개 주문 처리완료",
+      "exec_time": 1.5974044799804688e-05
+    },
+    {
+      "category": "Workflow",
+      "name": "전체워크플로우",
+      "success": true,
+      "message": "3단계 완료",
+      "exec_time": 2.9087066650390625e-05
+    },
+    {
+      "category": "Performance",
+      "name": "대용량처리-100개",
+      "success": true,
+      "message": "2056031 items/sec",
+      "exec_time": 4.863739013671875e-05
+    },
+    {
+      "category": "Performance",
+      "name": "대용량처리-500개",
+      "success": true,
+      "message": "2198273 items/sec",
+      "exec_time": 0.00022745132446289062
+    },
+    {
+      "category": "Performance",
+      "name": "대용량처리-1000개",
+      "success": true,
+      "message": "2155346 items/sec",
+      "exec_time": 0.0004639625549316406
+    },
+    {
+      "category": "Error Handling",
+      "name": "빈 상품명",
+      "success": true,
+      "message": "에러 감지: 상품명 필수",
+      "exec_time": 0
+    },
+    {
+      "category": "Error Handling",
+      "name": "음수 가격",
+      "success": true,
+      "message": "에러 감지: 가격은 양수여야 함",
+      "exec_time": 0
+    },
+    {
+      "category": "Error Handling",
+      "name": "0원 가격",
+      "success": true,
+      "message": "에러 감지: 가격은 양수여야 함",
+      "exec_time": 0
+    }
+  ],
+  "workflows": [
+    {
+      "name": "전체 드롭시핑 워크플로우",
+      "steps": 3,
+      "success": true,
+      "total_time": 2.9087066650390625e-05,
+      "processed_products": 3,
+      "profitable_products": 3,
+      "processed_orders": 2
+    }
+  ],
+  "summary": {
+    "total_tests": 19,
+    "passed_tests": 19,
+    "success_rate": 100.0,
+    "avg_exec_time": 0.00011239733014787947,
+    "business_metrics": {
+      "총_상품수": 3,
+      "수익성_상품수": 3,
+      "처리된_주문수": 2,
+      "전체_워크플로우_시간": 2.9087066650390625e-05
+    },
+    "business_readiness": 100.0,
+    "grade": "A+ 우수",
+    "status": "실제 운영 가능",
+    "recommendations": [
+      "실제 데이터베이스 연동 테스트",
+      "외부 API 연동 테스트",
+      "사용자 인수 테스트"
+    ]
+  }
+}

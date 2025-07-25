@@ -1,0 +1,252 @@
+name: Security Scanning
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'  # 매주 월요일 오전 2시
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # 종속성 취약점 스캔
+  dependency-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install safety bandit[toml] semgrep
+    
+    - name: Run Safety (dependency vulnerability scan)
+      run: |
+        safety check --json --output safety-report.json
+      continue-on-error: true
+    
+    - name: Run Bandit (Python security linter)
+      run: |
+        bandit -r app/ -f json -o bandit-report.json
+      continue-on-error: true
+    
+    - name: Run Semgrep (static analysis)
+      run: |
+        semgrep --config=auto app/ --json --output=semgrep-report.json
+      continue-on-error: true
+    
+    - name: Upload security scan results
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-scan-results
+        path: |
+          safety-report.json
+          bandit-report.json
+          semgrep-report.json
+
+  # Docker 이미지 취약점 스캔
+  container-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Build Docker image
+      run: |
+        docker build -t dropshipping-backend:scan .
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'dropshipping-backend:scan'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # 시크릿 스캔
+  secret-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # 전체 히스토리 가져오기
+    
+    - name: Run TruffleHog
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: main
+        head: HEAD
+        extra_args: --debug --only-verified
+
+  # 코드 품질 및 보안 분석
+  codeql-analysis:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'python' ]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+        queries: security-extended,security-and-quality
+    
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+    
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{matrix.language}}"
+
+  # OWASP ZAP 동적 보안 테스트
+  zap-scan:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Start application for testing
+      run: |
+        docker-compose -f docker-compose.test.yml up -d
+        sleep 30  # 애플리케이션 시작 대기
+    
+    - name: Run OWASP ZAP Full Scan
+      uses: zaproxy/action-full-scan@v0.4.0
+      with:
+        target: 'http://localhost:8000'
+        rules_file_name: '.zap/rules.tsv'
+        cmd_options: '-a'
+    
+    - name: Stop application
+      run: |
+        docker-compose -f docker-compose.test.yml down
+
+  # 보안 스캔 결과 요약
+  security-summary:
+    needs: [dependency-scan, container-scan, secret-scan, codeql-analysis]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Download scan results
+      uses: actions/download-artifact@v3
+      with:
+        name: security-scan-results
+    
+    - name: Generate security summary
+      run: |
+        echo "# Security Scan Summary" > security-summary.md
+        echo "" >> security-summary.md
+        echo "## Scan Results" >> security-summary.md
+        
+        if [ -f safety-report.json ]; then
+          echo "### Safety (Dependency Vulnerabilities)" >> security-summary.md
+          jq -r '.vulnerabilities | length' safety-report.json >> security-summary.md
+          echo " vulnerabilities found" >> security-summary.md
+          echo "" >> security-summary.md
+        fi
+        
+        if [ -f bandit-report.json ]; then
+          echo "### Bandit (Python Security Issues)" >> security-summary.md
+          jq -r '.results | length' bandit-report.json >> security-summary.md
+          echo " issues found" >> security-summary.md
+          echo "" >> security-summary.md
+        fi
+        
+        echo "Scan completed at: $(date)" >> security-summary.md
+    
+    - name: Upload security summary
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-summary
+        path: security-summary.md
+    
+    - name: Comment PR with security summary
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const summary = fs.readFileSync('security-summary.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: summary
+          });
+
+  # 취약점 대응 이슈 생성
+  create-security-issues:
+    needs: [dependency-scan]
+    runs-on: ubuntu-latest
+    if: failure()
+    
+    steps:
+    - name: Create security issue
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: '🚨 Security vulnerabilities detected',
+            body: `
+            Security scan found vulnerabilities that need attention.
+            
+            **Details:**
+            - Workflow: ${context.workflow}
+            - Run ID: ${context.runId}
+            - Commit: ${context.sha}
+            
+            Please review the scan results and address the vulnerabilities.
+            `,
+            labels: ['security', 'vulnerability', 'high-priority']
+          });
+
+  # Slack 알림
+  notify-security:
+    needs: [dependency-scan, container-scan, secret-scan, codeql-analysis]
+    runs-on: ubuntu-latest
+    if: always() && (failure() || cancelled())
+    
+    steps:
+    - name: Notify security team
+      if: ${{ secrets.SECURITY_SLACK_WEBHOOK }}
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        webhook_url: ${{ secrets.SECURITY_SLACK_WEBHOOK }}
+        channel: '#security-alerts'
+        fields: repo,message,commit,author,action,eventName,ref,workflow
+        text: '🚨 Security scan detected vulnerabilities in the codebase!'

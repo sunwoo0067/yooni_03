@@ -1,0 +1,48 @@
+{
+  "test_session": {
+    "tester_name": "",
+    "test_date": "",
+    "test_environment": "UAT",
+    "browser": "",
+    "os": ""
+  },
+  "test_results": [
+    {
+      "scenario_id": "TS-001",
+      "scenario_name": "도매상품 관리 테스트",
+      "status": "",
+      "execution_time": "",
+      "issues_found": [],
+      "comments": "",
+      "evidence": []
+    },
+    {
+      "scenario_id": "TS-002",
+      "scenario_name": "수익성 분석 테스트",
+      "status": "",
+      "execution_time": "",
+      "issues_found": [],
+      "comments": "",
+      "evidence": []
+    },
+    {
+      "scenario_id": "TS-003",
+      "scenario_name": "주문 처리 워크플로우 테스트",
+      "status": "",
+      "execution_time": "",
+      "issues_found": [],
+      "comments": "",
+      "evidence": []
+    }
+  ],
+  "overall_assessment": {
+    "total_tests": 0,
+    "passed_tests": 0,
+    "failed_tests": 0,
+    "success_rate": 0,
+    "overall_rating": "",
+    "ready_for_production": "",
+    "major_issues": [],
+    "recommendations": []
+  }
+}
