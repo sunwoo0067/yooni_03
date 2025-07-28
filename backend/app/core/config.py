@@ -1,231 +1,355 @@
 """
-Application configuration settings.
+통합된 애플리케이션 설정
+V2의 프로덕션 레벨 기능과 V1의 AI 설정을 결합
 """
 import os
-from typing import List, Optional
-from pydantic_settings import BaseSettings
-from pydantic import field_validator
+import secrets
+from typing import List, Optional, Dict, Any, Union
+from enum import Enum
+from functools import lru_cache
+from pydantic import Field, validator, SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Environment(str, Enum):
+    """애플리케이션 환경"""
+    DEVELOPMENT = "development"
+    STAGING = "staging"
+    PRODUCTION = "production"
 
 
 class Settings(BaseSettings):
-    """Application settings."""
+    """통합 애플리케이션 설정"""
     
-    # Application
-    APP_NAME: str = "Yooni E-commerce Manager"
-    APP_VERSION: str = "1.0.0"
-    DEBUG: bool = False
-    TESTING: bool = False
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+        extra="allow"
+    )
     
-    # Database
-    DATABASE_URL: str = "postgresql://postgres:1234@localhost:5433/yoni_03"
+    # ==================
+    # 애플리케이션 기본 설정
+    # ==================
+    PROJECT_NAME: str = Field(default="Yooni Dropshipping System", description="프로젝트 이름")
+    VERSION: str = Field(default="1.0.0", description="API 버전")
+    ENVIRONMENT: Environment = Field(default=Environment.DEVELOPMENT, description="실행 환경")
+    DEBUG: bool = Field(default=False, description="디버그 모드")
     
-    # Security
-    SECRET_KEY: str
-    JWT_SECRET_KEY: str
-    JWT_ALGORITHM: str = "HS256"
-    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    # main.py 호환성을 위한 별칭
+    @property
+    def APP_NAME(self) -> str:
+        return self.PROJECT_NAME
     
-    # AI Services
-    GEMINI_API_KEY: Optional[str] = None
-    OLLAMA_BASE_URL: str = "http://localhost:11434"
-    DEFAULT_AI_MODEL: str = "gemini-pro"
-    OLLAMA_MODEL: str = "llama2"
-    AI_TEMPERATURE: float = 0.7
-    AI_MAX_TOKENS: int = 1024
+    @property
+    def APP_VERSION(self) -> str:
+        return self.VERSION
     
-    # Marketplace Platform API Keys
-    # Coupang
-    COUPANG_ACCESS_KEY: Optional[str] = None
-    COUPANG_SECRET_KEY: Optional[str] = None
-    COUPANG_VENDOR_ID: Optional[str] = None
+    # API 설정
+    API_V1_STR: str = "/api/v1"
+    ALLOWED_HOSTS: List[str] = Field(default=["*"])
+    BACKEND_CORS_ORIGINS: List[str] = Field(
+        default=["http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003", "http://localhost:3004", "http://localhost:3005", "http://localhost:3006", "http://localhost:3010"]
+    )
     
-    # Naver Shopping
-    NAVER_CLIENT_ID: Optional[str] = None
-    NAVER_CLIENT_SECRET: Optional[str] = None
-    NAVER_STORE_ID: Optional[str] = None
+    # CORS 설정 (main.py에서 사용하는 이름으로 추가)
+    @property
+    def CORS_ORIGINS(self) -> List[str]:
+        return self.BACKEND_CORS_ORIGINS
     
-    # 11번가 (11st)
-    ELEVENTH_STREET_API_KEY: Optional[str] = None
-    ELEVENTH_STREET_SECRET_KEY: Optional[str] = None
-    ELEVENTH_STREET_SELLER_ID: Optional[str] = None
-    
-    # Additional Platform Keys
-    GMARKET_API_KEY: Optional[str] = None
-    AUCTION_API_KEY: Optional[str] = None
-    INTERPARK_API_KEY: Optional[str] = None
-    
-    # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:8080"]
     CORS_ALLOW_CREDENTIALS: bool = True
-    CORS_ALLOW_METHODS: List[str] = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+    CORS_ALLOW_METHODS: List[str] = ["*"]
     CORS_ALLOW_HEADERS: List[str] = ["*"]
     
-    # Rate Limiting
-    RATE_LIMIT_PER_MINUTE: int = 60
-    RATE_LIMIT_BURST: int = 10
+    # ==================
+    # 보안 설정
+    # ==================
+    SECRET_KEY: SecretStr = Field(default_factory=lambda: SecretStr(secrets.token_urlsafe(32)))
+    JWT_SECRET_KEY: SecretStr = Field(default_factory=lambda: SecretStr(secrets.token_urlsafe(32)))
+    JWT_ALGORITHM: str = "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     
-    # Cache
-    REDIS_URL: str = "redis://localhost:6379/0"
-    CACHE_TTL: int = 3600
+    # 암호화
+    ENCRYPTION_KEY: SecretStr = Field(default_factory=lambda: SecretStr(secrets.token_urlsafe(32)))
+    PASSWORD_MIN_LENGTH: int = 8
+    PASSWORD_REQUIRE_UPPERCASE: bool = True
+    PASSWORD_REQUIRE_NUMBERS: bool = True
+    PASSWORD_REQUIRE_SPECIAL: bool = True
     
-    # Logging
+    # 이메일 설정
+    SMTP_HOST: str = Field(default="", description="SMTP 서버 호스트")
+    SMTP_PORT: int = Field(default=587, description="SMTP 서버 포트")
+    SMTP_USERNAME: str = Field(default="", description="SMTP 사용자명")
+    SMTP_PASSWORD: SecretStr = Field(default_factory=lambda: SecretStr(""), description="SMTP 비밀번호")
+    SMTP_FROM_EMAIL: str = Field(default="noreply@yooni.com", description="발신자 이메일")
+    SMTP_FROM_NAME: str = Field(default="Yooni Dropshipping", description="발신자 이름")
+    SMTP_TLS: bool = Field(default=True, description="TLS 사용 여부")
+    
+    # 프론트엔드 URL
+    FRONTEND_URL: str = Field(default="http://localhost:3000", description="프론트엔드 URL")
+    
+    # ==================
+    # 데이터베이스 설정
+    # ==================
+    DATABASE_URL: str = Field(
+        default="sqlite:///./yooni_dropshipping.db",
+        description="메인 데이터베이스 URL"
+    )
+    DATABASE_POOL_SIZE: int = Field(default=5, ge=1, le=100)
+    DATABASE_MAX_OVERFLOW: int = Field(default=10, ge=0, le=100)
+    DATABASE_POOL_TIMEOUT: int = Field(default=30, ge=1)
+    DATABASE_ECHO: bool = False
+    
+    # 백업 설정
+    BACKUP_ENABLED: bool = True
+    BACKUP_INTERVAL_HOURS: int = 24
+    BACKUP_RETENTION_DAYS: int = 7
+    BACKUP_PATH: str = "./backups"
+    
+    # ==================
+    # AI 서비스 설정 (V1에서 통합)
+    # ==================
+    # Google Gemini
+    GEMINI_API_KEY: Optional[SecretStr] = None
+    GEMINI_MODEL: str = "gemini-pro"
+    
+    # Ollama (로컬 LLM)
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "llama2"
+    
+    # OpenAI
+    OPENAI_API_KEY: Optional[SecretStr] = None
+    OPENAI_MODEL: str = "gpt-4"
+    
+    # Anthropic Claude
+    ANTHROPIC_API_KEY: Optional[SecretStr] = None
+    ANTHROPIC_MODEL: str = "claude-3-sonnet"
+    
+    # AI 공통 설정
+    DEFAULT_AI_PROVIDER: str = "gemini"  # gemini, openai, anthropic, ollama
+    AI_TEMPERATURE: float = Field(default=0.7, ge=0.0, le=2.0)
+    AI_MAX_TOKENS: int = Field(default=1024, ge=1, le=32000)
+    AI_TIMEOUT_SECONDS: int = 60
+    AI_MAX_RETRIES: int = 3
+    AI_CACHE_ENABLED: bool = True
+    AI_CACHE_TTL_SECONDS: int = 3600
+    
+    # ==================
+    # 마켓플레이스 API 설정
+    # ==================
+    # 쿠팡
+    COUPANG_ACCESS_KEY: Optional[SecretStr] = None
+    COUPANG_SECRET_KEY: Optional[SecretStr] = None
+    COUPANG_VENDOR_ID: Optional[str] = None
+    COUPANG_API_URL: str = "https://api-gateway.coupang.com"
+    
+    # 네이버
+    NAVER_CLIENT_ID: Optional[SecretStr] = None
+    NAVER_CLIENT_SECRET: Optional[SecretStr] = None
+    NAVER_STORE_ID: Optional[str] = None
+    NAVER_API_URL: str = "https://api.commerce.naver.com"
+    
+    # 11번가
+    ELEVEN_ST_API_KEY: Optional[SecretStr] = None
+    ELEVEN_ST_SECRET_KEY: Optional[SecretStr] = None
+    ELEVEN_ST_SELLER_ID: Optional[str] = None
+    ELEVEN_ST_API_URL: str = "https://api.11st.co.kr"
+    
+    # ==================
+    # 도매 사이트 설정
+    # ==================
+    # 오너클랜
+    OWNERCLAN_USERNAME: Optional[str] = None
+    OWNERCLAN_PASSWORD: Optional[SecretStr] = None
+    OWNERCLAN_API_URL: str = "https://api-sandbox.ownerclan.com/v1/graphql"
+    
+    # 도매꾹
+    DOMEGGOOK_API_KEY: Optional[SecretStr] = None
+    DOMEGGOOK_API_URL: str = "https://domeggook.com/api/v2"
+    
+    # 젠트레이드
+    ZENTRADE_ACCESS_KEY: Optional[SecretStr] = None
+    ZENTRADE_SECRET_KEY: Optional[SecretStr] = None
+    ZENTRADE_API_URL: str = "https://api.zentrade.co.kr"
+    
+    # ==================
+    # 캐싱 및 큐 설정
+    # ==================
+    REDIS_URL: Optional[str] = None
+    CACHE_TTL_SECONDS: int = 300
+    CACHE_KEY_PREFIX: str = "yooni:"
+    
+    # 캐시 압축 설정
+    CACHE_COMPRESSION_ENABLED: bool = True
+    CACHE_COMPRESSION_THRESHOLD: int = 1024  # 1KB 이상만 압축
+    CACHE_COMPRESSION_LEVEL: int = 6  # gzip 압축 레벨 (1-9, 기본값 6)
+    
+    # ==================
+    # Redis 설정
+    # ==================
+    REDIS_HOST: str = Field(default="localhost", description="Redis 호스트")
+    REDIS_PORT: int = Field(default=6379, description="Redis 포트")
+    REDIS_DB: int = Field(default=0, description="Redis 데이터베이스 번호")
+    REDIS_PASSWORD: Optional[SecretStr] = Field(default=None, description="Redis 비밀번호")
+    REDIS_SSL: bool = Field(default=False, description="Redis SSL 사용 여부")
+    REDIS_POOL_SIZE: int = Field(default=10, description="Redis 연결 풀 크기")
+    
+    # Redis Cluster 설정
+    REDIS_CLUSTER_ENABLED: bool = False
+    REDIS_CLUSTER_NODES: Optional[List[str]] = None  # ["host1:7000", "host2:7001", ...]
+    REDIS_CLUSTER_PASSWORD: Optional[SecretStr] = None
+    
+    # Celery 설정
+    CELERY_BROKER_URL: Optional[str] = None
+    CELERY_RESULT_BACKEND: Optional[str] = None
+    CELERY_TASK_TIME_LIMIT: int = 300
+    CELERY_TASK_SOFT_TIME_LIMIT: int = 240
+    
+    # ==================
+    # 파일 업로드 설정
+    # ==================
+    UPLOAD_DIR: str = "./uploads"
+    MAX_UPLOAD_SIZE_MB: int = 50
+    ALLOWED_IMAGE_EXTENSIONS: List[str] = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
+    ALLOWED_DOCUMENT_EXTENSIONS: List[str] = [".pdf", ".xlsx", ".csv", ".txt"]
+    
+    # ==================
+    # 로깅 및 모니터링
+    # ==================
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    LOG_FILE: str = "logs/app.log"
+    LOG_FILE: Optional[str] = None
+    LOG_ROTATION: str = "1 day"
+    LOG_RETENTION: str = "30 days"
     
-    # Email
-    SMTP_HOST: Optional[str] = None
-    SMTP_PORT: int = 587
-    SMTP_USER: Optional[str] = None
-    SMTP_PASSWORD: Optional[str] = None
-    SMTP_TLS: bool = True
-    
-    # File Upload
-    MAX_FILE_SIZE: int = 10485760  # 10MB
-    UPLOAD_DIR: str = "uploads/"
-    ALLOWED_EXTENSIONS: List[str] = ["jpg", "jpeg", "png", "gif", "pdf", "csv", "xlsx"]
-    
-    # Background Tasks
-    CELERY_BROKER_URL: str = "redis://localhost:6379/1"
-    CELERY_RESULT_BACKEND: str = "redis://localhost:6379/2"
-    
-    # Monitoring
+    # Sentry
     SENTRY_DSN: Optional[str] = None
-    HEALTH_CHECK_INTERVAL: int = 300  # 5 minutes
+    SENTRY_ENVIRONMENT: Optional[str] = None
+    SENTRY_TRACES_SAMPLE_RATE: float = 0.1
     
-    @field_validator("CORS_ORIGINS", mode="before")
-    @classmethod
-    def assemble_cors_origins(cls, v):
-        """Parse CORS origins from string or list."""
+    # ==================
+    # 레이트 리미팅
+    # ==================
+    RATE_LIMIT_ENABLED: bool = True
+    RATE_LIMIT_DEFAULT: str = "100/minute"
+    RATE_LIMIT_STORAGE_URL: Optional[str] = None
+    
+    # ==================
+    # 웹훅 설정
+    # ==================
+    WEBHOOK_TIMEOUT_SECONDS: int = 30
+    WEBHOOK_MAX_RETRIES: int = 3
+    WEBHOOK_RETRY_DELAY_SECONDS: int = 60
+    
+    # ==================
+    # 검증 및 유틸리티 메서드
+    # ==================
+    @validator("ENVIRONMENT", pre=True)
+    def validate_environment(cls, v: Union[str, Environment]) -> Environment:
+        """환경 설정 검증"""
         if isinstance(v, str):
-            return [i.strip() for i in v.split(",")]
+            try:
+                return Environment(v.lower())
+            except ValueError:
+                raise ValueError(f"Invalid environment: {v}")
         return v
     
-    @field_validator("CORS_ALLOW_METHODS", mode="before")
-    @classmethod
-    def assemble_cors_methods(cls, v):
-        """Parse CORS methods from string or list."""
-        if isinstance(v, str):
-            return [i.strip() for i in v.split(",")]
+    @validator("DATABASE_URL", pre=True)
+    def validate_database_url(cls, v: str, values: Dict[str, Any]) -> str:
+        """데이터베이스 URL 검증 및 환경별 조정"""
+        if not v:
+            env = values.get("ENVIRONMENT", Environment.DEVELOPMENT)
+            if env == Environment.DEVELOPMENT:
+                return "sqlite:///./yooni_dropshipping.db"
+            else:
+                raise ValueError("DATABASE_URL must be set for non-development environments")
         return v
     
-    @field_validator("ALLOWED_EXTENSIONS", mode="before")
-    @classmethod
-    def assemble_allowed_extensions(cls, v):
-        """Parse allowed extensions from string or list."""
-        if isinstance(v, str):
-            return [i.strip() for i in v.split(",")]
-        return v
+    @validator("LOG_LEVEL", pre=True)
+    def validate_log_level(cls, v: str, values: Dict[str, Any]) -> str:
+        """로그 레벨 환경별 조정"""
+        env = values.get("ENVIRONMENT", Environment.DEVELOPMENT)
+        if env == Environment.DEVELOPMENT and not v:
+            return "DEBUG"
+        elif env == Environment.PRODUCTION and not v:
+            return "INFO"
+        return v.upper()
     
     @property
-    def database_url_sync(self) -> str:
-        """Get synchronous database URL."""
-        return self.DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://")
+    def is_development(self) -> bool:
+        """개발 환경 여부"""
+        return self.ENVIRONMENT == Environment.DEVELOPMENT
     
     @property
-    def database_url_async(self) -> str:
-        """Get asynchronous database URL."""
-        return self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+    def is_production(self) -> bool:
+        """프로덕션 환경 여부"""
+        return self.ENVIRONMENT == Environment.PRODUCTION
     
-    model_config = {
-        "env_file": ".env",
-        "case_sensitive": True
-    }
+    @property
+    def is_staging(self) -> bool:
+        """스테이징 환경 여부"""
+        return self.ENVIRONMENT == Environment.STAGING
+    
+    def get_masked_value(self, key: str) -> str:
+        """민감한 값 마스킹"""
+        value = getattr(self, key, None)
+        if value is None:
+            return "Not Set"
+        
+        if isinstance(value, SecretStr):
+            value = value.get_secret_value()
+        
+        if len(str(value)) <= 8:
+            return "*" * len(str(value))
+        
+        visible_chars = 4
+        return f"{str(value)[:visible_chars]}{'*' * (len(str(value)) - visible_chars * 2)}{str(value)[-visible_chars:]}"
+    
+    def get_db_settings(self) -> Dict[str, Any]:
+        """데이터베이스 설정 반환"""
+        return {
+            "url": self.DATABASE_URL,
+            "pool_size": self.DATABASE_POOL_SIZE,
+            "max_overflow": self.DATABASE_MAX_OVERFLOW,
+            "pool_timeout": self.DATABASE_POOL_TIMEOUT,
+            "echo": self.DATABASE_ECHO
+        }
+    
+    def get_ai_settings(self) -> Dict[str, Any]:
+        """AI 서비스 설정 반환"""
+        return {
+            "provider": self.DEFAULT_AI_PROVIDER,
+            "temperature": self.AI_TEMPERATURE,
+            "max_tokens": self.AI_MAX_TOKENS,
+            "timeout": self.AI_TIMEOUT_SECONDS,
+            "cache_enabled": self.AI_CACHE_ENABLED,
+            "models": {
+                "gemini": self.GEMINI_MODEL,
+                "openai": self.OPENAI_MODEL,
+                "anthropic": self.ANTHROPIC_MODEL,
+                "ollama": self.OLLAMA_MODEL
+            }
+        }
 
 
-# Global settings instance
-settings = Settings()
-
-
+@lru_cache()
 def get_settings() -> Settings:
-    """Get settings instance."""
-    return settings
+    """설정 인스턴스 반환 (캐싱)"""
+    return Settings()
 
 
-# Database configuration for different environments
-class DatabaseConfig:
-    """Database configuration helper."""
-    
-    @staticmethod
-    def get_url(async_mode: bool = False) -> str:
-        """Get database URL for sync or async connections."""
-        if async_mode:
-            return settings.database_url_async
-        return settings.database_url_sync
-    
-    @staticmethod
-    def get_connection_args() -> dict:
-        """Get database connection arguments."""
-        return {
-            "pool_pre_ping": True,
-            "pool_recycle": 300,
-            "pool_size": 10,
-            "max_overflow": 20,
-        }
-    
-    @staticmethod
-    def get_async_connection_args() -> dict:
-        """Get async database connection arguments."""
-        return {
-            "pool_pre_ping": True,
-            "pool_recycle": 300,
-            "pool_size": 10,
-            "max_overflow": 20,
-        }
+# 개발 환경 간편 설정 헬퍼
+class DevelopmentSettings(Settings):
+    """개발 환경 전용 설정"""
+    ENVIRONMENT: Environment = Environment.DEVELOPMENT
+    DEBUG: bool = True
+    DATABASE_URL: str = "sqlite:///./yooni_dev.db"
+    LOG_LEVEL: str = "DEBUG"
+    DATABASE_ECHO: bool = True
+    BACKUP_ENABLED: bool = False
+    RATE_LIMIT_ENABLED: bool = False
 
 
-# AI Configuration
-class AIConfig:
-    """AI service configuration helper."""
-    
-    @staticmethod
-    def get_gemini_config() -> dict:
-        """Get Gemini API configuration."""
-        return {
-            "api_key": settings.GEMINI_API_KEY,
-            "model": settings.DEFAULT_AI_MODEL,
-            "temperature": settings.AI_TEMPERATURE,
-            "max_tokens": settings.AI_MAX_TOKENS,
-        }
-    
-    @staticmethod
-    def get_ollama_config() -> dict:
-        """Get Ollama configuration."""
-        return {
-            "base_url": settings.OLLAMA_BASE_URL,
-            "model": settings.OLLAMA_MODEL,
-            "temperature": settings.AI_TEMPERATURE,
-            "max_tokens": settings.AI_MAX_TOKENS,
-        }
-
-
-# Marketplace Configuration
-class MarketplaceConfig:
-    """Marketplace platform configuration helper."""
-    
-    @staticmethod
-    def get_coupang_config() -> dict:
-        """Get Coupang API configuration."""
-        return {
-            "access_key": settings.COUPANG_ACCESS_KEY,
-            "secret_key": settings.COUPANG_SECRET_KEY,
-            "vendor_id": settings.COUPANG_VENDOR_ID,
-        }
-    
-    @staticmethod
-    def get_naver_config() -> dict:
-        """Get Naver Shopping API configuration."""
-        return {
-            "client_id": settings.NAVER_CLIENT_ID,
-            "client_secret": settings.NAVER_CLIENT_SECRET,
-            "store_id": settings.NAVER_STORE_ID,
-        }
-    
-    @staticmethod
-    def get_eleventh_street_config() -> dict:
-        """Get 11번가 API configuration."""
-        return {
-            "api_key": settings.ELEVENTH_STREET_API_KEY,
-            "secret_key": settings.ELEVENTH_STREET_SECRET_KEY,
-            "seller_id": settings.ELEVENTH_STREET_SELLER_ID,
-        }
+# 설정 내보내기
+settings = get_settings()

@@ -99,7 +99,8 @@ class RateLimitMiddleware:
     
     async def __call__(self, request: Request, call_next: Callable) -> Response:
         """미들웨어 실행"""
-        if not self.rate_limiter or not settings.RATE_LIMIT_ENABLED:
+        # 개발 환경에서는 rate limiting 비활성화
+        if settings.DEBUG or not self.rate_limiter or not settings.RATE_LIMIT_ENABLED:
             return await call_next(request)
         
         # Rate limit 체크 제외 경로

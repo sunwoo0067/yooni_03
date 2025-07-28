@@ -1,0 +1,93 @@
+{
+  "test_run": "2025-07-25T04:53:08.787012",
+  "backend_url": "http://localhost:8000",
+  "frontend_url": "http://localhost:3002",
+  "results": [
+    {
+      "category": "백엔드",
+      "test_name": "서버 상태",
+      "status": "PASS",
+      "message": "",
+      "duration": 0,
+      "timestamp": "2025-07-25T04:53:08.755991"
+    },
+    {
+      "category": "프론트엔드",
+      "test_name": "서버 상태",
+      "status": "PASS",
+      "message": "",
+      "duration": 0,
+      "timestamp": "2025-07-25T04:53:08.764363"
+    },
+    {
+      "category": "통합",
+      "test_name": "CORS 설정",
+      "status": "FAIL",
+      "message": "HTTP 400",
+      "duration": 0,
+      "timestamp": "2025-07-25T04:53:08.767137"
+    },
+    {
+      "category": "API 형식",
+      "test_name": "응답 구조",
+      "status": "PASS",
+      "message": "",
+      "duration": 0,
+      "timestamp": "2025-07-25T04:53:08.769244"
+    },
+    {
+      "category": "데이터베이스",
+      "test_name": "연결 일관성",
+      "status": "WARN",
+      "message": "DB 상태 확인 불가",
+      "duration": 0,
+      "timestamp": "2025-07-25T04:53:08.774770"
+    },
+    {
+      "category": "성능",
+      "test_name": "헬스체크 응답시간",
+      "status": "PASS",
+      "message": "4.4ms",
+      "duration": 0,
+      "timestamp": "2025-07-25T04:53:08.779229"
+    },
+    {
+      "category": "성능",
+      "test_name": "API 상태 응답시간",
+      "status": "PASS",
+      "message": "2.1ms",
+      "duration": 0,
+      "timestamp": "2025-07-25T04:53:08.781317"
+    },
+    {
+      "category": "성능",
+      "test_name": "상품 목록 응답시간",
+      "status": "PASS",
+      "message": "1.7ms",
+      "duration": 0,
+      "timestamp": "2025-07-25T04:53:08.782992"
+    },
+    {
+      "category": "에러 처리",
+      "test_name": "404 처리",
+      "status": "PASS",
+      "message": "",
+      "duration": 0,
+      "timestamp": "2025-07-25T04:53:08.784684"
+    },
+    {
+      "category": "에러 처리",
+      "test_name": "메서드 검증",
+      "status": "PASS",
+      "message": "",
+      "duration": 0,
+      "timestamp": "2025-07-25T04:53:08.786441"
+    }
+  ],
+  "summary": {
+    "total": 10,
+    "passed": 8,
+    "failed": 1,
+    "warned": 1
+  }
+}

@@ -1,0 +1,42 @@
+# 개발 환경용 Dockerfile - 보안 완화 설정
+FROM python:3.11-slim
+
+# 개발 환경 변수 설정
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV DEBUG=True
+ENV TESTING=True
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# 시스템 패키지 업데이트 및 설치
+RUN apt-get update && apt-get install -y \
+    curl \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python 의존성 설치
+COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+# 개발용 추가 패키지 설치
+RUN pip install \
+    pytest \
+    pytest-asyncio \
+    httpx \
+    jupyter \
+    ipython
+
+# 애플리케이션 코드 복사
+COPY . .
+
+# 로그 및 업로드 디렉토리 생성
+RUN mkdir -p logs uploads
+
+# 개발용 포트 노출 (여러 포트 허용)
+EXPOSE 8000 8080 3000
+
+# 개발 서버 실행 (리로드 모드)
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"]

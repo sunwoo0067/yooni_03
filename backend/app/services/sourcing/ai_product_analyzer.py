@@ -11,9 +11,16 @@ import joblib
 from sqlalchemy.orm import Session
 
 from ...models.product import Product
-from ...models.market import MarketProduct, MarketSalesData
-from ...models.trend import TrendKeyword
-from ...models.order import Order
+try:
+    from ...models.market import MarketProduct, MarketSalesData
+except ImportError:
+    MarketProduct = None
+    MarketSalesData = None
+try:
+    from ...models.trend import TrendKeyword
+except ImportError:
+    TrendKeyword = None
+from ...models.order_core import Order
 
 
 class AIProductAnalyzer:

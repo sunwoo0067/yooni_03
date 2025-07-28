@@ -394,11 +394,11 @@ async def handle_webhook(
 
 @router.post("/all", summary="Perform full synchronization")
 async def sync_all(
+    background_tasks: BackgroundTasks,
     sync_types: Optional[List[str]] = Query(
         None,
         description="Types of sync to perform. If not specified, performs all types."
     ),
-    background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):

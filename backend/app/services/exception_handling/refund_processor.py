@@ -9,7 +9,7 @@ from enum import Enum
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 
-from app.models.order import DropshippingOrder, SupplierOrderStatus, Order, OrderStatus, OrderPayment, PaymentStatus
+from app.models.order_core import DropshippingOrder, SupplierOrderStatus, Order, OrderStatus, OrderPayment, PaymentStatus
 from app.models.wholesaler import Wholesaler
 
 logger = logging.getLogger(__name__)
@@ -293,7 +293,7 @@ class RefundProcessor:
             
             # 실제로는 별도의 환불 테이블에 저장
             # 여기서는 드롭쉬핑 주문 로그에 저장
-            from app.models.order import DropshippingOrderLog
+            from app.models.order_core import DropshippingOrderLog
             
             log = DropshippingOrderLog(
                 dropshipping_order_id=dropshipping_order.id,
@@ -624,7 +624,7 @@ class RefundProcessor:
     async def get_refund_statistics(self, days: int = 30) -> Dict:
         """환불 통계 조회"""
         try:
-            from app.models.order import DropshippingOrderLog
+            from app.models.order_core import DropshippingOrderLog
             
             end_date = datetime.utcnow()
             start_date = end_date - timedelta(days=days)
@@ -688,7 +688,7 @@ class RefundProcessor:
     async def get_pending_refunds(self, limit: int = 50) -> List[Dict]:
         """대기 중인 환불 목록 조회"""
         try:
-            from app.models.order import DropshippingOrderLog
+            from app.models.order_core import DropshippingOrderLog
             
             # 수동 검토가 필요한 환불 요청들 조회
             pending_logs = (

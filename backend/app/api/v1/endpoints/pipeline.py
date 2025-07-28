@@ -7,17 +7,17 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, desc
 
-from ....api.v1.dependencies.database import get_db
-from ....services.pipeline.workflow_orchestrator import WorkflowOrchestrator
-from ....services.pipeline.state_manager import StateManager
-from ....services.pipeline.progress_tracker import ProgressTracker
-from ....services.analytics.performance_analyzer import PerformanceAnalyzer
-from ....services.analytics.sales_data_collector import SalesDataCollector
-from ....models.pipeline import (
+from app.api.v1.dependencies.database import get_db
+from app.services.pipeline.workflow_orchestrator import WorkflowOrchestrator
+from app.services.pipeline.state_manager import StateManager
+from app.services.pipeline.progress_tracker import ProgressTracker
+from app.services.analytics.performance_analyzer import PerformanceAnalyzer
+from app.services.analytics.sales_data_collector import SalesDataCollector
+from app.models.pipeline import (
     PipelineExecution, PipelineStep, WorkflowTemplate, 
     PipelineAlert, PipelineSchedule
 )
-from ....models.sales_analytics import SalesAnalytics, MarketplaceSession
+from app.models.sales_analytics import SalesAnalytics, MarketplaceSession
 from pydantic import BaseModel
 
 

@@ -1,0 +1,35 @@
+# 개발용 React Dockerfile
+FROM node:18-alpine
+
+# 개발용 도구 설치
+RUN apk add --no-cache \
+    git \
+    curl \
+    bash
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# 패키지 파일 복사
+COPY package*.json ./
+
+# 의존성 설치 (개발 의존성 포함)
+RUN npm install
+
+# 개발용 환경 변수
+ENV NODE_ENV=development
+ENV CHOKIDAR_USEPOLLING=true
+ENV WATCHPACK_POLLING=true
+
+# 포트 노출
+EXPOSE 3000
+
+# 개발용 사용자 설정
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S reactjs -u 1001 && \
+    chown -R reactjs:nodejs /app
+
+USER reactjs
+
+# 기본 명령어
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

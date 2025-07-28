@@ -5,10 +5,10 @@ from datetime import datetime
 from typing import List, Optional, Dict, Any
 from sqlalchemy import Boolean, Column, String, Text, DateTime, Integer, ForeignKey, Enum as SQLEnum, Numeric
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy.dialects.postgresql import UUID
 import enum
 
-from .base import BaseModel
+from .base import BaseModel, get_json_type
 
 
 class AIOperationType(enum.Enum):
@@ -69,9 +69,9 @@ class AILog(BaseModel):
     duration_seconds = Column(Integer, nullable=True)
     
     # Input/Output Data
-    input_data = Column(JSONB, nullable=True)
-    output_data = Column(JSONB, nullable=True)
-    parameters = Column(JSONB, nullable=True)
+    input_data = Column(get_json_type(), nullable=True)
+    output_data = Column(get_json_type(), nullable=True)
+    parameters = Column(get_json_type(), nullable=True)
     
     # Results and Metrics
     confidence_score = Column(Numeric(5, 4), nullable=True)  # 0.0 to 1.0
@@ -81,8 +81,8 @@ class AILog(BaseModel):
     f1_score = Column(Numeric(5, 4), nullable=True)
     
     # Business Impact
-    predicted_impact = Column(JSONB, nullable=True)  # Predicted business impact
-    actual_impact = Column(JSONB, nullable=True)     # Measured actual impact
+    predicted_impact = Column(get_json_type(), nullable=True)  # Predicted business impact
+    actual_impact = Column(get_json_type(), nullable=True)     # Measured actual impact
     roi_estimate = Column(Numeric(10, 4), nullable=True)  # ROI percentage
     
     # Error Information
@@ -96,7 +96,7 @@ class AILog(BaseModel):
     gpu_usage_percent = Column(Numeric(5, 2), nullable=True)
     
     # Context Information
-    context_data = Column(JSONB, nullable=True)  # Additional context
+    context_data = Column(get_json_type(), nullable=True)  # Additional context
     environment = Column(String(20), default="production", nullable=False)  # production, staging, development
     
     # Relationships
@@ -141,7 +141,7 @@ class AITrainingData(BaseModel):
     feature_name = Column(String(200), nullable=True, index=True)
     
     # Data Content
-    data_value = Column(JSONB, nullable=False)
+    data_value = Column(get_json_type(), nullable=False)
     data_source = Column(String(200), nullable=True)  # Source of the data
     
     # Quality Metrics
@@ -150,8 +150,8 @@ class AITrainingData(BaseModel):
     validation_method = Column(String(100), nullable=True)
     
     # Processing Information
-    preprocessing_applied = Column(JSONB, nullable=True)  # Preprocessing steps
-    normalization_params = Column(JSONB, nullable=True)
+    preprocessing_applied = Column(get_json_type(), nullable=True)  # Preprocessing steps
+    normalization_params = Column(get_json_type(), nullable=True)
     
     # Temporal Information
     data_timestamp = Column(DateTime, nullable=True, index=True)  # When the data was collected
@@ -180,7 +180,7 @@ class AIModel(BaseModel):
     
     # Model Description
     description = Column(Text, nullable=True)
-    tags = Column(JSONB, nullable=True)  # Array of tags
+    tags = Column(get_json_type(), nullable=True)  # Array of tags
     
     # Model Files and Configuration
     model_path = Column(String(1000), nullable=True)  # Path to model file
@@ -188,9 +188,9 @@ class AIModel(BaseModel):
     weights_path = Column(String(1000), nullable=True)  # Path to weights
     
     # Model Metadata
-    input_schema = Column(JSONB, nullable=True)   # Expected input format
-    output_schema = Column(JSONB, nullable=True)  # Expected output format
-    hyperparameters = Column(JSONB, nullable=True)
+    input_schema = Column(get_json_type(), nullable=True)   # Expected input format
+    output_schema = Column(get_json_type(), nullable=True)  # Expected output format
+    hyperparameters = Column(get_json_type(), nullable=True)
     
     # Training Information
     training_dataset_size = Column(Integer, nullable=True)
@@ -238,8 +238,8 @@ class AIPrediction(BaseModel):
     operation_type = Column(SQLEnum(AIOperationType), nullable=False, index=True)
     
     # Input/Output
-    input_data = Column(JSONB, nullable=False)
-    prediction_result = Column(JSONB, nullable=False)
+    input_data = Column(get_json_type(), nullable=False)
+    prediction_result = Column(get_json_type(), nullable=False)
     
     # Confidence and Quality
     confidence_score = Column(Numeric(5, 4), nullable=True)
@@ -254,7 +254,7 @@ class AIPrediction(BaseModel):
     response_time_ms = Column(Integer, nullable=True)
     
     # Feedback and Validation
-    actual_outcome = Column(JSONB, nullable=True)  # Actual result for comparison
+    actual_outcome = Column(get_json_type(), nullable=True)  # Actual result for comparison
     feedback_score = Column(Numeric(5, 4), nullable=True)  # User feedback
     is_validated = Column(Boolean, default=False, nullable=False)
     validated_at = Column(DateTime, nullable=True)
@@ -285,11 +285,11 @@ class AIExperiment(BaseModel):
     
     # Models being tested
     control_model_id = Column(UUID(as_uuid=True), ForeignKey("ai_models.id"), nullable=True)
-    test_models = Column(JSONB, nullable=True)  # Array of model IDs
+    test_models = Column(get_json_type(), nullable=True)  # Array of model IDs
     
     # Experiment Parameters
-    traffic_split = Column(JSONB, nullable=False)  # Traffic allocation
-    success_metrics = Column(JSONB, nullable=False)  # Metrics to track
+    traffic_split = Column(get_json_type(), nullable=False)  # Traffic allocation
+    success_metrics = Column(get_json_type(), nullable=False)  # Metrics to track
     
     # Status and Timeline
     status = Column(String(20), default="draft", nullable=False, index=True)  # draft, running, completed, cancelled
@@ -297,7 +297,7 @@ class AIExperiment(BaseModel):
     end_date = Column(DateTime, nullable=True, index=True)
     
     # Results
-    results = Column(JSONB, nullable=True)
+    results = Column(get_json_type(), nullable=True)
     statistical_significance = Column(Numeric(5, 4), nullable=True)
     winner_model_id = Column(UUID(as_uuid=True), nullable=True)
     

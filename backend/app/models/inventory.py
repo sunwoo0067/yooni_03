@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 import enum
 
-from .base import BaseModel
+from .base import BaseModel, get_json_type
 
 
 class MovementType(enum.Enum):
@@ -65,7 +65,7 @@ class Warehouse(BaseModel):
     auto_reorder = Column(Boolean, default=True, nullable=False)
     
     # Operational hours
-    operating_hours = Column(JSONB, nullable=True)  # JSON with daily hours
+    operating_hours = Column(get_json_type(), nullable=True)  # JSON with daily hours
     
     # Relationships
     inventory_items = relationship("InventoryItem", back_populates="warehouse", cascade="all, delete-orphan")
@@ -123,7 +123,7 @@ class InventoryItem(BaseModel):
     
     # Additional Information
     batch_number = Column(String(100), nullable=True, index=True)
-    serial_numbers = Column(JSONB, nullable=True)  # Array of serial numbers
+    serial_numbers = Column(get_json_type(), nullable=True)  # Array of serial numbers
     expiry_date = Column(DateTime, nullable=True, index=True)
     
     # Relationships
@@ -208,7 +208,7 @@ class InventoryMovement(BaseModel):
     serial_number = Column(String(100), nullable=True)
     
     # Additional data
-    movement_data = Column(JSONB, nullable=True)
+    movement_data = Column(get_json_type(), nullable=True)
     
     # Relationships
     inventory_item = relationship("InventoryItem", back_populates="movements")

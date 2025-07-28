@@ -184,7 +184,7 @@ class ProfitProtector:
             # 최근 30일 평균 일일 판매량 조회
             db = next(get_db())
             try:
-                from app.models.order import Order
+                from app.models.order_core import Order
                 
                 thirty_days_ago = datetime.now() - timedelta(days=30)
                 daily_sales = db.query(Order).filter(

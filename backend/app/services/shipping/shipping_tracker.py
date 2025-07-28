@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 
-from app.models.order import DropshippingOrder, SupplierOrderStatus, Order
+from app.models.order_core import DropshippingOrder, SupplierOrderStatus, Order
 from app.models.wholesaler import Wholesaler
 from app.services.ordering.order_manager import OrderManager
 
@@ -291,7 +291,7 @@ class ShippingTracker:
             current_tracking = await self.track_order(str(dropshipping_order.id))
             
             # 주문 상태 변경 이력 조회
-            from app.models.order import DropshippingOrderLog
+            from app.models.order_core import DropshippingOrderLog
             status_history = (
                 self.db.query(DropshippingOrderLog)
                 .filter(DropshippingOrderLog.dropshipping_order_id == dropshipping_order.id)

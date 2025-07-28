@@ -1,0 +1,211 @@
+groups:
+  - name: dropshipping_alerts
+    rules:
+      # 시스템 리소스 알림
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for more than 5 minutes on {{ $labels.instance }}"
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 85% for more than 5 minutes on {{ $labels.instance }}"
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"}) * 100 < 15
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Low disk space detected"
+          description: "Disk space is below 15% on {{ $labels.instance }} mount {{ $labels.mountpoint }}"
+
+      # 애플리케이션 헬스 알림
+      - alert: ApplicationDown
+        expr: up{job="fastapi-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Application is down"
+          description: "FastAPI backend application is down on {{ $labels.instance }}"
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) * 100 > 5
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is above 5% for more than 5 minutes"
+
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is above 2 seconds"
+
+      # 데이터베이스 알림
+      - alert: DatabaseDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database is down"
+          description: "PostgreSQL database is down on {{ $labels.instance }}"
+
+      - alert: DatabaseConnectionsHigh
+        expr: pg_stat_database_numbackends / pg_settings_max_connections * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database connections"
+          description: "Database connections are above 80% of max_connections"
+
+      - alert: DatabaseSlowQueries
+        expr: rate(pg_stat_database_tup_fetched[5m]) / rate(pg_stat_database_tup_returned[5m]) < 0.1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database slow queries detected"
+          description: "Database query efficiency is low - many sequential scans detected"
+
+      # Redis 알림
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+          description: "Redis cache server is down on {{ $labels.instance }}"
+
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Redis memory usage"
+          description: "Redis memory usage is above 85%"
+
+      # 컨테이너 알림
+      - alert: ContainerHighCPU
+        expr: rate(container_cpu_usage_seconds_total[5m]) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container high CPU usage"
+          description: "Container {{ $labels.name }} has high CPU usage ({{ $value }}%)"
+
+      - alert: ContainerHighMemory
+        expr: container_memory_usage_bytes / container_spec_memory_limit_bytes * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container high memory usage"
+          description: "Container {{ $labels.name }} has high memory usage ({{ $value }}%)"
+
+      - alert: ContainerRestartLoop
+        expr: increase(container_start_time_seconds[1h]) > 5
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Container restart loop"
+          description: "Container {{ $labels.name }} has restarted {{ $value }} times in the last hour"
+
+      # 비즈니스 메트릭 알림
+      - alert: LowOrderVolume
+        expr: rate(orders_total[1h]) < 0.1
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low order volume"
+          description: "Order rate is unusually low ({{ $value }} orders/hour)"
+
+      - alert: HighOrderFailureRate
+        expr: rate(orders_failed_total[5m]) / rate(orders_total[5m]) * 100 > 10
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High order failure rate"
+          description: "Order failure rate is above 10% ({{ $value }}%)"
+
+      - alert: PaymentProcessingIssues
+        expr: rate(payment_failures_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Payment processing issues"
+          description: "Payment failures detected ({{ $value }} failures/second)"
+
+      # SSL 인증서 알림
+      - alert: SSLCertificateExpiring
+        expr: (ssl_certificate_expiry_seconds - time()) / 86400 < 30
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SSL certificate expiring soon"
+          description: "SSL certificate for {{ $labels.instance }} will expire in {{ $value }} days"
+
+      - alert: SSLCertificateExpired
+        expr: ssl_certificate_expiry_seconds - time() < 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "SSL certificate expired"
+          description: "SSL certificate for {{ $labels.instance }} has expired"
+
+      # 백업 알림
+      - alert: BackupFailed
+        expr: backup_last_success_timestamp < (time() - 86400 * 2)  # 2일
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backup failed"
+          description: "Database backup has not been successful for more than 2 days"
+
+  - name: business_sla_alerts
+    rules:
+      # SLA 관련 알림
+      - alert: SLAViolationAvailability
+        expr: (1 - rate(http_requests_total{status=~"5.."}[24h]) / rate(http_requests_total[24h])) * 100 < 99.9
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "SLA availability violation"
+          description: "Service availability is below 99.9% SLA ({{ $value }}%)"
+
+      - alert: SLAViolationResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[1h])) > 1
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SLA response time violation"
+          description: "95th percentile response time is above 1 second SLA ({{ $value }}s)"

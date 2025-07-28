@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-07-27T18:04:48.767098",
+  "results": {
+    "ownerclan": {
+      "status": "success",
+      "connected": true,
+      "category_count": 0,
+      "product_count": 0,
+      "products": []
+    },
+    "zentrade": {
+      "status": "success",
+      "connected": true,
+      "product_count": 3528,
+      "collected_products": 0,
+      "category_count": 0,
+      "products": []
+    }
+  }
+}

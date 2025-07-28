@@ -1,0 +1,161 @@
+{
+  "generated_at": "2025-07-27T19:06:28.435056",
+  "statistics": {
+    "wholesalers": [
+      {
+        "wholesaler_name": "Zentrade",
+        "product_count": 5,
+        "inventory_value": 2212000,
+        "avg_price": "2042.0000000000000000"
+      },
+      {
+        "wholesaler_name": "OwnerClan",
+        "product_count": 5,
+        "inventory_value": 10297100,
+        "avg_price": "41624.000000000000"
+      }
+    ],
+    "marketplaces": [
+      {
+        "marketplace_name": "11st",
+        "product_count": 10,
+        "active_count": 10,
+        "avg_margin": "25.1360000000000000",
+        "total_value": 16161000
+      },
+      {
+        "marketplace_name": "coupang",
+        "product_count": 10,
+        "active_count": 10,
+        "avg_margin": "25.1360000000000000",
+        "total_value": 16161000
+      },
+      {
+        "marketplace_name": "naver",
+        "product_count": 10,
+        "active_count": 10,
+        "avg_margin": "25.1360000000000000",
+        "total_value": 16161000
+      }
+    ],
+    "summary": {
+      "total_wholesaler_products": 10,
+      "total_marketplace_products": 30
+    }
+  },
+  "profit_analysis": {
+    "margin_distribution": [
+      {
+        "margin_range": "손실",
+        "product_count": 3,
+        "avg_margin": "-9.0900000000000000"
+      },
+      {
+        "margin_range": "20-30%",
+        "product_count": 27,
+        "avg_margin": "28.9388888888888889"
+      }
+    ],
+    "high_profit_products": [
+      {
+        "product_name": "925실버 로즈 장식 타원 후프귀걸이",
+        "marketplace_name": "coupang",
+        "original_price": 79860,
+        "selling_price": 103800,
+        "margin_rate": "29.98",
+        "total_profit": 1197000
+      },
+      {
+        "product_name": "925실버 로즈 장식 타원 후프귀걸이",
+        "marketplace_name": "11st",
+        "original_price": 79860,
+        "selling_price": 103800,
+        "margin_rate": "29.98",
+        "total_profit": 1197000
+      },
+      {
+        "product_name": "925실버 로즈 장식 타원 후프귀걸이",
+        "marketplace_name": "naver",
+        "original_price": 79860,
+        "selling_price": 103800,
+        "margin_rate": "29.98",
+        "total_profit": 1197000
+      },
+      {
+        "product_name": "925실버 미니 볼륨 하트 목걸이",
+        "marketplace_name": "11st",
+        "original_price": 31460,
+        "selling_price": 40800,
+        "margin_rate": "29.69",
+        "total_profit": 700500
+      },
+      {
+        "product_name": "925실버 미니 볼륨 하트 목걸이",
+        "marketplace_name": "coupang",
+        "original_price": 31460,
+        "selling_price": 40800,
+        "margin_rate": "29.69",
+        "total_profit": 700500
+      },
+      {
+        "product_name": "925실버 미니 볼륨 하트 목걸이",
+        "marketplace_name": "naver",
+        "original_price": 31460,
+        "selling_price": 40800,
+        "margin_rate": "29.69",
+        "total_profit": 700500
+      },
+      {
+        "product_name": "925실버 매듭 디자인 미니 귀걸이",
+        "marketplace_name": "11st",
+        "original_price": 21780,
+        "selling_price": 28300,
+        "margin_rate": "29.94",
+        "total_profit": 652000
+      },
+      {
+        "product_name": "925실버 매듭 디자인 미니 귀걸이",
+        "marketplace_name": "coupang",
+        "original_price": 21780,
+        "selling_price": 28300,
+        "margin_rate": "29.94",
+        "total_profit": 652000
+      },
+      {
+        "product_name": "925실버 매듭 디자인 미니 귀걸이",
+        "marketplace_name": "naver",
+        "original_price": 21780,
+        "selling_price": 28300,
+        "margin_rate": "29.94",
+        "total_profit": 652000
+      },
+      {
+        "product_name": "925실버 볼드 물방울 귀걸이",
+        "marketplace_name": "11st",
+        "original_price": 48400,
+        "selling_price": 62900,
+        "margin_rate": "29.96",
+        "total_profit": 290000
+      }
+    ]
+  },
+  "inventory_status": {
+    "wholesaler_inventory": [
+      {
+        "wholesaler_name": "Zentrade",
+        "total_products": 5,
+        "out_of_stock": 0,
+        "low_stock": 0,
+        "total_stock": 1400
+      },
+      {
+        "wholesaler_name": "OwnerClan",
+        "total_products": 5,
+        "out_of_stock": 0,
+        "low_stock": 0,
+        "total_stock": 275
+      }
+    ],
+    "low_stock_products": []
+  }
+}

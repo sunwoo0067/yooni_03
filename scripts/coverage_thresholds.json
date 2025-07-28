@@ -1,0 +1,42 @@
+{
+  "backend_total": 80.0,
+  "backend_line": 80.0,
+  "backend_branch": 70.0,
+  "backend_function": 75.0,
+  "frontend_total": 80.0,
+  "frontend_line": 80.0,
+  "frontend_branch": 70.0,
+  "frontend_function": 75.0,
+  "frontend_statement": 80.0,
+  "overall_minimum": 75.0,
+  "critical_files": {
+    "backend": {
+      "app/services/": 85.0,
+      "app/api/": 90.0,
+      "app/crud/": 85.0
+    },
+    "frontend": {
+      "src/components/": 85.0,
+      "src/hooks/": 90.0,
+      "src/services/": 85.0
+    }
+  },
+  "exceptions": {
+    "backend": [
+      "app/main.py",
+      "app/config/settings.py",
+      "app/migrations/",
+      "app/alembic/"
+    ],
+    "frontend": [
+      "src/main.tsx",
+      "src/vite-env.d.ts",
+      "src/test/",
+      "**/*.config.*"
+    ]
+  },
+  "notification": {
+    "slack_webhook": null,
+    "email_recipients": []
+  }
+}

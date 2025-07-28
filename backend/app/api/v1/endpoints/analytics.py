@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.db.database import get_db
+from app.api.v1.dependencies.database import get_db
 
 router = APIRouter()
 

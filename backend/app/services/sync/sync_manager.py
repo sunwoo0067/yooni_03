@@ -9,7 +9,7 @@ import logging
 
 from app.models.platform_account import PlatformAccount, PlatformType
 from app.models.product import Product
-from app.models.order import Order
+from app.models.order_core import Order
 from app.services.platforms.platform_manager import PlatformManager
 from app.services.sync.product_sync import ProductSyncService
 from app.services.sync.order_sync import OrderSyncService

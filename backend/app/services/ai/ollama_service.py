@@ -42,8 +42,8 @@ class OllamaService:
             "num_thread": 8,  # CPU 스레드
         }
         
-        # 모델 초기화 확인
-        asyncio.create_task(self._ensure_ollama_running())
+        # 모델 초기화는 나중에 필요할 때 수행
+        self._initialized = False
         
     async def _ensure_ollama_running(self):
         """Ollama 서비스가 실행 중인지 확인하고 필요시 시작"""
@@ -181,10 +181,17 @@ class OllamaService:
                 "timestamp": datetime.utcnow().isoformat()
             }
     
+    async def _ensure_initialized(self):
+        """Ollama 서비스 초기화 확인"""
+        if not self._initialized:
+            await self._ensure_ollama_running()
+            self._initialized = True
+    
     async def generate_product_description(self,
                                          product_info: Dict[str, Any],
                                          style: str = "detailed") -> Dict[str, Any]:
         """상품 설명 생성 (개인정보 보호)"""
+        await self._ensure_initialized()
         try:
             prompt = f"""
             전문 상품 설명 작성가로서 다음 상품의 설명을 작성해주세요.
@@ -291,6 +298,7 @@ class OllamaService:
                                      product_info: Dict[str, Any],
                                      competitor_prices: List[float],
                                      cost: float) -> Dict[str, Any]:
+        await self._ensure_initialized()
         """가격 전략 분석 (민감한 가격 정보 로컬 처리)"""
         try:
             avg_competitor_price = sum(competitor_prices) / len(competitor_prices) if competitor_prices else 0

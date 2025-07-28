@@ -1,0 +1,130 @@
+{
+  "timestamp": "20250725_160841",
+  "test_type": "realistic_functional",
+  "summary": {
+    "total_tests": 13,
+    "passed": 13,
+    "failed": 0,
+    "warnings": 0,
+    "success_rate": 100.0
+  },
+  "results": [
+    {
+      "test_name": "Wholesaler Models - WholesalerAccount Class Definition",
+      "expected_behavior": "WholesalerAccount model should be properly defined with all required fields and enums",
+      "status": "PASS",
+      "actual_result": "WholesalerAccount model with enums: ['domeggook', 'ownerclan', 'zentrade'], ['connected', 'disconnected', 'error', 'testing']",
+      "error_details": "",
+      "recommendations": [],
+      "execution_time": 0.74008
+    },
+    {
+      "test_name": "Wholesaler Models - WholesalerProduct Structure",
+      "expected_behavior": "WholesalerProduct model should have all required fields for product management",
+      "status": "PASS",
+      "actual_result": "WholesalerProduct table 'wholesaler_products' has required fields: ['name', 'wholesale_price', 'stock_quantity', 'is_in_stock']",
+      "error_details": "",
+      "recommendations": [],
+      "execution_time": 8e-06
+    },
+    {
+      "test_name": "Wholesale Analysis - AnalysisService Class Components",
+      "expected_behavior": "AnalysisService should have ProductAnalyzer, TrendAnalyzer, and CollectionAnalyzer",
+      "status": "PASS",
+      "actual_result": "AnalysisService has all analyzers: ['ProductAnalyzer', 'TrendAnalyzer', 'CollectionAnalyzer']",
+      "error_details": "",
+      "recommendations": [],
+      "execution_time": 0.487287
+    },
+    {
+      "test_name": "Wholesale Analysis - ProductAnalyzer Method Availability",
+      "expected_behavior": "ProductAnalyzer should have methods for recent products, price analysis, and stock monitoring",
+      "status": "PASS",
+      "actual_result": "ProductAnalyzer has all methods: ['get_recent_products', 'analyze_price_changes', 'monitor_stock_changes']",
+      "error_details": "",
+      "recommendations": [],
+      "execution_time": 1.4e-05
+    },
+    {
+      "test_name": "Excel Service - ExcelService Initialization",
+      "expected_behavior": "ExcelService should initialize with database session and have processor",
+      "status": "PASS",
+      "actual_result": "ExcelService initialized with database and processor",
+      "error_details": "",
+      "recommendations": [],
+      "execution_time": 0.096766
+    },
+    {
+      "test_name": "Excel Service - Column Mapping Functionality",
+      "expected_behavior": "ExcelColumnMapper should auto-map common Excel column names to standard fields",
+      "status": "PASS",
+      "actual_result": "Column mapping successful: {'상품명': 'name', '가격': 'price', '재고': 'stock', '브랜드': 'brand'}",
+      "error_details": "",
+      "recommendations": [],
+      "execution_time": 0.008558
+    },
+    {
+      "test_name": "API Structure - Endpoint Files Existence",
+      "expected_behavior": "All critical API endpoint files should exist in the endpoints directory",
+      "status": "PASS",
+      "actual_result": "All API endpoint files exist: ['products.py', 'wholesaler.py', 'orders.py', 'dashboard.py']",
+      "error_details": "",
+      "recommendations": [],
+      "execution_time": 5.6e-05
+    },
+    {
+      "test_name": "API Structure - Pydantic Schema Files",
+      "expected_behavior": "Schema files should exist for data validation",
+      "status": "PASS",
+      "actual_result": "Schema files exist: ['product.py', 'wholesaler.py', 'platform_account.py']",
+      "error_details": "",
+      "recommendations": [],
+      "execution_time": 2.7e-05
+    },
+    {
+      "test_name": "Performance System - Decorator Import Test",
+      "expected_behavior": "Performance decorators should be importable and functional",
+      "status": "PASS",
+      "actual_result": "Performance decorators available: ['redis_cache', 'memory_cache', 'batch_process', 'optimize_memory_usage']",
+      "error_details": "",
+      "recommendations": [],
+      "execution_time": 3e-06
+    },
+    {
+      "test_name": "Service Integration - Service Directory Structure",
+      "expected_behavior": "Services should be organized in logical directories with proper modules",
+      "status": "PASS",
+      "actual_result": "Service directories exist: ['wholesale', 'dashboard', 'performance', 'platforms']",
+      "error_details": "",
+      "recommendations": [],
+      "execution_time": 5.1e-05
+    },
+    {
+      "test_name": "Service Integration - Core Service Files Existence",
+      "expected_behavior": "Core service files should exist for main functionality",
+      "status": "PASS",
+      "actual_result": "Core services exist: ['product_service.py', 'dropshipping_service.py', 'platform_account_service.py']",
+      "error_details": "",
+      "recommendations": [],
+      "execution_time": 2.5e-05
+    },
+    {
+      "test_name": "Realistic Scenarios - Wholesale Analysis Workflow",
+      "expected_behavior": "Should be able to simulate wholesale product analysis workflow",
+      "status": "PASS",
+      "actual_result": "Wholesale analysis workflow methods functional",
+      "error_details": "",
+      "recommendations": [],
+      "execution_time": 0.000742
+    },
+    {
+      "test_name": "Realistic Scenarios - Excel Processing Workflow",
+      "expected_behavior": "Should handle Excel file processing workflow simulation",
+      "status": "PASS",
+      "actual_result": "Excel processing can map critical fields: ['name', 'price', 'wholesale_price', 'stock']",
+      "error_details": "",
+      "recommendations": [],
+      "execution_time": 0.000706
+    }
+  ]
+}

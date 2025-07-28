@@ -56,7 +56,7 @@ class WholesaleOrder(BaseModel):
     order_item_id = Column(UUID(as_uuid=True), ForeignKey("order_items.id"), nullable=True, index=True)
     
     # 도매업체 정보
-    wholesaler_id = Column(UUID(as_uuid=True), ForeignKey("wholesalers.id"), nullable=False, index=True)
+    wholesaler_id = Column(UUID(as_uuid=True), ForeignKey("wholesaler_accounts.id"), nullable=False, index=True)
     wholesaler_order_id = Column(String(100), nullable=True, index=True)  # 도매업체 주문 ID
     
     # 주문 정보
@@ -254,7 +254,7 @@ class OrderProcessingRule(BaseModel):
     
     # 적용 범위
     marketplace = Column(String(50), nullable=True)  # 특정 마켓플레이스
-    wholesaler_id = Column(UUID(as_uuid=True), ForeignKey("wholesalers.id"), nullable=True, index=True)
+    wholesaler_id = Column(UUID(as_uuid=True), ForeignKey("wholesaler_accounts.id"), nullable=True, index=True)
     product_category = Column(String(100), nullable=True)
     product_id = Column(UUID(as_uuid=True), ForeignKey("products.id"), nullable=True, index=True)
     

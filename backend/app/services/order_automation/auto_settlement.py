@@ -12,7 +12,7 @@ from sqlalchemy import select, and_, or_, func, text
 import pandas as pd
 from io import BytesIO
 
-from app.models.order import Order, OrderItem, OrderStatus, PaymentStatus
+from app.models.order_core import Order, OrderItem, OrderStatus, PaymentStatus
 from app.models.order_automation import (
     WholesaleOrder, Settlement, SettlementStatus,
     OrderProcessingLog

@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from app.services.realtime.websocket_manager import connection_manager
 from app.services.dashboard.dashboard_service import DashboardService
 from app.services.cache_service import CacheService
-from app.services.notification_service import NotificationService
+from app.services.dashboard.notification_service import NotificationService
 from app.core.logging import logger
 from app.core.database import get_db
 

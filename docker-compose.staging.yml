@@ -1,0 +1,183 @@
+version: '3.8'
+
+services:
+  # 프론트엔드 (React + Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: dropshipping_frontend_staging
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=staging
+      - VITE_API_BASE_URL=http://backend:8000
+    volumes:
+      - ./nginx/staging.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+    networks:
+      - dropshipping_staging_network
+    restart: unless-stopped
+
+  # 백엔드 (FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: dropshipping_backend_staging
+    ports:
+      - "8000:8000"
+    environment:
+      # 데이터베이스
+      - DATABASE_URL=postgresql://dropshipping:${DB_PASSWORD:-staging123}@db:5432/dropshipping_staging
+      - REDIS_URL=redis://redis:6379/0
+      
+      # 보안 (스테이징용)
+      - SECRET_KEY=${SECRET_KEY:-staging-secret-key-not-for-production}
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+      
+      # 환경 설정
+      - ENVIRONMENT=staging
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+      
+      # Rate Limiting (느슨함)
+      - RATE_LIMIT_ENABLED=false
+      
+      # 모니터링 (간소화)
+      - PROMETHEUS_ENABLED=true
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      
+      # 외부 API (테스트 키)
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-test-key}
+      
+      # 이메일 (MailHog 사용)
+      - SMTP_HOST=mailhog
+      - SMTP_PORT=1025
+      - SMTP_USER=""
+      - SMTP_PASSWORD=""
+      - SMTP_FROM_EMAIL=staging@localhost
+      
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - ./backend/logs:/app/logs
+      - ./backend/uploads:/app/uploads
+    networks:
+      - dropshipping_staging_network
+    restart: unless-stopped
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"]
+
+  # PostgreSQL 데이터베이스
+  db:
+    image: postgres:15-alpine
+    container_name: dropshipping_db_staging
+    environment:
+      POSTGRES_DB: dropshipping_staging
+      POSTGRES_USER: dropshipping
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-staging123}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+      - ./backend/scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+    networks:
+      - dropshipping_staging_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dropshipping -d dropshipping_staging"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 캐시
+  redis:
+    image: redis:7-alpine
+    container_name: dropshipping_redis_staging
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_staging_data:/data
+    networks:
+      - dropshipping_staging_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # MailHog (이메일 테스트)
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: dropshipping_mailhog_staging
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - dropshipping_staging_network
+    restart: unless-stopped
+
+  # Prometheus (간소화된 모니터링)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: dropshipping_prometheus_staging
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./monitoring/prometheus-staging.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_staging_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=7d'
+      - '--web.enable-lifecycle'
+    networks:
+      - dropshipping_staging_network
+    restart: unless-stopped
+
+  # Grafana (간소화된 대시보드)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: dropshipping_grafana_staging
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=staging123
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    volumes:
+      - grafana_staging_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - dropshipping_staging_network
+    restart: unless-stopped
+
+volumes:
+  postgres_staging_data:
+    driver: local
+  redis_staging_data:
+    driver: local
+  prometheus_staging_data:
+    driver: local
+  grafana_staging_data:
+    driver: local
+
+networks:
+  dropshipping_staging_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+          gateway: 172.21.0.1

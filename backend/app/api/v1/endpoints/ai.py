@@ -25,7 +25,7 @@ from app.models.ai import (
 )
 from app.services.ai.ai_manager import AIManager
 from app.utils.ai.learning_engine import LearningEngine, SalesData
-from app.api.deps import get_current_user
+from app.api.v1.dependencies.auth import get_current_user
 from app.models.user import User
 
 logger = logging.getLogger(__name__)

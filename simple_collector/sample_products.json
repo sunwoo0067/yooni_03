@@ -1,0 +1,329 @@
+{
+  "zentrade": [
+    {
+      "product_code": "ZT0001",
+      "product_info": {
+        "product_code": "ZT0001",
+        "product_name": "테스트 상품 1",
+        "price": "11000",
+        "sale_price": "10000",
+        "category": "테스트 카테고리",
+        "brand": "테스트 브랜드",
+        "description": "테스트 상품 1의 설명입니다",
+        "images": [
+          "https://example.com/image1.jpg"
+        ],
+        "stock_status": "available",
+        "shipping_fee": "3000",
+        "return_fee": "3000",
+        "url": "https://zentrade.co.kr/product/1",
+        "collected_at": "2025-07-26T13:43:53.362834",
+        "supplier": "zentrade"
+      },
+      "created_at": "2025-07-26T04:09:02",
+      "updated_at": "2025-07-26T13:43:53.363888"
+    },
+    {
+      "product_code": "ZT0002",
+      "product_info": {
+        "product_code": "ZT0002",
+        "product_name": "테스트 상품 2",
+        "price": "12000",
+        "sale_price": "11000",
+        "category": "테스트 카테고리",
+        "brand": "테스트 브랜드",
+        "description": "테스트 상품 2의 설명입니다",
+        "images": [
+          "https://example.com/image2.jpg"
+        ],
+        "stock_status": "available",
+        "shipping_fee": "3000",
+        "return_fee": "3000",
+        "url": "https://zentrade.co.kr/product/2",
+        "collected_at": "2025-07-26T13:43:53.464291",
+        "supplier": "zentrade"
+      },
+      "created_at": "2025-07-26T04:09:02",
+      "updated_at": "2025-07-26T13:43:53.465107"
+    },
+    {
+      "product_code": "ZT0003",
+      "product_info": {
+        "product_code": "ZT0003",
+        "product_name": "테스트 상품 3",
+        "price": "13000",
+        "sale_price": "12000",
+        "category": "테스트 카테고리",
+        "brand": "테스트 브랜드",
+        "description": "테스트 상품 3의 설명입니다",
+        "images": [
+          "https://example.com/image3.jpg"
+        ],
+        "stock_status": "available",
+        "shipping_fee": "3000",
+        "return_fee": "3000",
+        "url": "https://zentrade.co.kr/product/3",
+        "collected_at": "2025-07-26T13:43:53.565285",
+        "supplier": "zentrade"
+      },
+      "created_at": "2025-07-26T04:09:02",
+      "updated_at": "2025-07-26T13:43:53.566031"
+    }
+  ],
+  "ownerclan": [
+    {
+      "product_code": "OC0001",
+      "product_info": {
+        "product_code": "OC0001",
+        "product_name": "오너클랜 테스트 상품 OC0001",
+        "brand_name": "테스트 브랜드",
+        "category_name": "테스트 카테고리",
+        "sale_price": "15000",
+        "supply_price": "12000",
+        "stock_quantity": 100,
+        "product_status": "active",
+        "images": [
+          {
+            "imageUrl": "https://example.com/oc_image_OC0001.jpg",
+            "imageType": "main"
+          }
+        ],
+        "options": [],
+        "description": "OC0001 상품의 상세 설명입니다",
+        "specifications": {
+          "재질": "테스트",
+          "크기": "표준"
+        },
+        "shipping_info": {
+          "shippingFee": 3000,
+          "returnFee": 3000,
+          "exchangeFee": 3000
+        },
+        "product_url": "https://ownerclan.com/product/OC0001",
+        "created_at": "2025-07-26T13:43:55.289330",
+        "updated_at": "2025-07-26T13:43:55.289030",
+        "collected_at": "2025-07-26T13:43:55.289333",
+        "supplier": "ownerclan"
+      },
+      "created_at": "2025-07-26T04:15:03",
+      "updated_at": "2025-07-26T13:43:55.290164"
+    },
+    {
+      "product_code": "OC0002",
+      "product_info": {
+        "product_code": "OC0002",
+        "product_name": "오너클랜 테스트 상품 OC0002",
+        "brand_name": "테스트 브랜드",
+        "category_name": "테스트 카테고리",
+        "sale_price": "16000",
+        "supply_price": "13000",
+        "stock_quantity": 100,
+        "product_status": "active",
+        "images": [
+          {
+            "imageUrl": "https://example.com/oc_image_OC0002.jpg",
+            "imageType": "main"
+          }
+        ],
+        "options": [],
+        "description": "OC0002 상품의 상세 설명입니다",
+        "specifications": {
+          "재질": "테스트",
+          "크기": "표준"
+        },
+        "shipping_info": {
+          "shippingFee": 3000,
+          "returnFee": 3000,
+          "exchangeFee": 3000
+        },
+        "product_url": "https://ownerclan.com/product/OC0002",
+        "created_at": "2025-07-26T13:43:55.390500",
+        "updated_at": "2025-07-26T13:43:55.289040",
+        "collected_at": "2025-07-26T13:43:55.390512",
+        "supplier": "ownerclan"
+      },
+      "created_at": "2025-07-26T04:15:03",
+      "updated_at": "2025-07-26T13:43:55.391524"
+    },
+    {
+      "product_code": "OC0003",
+      "product_info": {
+        "product_code": "OC0003",
+        "product_name": "오너클랜 테스트 상품 OC0003",
+        "brand_name": "테스트 브랜드",
+        "category_name": "테스트 카테고리",
+        "sale_price": "17000",
+        "supply_price": "14000",
+        "stock_quantity": 100,
+        "product_status": "active",
+        "images": [
+          {
+            "imageUrl": "https://example.com/oc_image_OC0003.jpg",
+            "imageType": "main"
+          }
+        ],
+        "options": [],
+        "description": "OC0003 상품의 상세 설명입니다",
+        "specifications": {
+          "재질": "테스트",
+          "크기": "표준"
+        },
+        "shipping_info": {
+          "shippingFee": 3000,
+          "returnFee": 3000,
+          "exchangeFee": 3000
+        },
+        "product_url": "https://ownerclan.com/product/OC0003",
+        "created_at": "2025-07-26T13:43:55.491701",
+        "updated_at": "2025-07-26T13:43:55.289043",
+        "collected_at": "2025-07-26T13:43:55.491717",
+        "supplier": "ownerclan"
+      },
+      "created_at": "2025-07-26T04:15:03",
+      "updated_at": "2025-07-26T13:43:55.493294"
+    }
+  ],
+  "domeggook": [
+    {
+      "product_code": "DG0101000000001",
+      "product_info": {
+        "product_code": "DG0101000000001",
+        "product_name": "도매꾹 테스트 상품 01_01_00_00_00 - 1",
+        "category_code": "01_01_00_00_00",
+        "category_name": "여성의류",
+        "vendor_code": "V01001",
+        "supply_price": "6000",
+        "consumer_price": "12000",
+        "min_order_qty": 1,
+        "stock_status": "available",
+        "images": [
+          "https://example.com/dg_image_DG0101000000001_1.jpg",
+          "https://example.com/dg_image_DG0101000000001_2.jpg"
+        ],
+        "options": [
+          {
+            "option_name": "색상",
+            "option_value": "블랙",
+            "additional_price": 0
+          },
+          {
+            "option_name": "색상",
+            "option_value": "화이트",
+            "additional_price": 0
+          },
+          {
+            "option_name": "색상",
+            "option_value": "네이비",
+            "additional_price": 500
+          }
+        ],
+        "description": "DG0101000000001 상품의 상세 설명입니다",
+        "shipping_info": {
+          "shipping_fee": 3000,
+          "return_fee": 3000,
+          "exchange_fee": 3000,
+          "delivery_type": "택배"
+        },
+        "product_url": "https://domeggook.com/product/DG0101000000001",
+        "collected_at": "2025-07-26T13:43:57.216628",
+        "supplier": "domeggook"
+      },
+      "created_at": "2025-07-26T04:15:06",
+      "updated_at": "2025-07-26T13:43:57.218349"
+    },
+    {
+      "product_code": "DG0101000000002",
+      "product_info": {
+        "product_code": "DG0101000000002",
+        "product_name": "도매꾹 테스트 상품 01_01_00_00_00 - 2",
+        "category_code": "01_01_00_00_00",
+        "category_name": "여성의류",
+        "vendor_code": "V01002",
+        "supply_price": "7000",
+        "consumer_price": "14000",
+        "min_order_qty": 1,
+        "stock_status": "available",
+        "images": [
+          "https://example.com/dg_image_DG0101000000002_1.jpg",
+          "https://example.com/dg_image_DG0101000000002_2.jpg"
+        ],
+        "options": [
+          {
+            "option_name": "사이즈",
+            "option_value": "S",
+            "additional_price": 0
+          },
+          {
+            "option_name": "사이즈",
+            "option_value": "M",
+            "additional_price": 0
+          },
+          {
+            "option_name": "사이즈",
+            "option_value": "L",
+            "additional_price": 1000
+          }
+        ],
+        "description": "DG0101000000002 상품의 상세 설명입니다",
+        "shipping_info": {
+          "shipping_fee": 3000,
+          "return_fee": 3000,
+          "exchange_fee": 3000,
+          "delivery_type": "택배"
+        },
+        "product_url": "https://domeggook.com/product/DG0101000000002",
+        "collected_at": "2025-07-26T13:43:57.318482",
+        "supplier": "domeggook"
+      },
+      "created_at": "2025-07-26T04:15:06",
+      "updated_at": "2025-07-26T13:43:57.319694"
+    },
+    {
+      "product_code": "DG0101000000003",
+      "product_info": {
+        "product_code": "DG0101000000003",
+        "product_name": "도매꾹 테스트 상품 01_01_00_00_00 - 3",
+        "category_code": "01_01_00_00_00",
+        "category_name": "여성의류",
+        "vendor_code": "V01003",
+        "supply_price": "8000",
+        "consumer_price": "16000",
+        "min_order_qty": 1,
+        "stock_status": "available",
+        "images": [
+          "https://example.com/dg_image_DG0101000000003_1.jpg",
+          "https://example.com/dg_image_DG0101000000003_2.jpg"
+        ],
+        "options": [
+          {
+            "option_name": "색상",
+            "option_value": "블랙",
+            "additional_price": 0
+          },
+          {
+            "option_name": "색상",
+            "option_value": "화이트",
+            "additional_price": 0
+          },
+          {
+            "option_name": "색상",
+            "option_value": "네이비",
+            "additional_price": 500
+          }
+        ],
+        "description": "DG0101000000003 상품의 상세 설명입니다",
+        "shipping_info": {
+          "shipping_fee": 3000,
+          "return_fee": 3000,
+          "exchange_fee": 3000,
+          "delivery_type": "택배"
+        },
+        "product_url": "https://domeggook.com/product/DG0101000000003",
+        "collected_at": "2025-07-26T13:43:57.420037",
+        "supplier": "domeggook"
+      },
+      "created_at": "2025-07-26T04:15:06",
+      "updated_at": "2025-07-26T13:43:57.421128"
+    }
+  ]
+}

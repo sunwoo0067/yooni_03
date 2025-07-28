@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-07-27T19:02:39.498895",
+  "results": {
+    "coupang": false,
+    "naver": true,
+    "11st": false
+  },
+  "notes": {
+    "naver": "네이버는 OAuth 인증이 필요하여 실제 API 호출은 테스트하지 못했습니다.",
+    "coupang": "쿠팡 파트너스 API 연동",
+    "11st": "11번가 오픈 API 연동"
+  }
+}

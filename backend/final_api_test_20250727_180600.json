@@ -1,0 +1,72 @@
+{
+  "timestamp": "2025-07-27T18:06:00.648743",
+  "results": {
+    "ownerclan": {
+      "status": "success",
+      "count": 5,
+      "products": [
+        {
+          "id": "WFJ59ER",
+          "name": "925실버 로즈 장식 타원 후프귀걸이 장미디테일 포인트 데일리 하객룩용 여성용 귀걸이",
+          "price": 79860,
+          "status": "available"
+        },
+        {
+          "id": "WFJ59EQ",
+          "name": "925실버 매듭 디자인 미니 귀걸이 단정한 조형 볼륨 이어링 데일리룩 여성용 태국산",
+          "price": 21780,
+          "status": "available"
+        },
+        {
+          "id": "WFJ59EP",
+          "name": "925실버 미니 볼륨 하트 목걸이 러블리 펜던트 데일리룩 여성용 국산 실버 주얼리",
+          "price": 31460,
+          "status": "available"
+        },
+        {
+          "id": "WFJ59EO",
+          "name": "925실버 커팅 쉐입 미니 이어커프 입체디자인 귀찌형 데일리 포인트 국산 귀걸이",
+          "price": 26620,
+          "status": "available"
+        },
+        {
+          "id": "WFJ59EN",
+          "name": "925실버 볼드 물방울 귀걸이 빅사이즈 유광 쉐입 침형 데일리룩 포인트 태국산",
+          "price": 48400,
+          "status": "available"
+        }
+      ]
+    },
+    "zentrade": {
+      "status": "success",
+      "count": 5,
+      "products": [
+        {
+          "id": "5009",
+          "name": "PP 미니 소분 스페출라 10P",
+          "price": 220
+        },
+        {
+          "id": "5007",
+          "name": "옻칠 계란말이 뒤집개",
+          "price": 2330
+        },
+        {
+          "id": "5006",
+          "name": "띄움 실리콘 주방집게",
+          "price": 3630
+        },
+        {
+          "id": "5005",
+          "name": "네오 스푼 양념통 380ml",
+          "price": 1680
+        },
+        {
+          "id": "5004",
+          "name": "컬러 파티컵 4P",
+          "price": 2350
+        }
+      ]
+    }
+  }
+}

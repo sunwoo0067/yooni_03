@@ -11,7 +11,7 @@ from collections import defaultdict
 import numpy as np
 
 from app.models.product import Product
-from app.models.order import Order, OrderItem
+from app.models.order_core import Order, OrderItem
 from app.models.inventory import Inventory
 from app.models.platform import Platform
 from app.models.keyword import KeywordPerformance

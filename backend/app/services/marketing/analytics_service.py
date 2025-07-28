@@ -14,7 +14,7 @@ from app.models.marketing import (
     CampaignType, MessageStatus, ABTestVariant
 )
 from app.models.crm import Customer, CustomerSegment
-from app.models.order import Order
+from app.models.order_core import Order
 from app.core.exceptions import BusinessException
 
 

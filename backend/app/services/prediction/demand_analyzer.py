@@ -80,7 +80,7 @@ class DemandAnalyzer:
         db = next(get_db())
         try:
             from app.models.product import Product
-            from app.models.order import Order
+            from app.models.order_core import Order
             
             # 기본 상품 정보
             product = db.query(Product).filter(Product.id == product_id).first()

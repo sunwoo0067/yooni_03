@@ -1,0 +1,44 @@
+{
+  "timestamp": "2025-07-27T17:58:15.109438",
+  "total_apis_tested": 3,
+  "successful_apis": 1,
+  "results": {
+    "ownerclan": {
+      "status": "success",
+      "authenticated": true,
+      "products": [
+        {
+          "id": "WFJ59ER",
+          "name": "925실버 로즈 장식 타원 후프귀걸이 장미디테일 포인트 데일리 하객룩용 여성용 귀걸이",
+          "price": 79860,
+          "status": "available"
+        },
+        {
+          "id": "WFJ59EQ",
+          "name": "925실버 매듭 디자인 미니 귀걸이 단정한 조형 볼륨 이어링 데일리룩 여성용 태국산",
+          "price": 21780,
+          "status": "available"
+        },
+        {
+          "id": "WFJ59EP",
+          "name": "925실버 미니 볼륨 하트 목걸이 러블리 펜던트 데일리룩 여성용 국산 실버 주얼리",
+          "price": 31460,
+          "status": "available"
+        }
+      ],
+      "notes": "JWT 토큰이 텍스트로 반환됨"
+    },
+    "domeggook": {
+      "status": "api_key_valid",
+      "api_key_valid": true,
+      "products": [],
+      "notes": "표준 REST API 미제공, 웹 스크래핑 필요"
+    },
+    "zentrade": {
+      "status": "blocked",
+      "website_accessible": false,
+      "products": [],
+      "notes": "API 요청 차단됨, IP 화이트리스트 또는 계정 활성화 필요"
+    }
+  }
+}

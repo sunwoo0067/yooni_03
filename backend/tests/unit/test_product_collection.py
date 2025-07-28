@@ -8,7 +8,7 @@ from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
 from typing import List, Dict, Any
 
-from app.services.wholesalers.zentrade_api import ZentradeAPI
+from app.services.wholesalers.zentrade_api import ZentradeAPIFixed as ZentradeAPI
 from app.services.wholesalers.ownerclan_api import OwnerClanAPI
 from app.services.wholesalers.domeggook_api import DomeggookAPI
 from app.services.collection.product_collector import ProductCollector

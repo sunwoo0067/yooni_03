@@ -5,11 +5,13 @@ import logging
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
+from datetime import datetime
 
 import uvicorn
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
@@ -22,7 +24,13 @@ sys.path.insert(0, str(project_root))
 from app.core.config import settings
 from app.services.database import db_manager, health_check
 from app.api.v1 import api_router
-from app.services.wholesale.scheduler_service import SchedulerManager
+from app.middleware.logging_middleware import LoggingMiddleware, RequestContextMiddleware
+from app.middleware.security_middleware import (
+    SecurityHeadersMiddleware,
+    RequestSizeLimitMiddleware,
+    SQLInjectionProtectionMiddleware,
+    RequestLoggingMiddleware
+)
 
 
 # Configure logging
@@ -71,11 +79,63 @@ async def lifespan(app: FastAPI):
         # Start scheduler service
         logger.info("Starting scheduler service...")
         try:
+            from app.services.wholesale.scheduler_service import SchedulerManager
             scheduler_service = await SchedulerManager.get_scheduler_service()
             logger.info("Scheduler service started successfully")
         except Exception as e:
             logger.error(f"Failed to start scheduler service: {e}")
             # 스케줄러 실패는 치명적이지 않으므로 애플리케이션은 계속 실행
+        
+        # Start task queue
+        logger.info("Starting task queue...")
+        try:
+            from app.services.tasks.task_queue import task_queue
+            await task_queue.start()
+            logger.info("Task queue started successfully")
+        except Exception as e:
+            logger.error(f"Failed to start task queue: {e}")
+            # 태스크 큐 실패는 치명적이지 않으므로 계속 진행
+        
+        # Start metrics collection
+        logger.info("Starting metrics collection...")
+        try:
+            from app.services.monitoring import start_metrics_collection
+            await start_metrics_collection()
+            logger.info("Metrics collection started successfully")
+        except Exception as e:
+            logger.error(f"Failed to start metrics collection: {e}")
+            # 메트릭 수집 실패는 치명적이지 않으므로 계속 진행
+        
+        # Start cache warmup in background
+        logger.info("Starting cache warmup...")
+        try:
+            from app.services.cache.cache_warmup_service import run_cache_warmup
+            import asyncio
+            asyncio.create_task(run_cache_warmup())
+            logger.info("Cache warmup started in background")
+        except Exception as e:
+            logger.warning(f"Cache warmup failed to start: {e}")
+            # 캐시 워밍업 실패는 치명적이지 않으므로 계속 진행
+            
+        # Start cache refresh service
+        logger.info("Starting cache refresh service...")
+        try:
+            from app.services.cache.cache_refresh_service import cache_refresh_service
+            await cache_refresh_service.start()
+            logger.info("Cache refresh service started")
+        except Exception as e:
+            logger.warning(f"Cache refresh service failed to start: {e}")
+            # 캐시 갱신 서비스 실패는 치명적이지 않으므로 계속 진행
+            
+        # Start collection scheduler
+        logger.info("Starting collection scheduler...")
+        try:
+            from app.services.collection import collection_scheduler
+            await collection_scheduler.start()
+            logger.info("Collection scheduler started")
+        except Exception as e:
+            logger.warning(f"Collection scheduler failed to start: {e}")
+            # 수집 스케줄러 실패는 치명적이지 않으므로 계속 진행
         
         logger.info("Application startup completed successfully")
         
@@ -88,8 +148,33 @@ async def lifespan(app: FastAPI):
     # Shutdown
     logger.info("Shutting down application...")
     
+    # Stop cache refresh service
+    try:
+        from app.services.cache.cache_refresh_service import cache_refresh_service
+        await cache_refresh_service.stop()
+        logger.info("Cache refresh service stopped")
+    except Exception as e:
+        logger.error(f"Error stopping cache refresh service: {e}")
+        
+    # Stop collection scheduler
+    try:
+        from app.services.collection import collection_scheduler
+        await collection_scheduler.stop()
+        logger.info("Collection scheduler stopped")
+    except Exception as e:
+        logger.error(f"Error stopping collection scheduler: {e}")
+    
+    # Shutdown task queue
+    try:
+        from app.services.tasks.task_queue import task_queue
+        await task_queue.stop()
+        logger.info("Task queue shutdown completed")
+    except Exception as e:
+        logger.error(f"Error shutting down task queue: {e}")
+    
     # Shutdown scheduler service
     try:
+        from app.services.wholesale.scheduler_service import SchedulerManager
         await SchedulerManager.shutdown()
         logger.info("Scheduler service shutdown completed")
     except Exception as e:
@@ -126,6 +211,27 @@ app.add_middleware(
     allow_methods=settings.CORS_ALLOW_METHODS,
     allow_headers=settings.CORS_ALLOW_HEADERS,
 )
+
+# Gzip compression middleware
+app.add_middleware(
+    GZipMiddleware,
+    minimum_size=1000,  # 1KB 이상인 응답만 압축
+)
+
+# Logging middleware
+app.add_middleware(
+    LoggingMiddleware,
+    skip_paths=["/health", "/metrics", "/docs", "/openapi.json", "/redoc"]
+)
+
+# Request context middleware
+app.add_middleware(RequestContextMiddleware)
+
+# Security middleware
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RequestSizeLimitMiddleware, max_request_size=10 * 1024 * 1024)  # 10MB
+app.add_middleware(SQLInjectionProtectionMiddleware)
+app.add_middleware(RequestLoggingMiddleware)
 
 
 # Exception handlers
@@ -191,7 +297,7 @@ async def health_check_endpoint():
         health_status = await health_check()
         return {
             "status": "healthy",
-            "timestamp": "2025-01-24T00:00:00Z",  # You might want to use datetime.utcnow()
+            "timestamp": datetime.utcnow().isoformat() + "Z",
             "version": settings.APP_VERSION,
             "services": health_status
         }
@@ -201,7 +307,7 @@ async def health_check_endpoint():
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             content={
                 "status": "unhealthy",
-                "timestamp": "2025-01-24T00:00:00Z",
+                "timestamp": datetime.utcnow().isoformat() + "Z",
                 "version": settings.APP_VERSION,
                 "error": str(e)
             }
@@ -227,25 +333,15 @@ app.include_router(
     tags=["API v1"]
 )
 
+# Debug: Print all registered routes
+logger.info("=== Registered Routes ===")
+for i, route in enumerate(app.routes):
+    if hasattr(route, 'path') and hasattr(route, 'methods'):
+        logger.info(f"{i+1:2d}. {route.methods} {route.path}")
+logger.info(f"Total routes registered: {len(app.routes)}")
 
-# Additional middleware for request logging
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    """Log all requests."""
-    import time
-    
-    start_time = time.time()
-    
-    # Log request
-    logger.info(f"{request.method} {request.url.path} - {request.client.host if request.client else 'unknown'}")
-    
-    response = await call_next(request)
-    
-    # Log response
-    process_time = time.time() - start_time
-    logger.info(f"Response: {response.status_code} - {process_time:.3f}s")
-    
-    return response
+
+# Remove additional logging middleware since we now use LoggingMiddleware
 
 
 # Run the application

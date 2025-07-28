@@ -8,7 +8,7 @@ from enum import Enum
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 
-from app.models.order import DropshippingOrder, SupplierOrderStatus, Order, OrderStatus
+from app.models.order_core import DropshippingOrder, SupplierOrderStatus, Order, OrderStatus
 from app.models.wholesaler import Wholesaler
 
 logger = logging.getLogger(__name__)
@@ -534,7 +534,7 @@ class OrderExceptionHandler:
         try:
             # 실제로는 별도의 예외 테이블에 저장
             # 여기서는 드롭쉬핑 주문 로그에 저장
-            from app.models.order import DropshippingOrderLog
+            from app.models.order_core import DropshippingOrderLog
             
             exception_record = {
                 'id': f"EXC_{int(datetime.utcnow().timestamp())}",
@@ -809,7 +809,7 @@ class OrderExceptionHandler:
     async def get_exception_statistics(self, days: int = 30) -> Dict:
         """예외 통계 조회"""
         try:
-            from app.models.order import DropshippingOrderLog
+            from app.models.order_core import DropshippingOrderLog
             
             end_date = datetime.utcnow()
             start_date = end_date - timedelta(days=days)

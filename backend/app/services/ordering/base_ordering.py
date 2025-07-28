@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
-from app.models.order import DropshippingOrder
+from app.models.order_core import DropshippingOrder
 from app.models.wholesaler import Wholesaler
 
 logger = logging.getLogger(__name__)

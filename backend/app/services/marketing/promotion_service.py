@@ -12,7 +12,7 @@ import uuid
 
 from app.models.marketing import PromotionCode, MarketingSegment
 from app.models.crm import Customer
-from app.models.order import Order
+from app.models.order_core import Order
 from app.core.exceptions import BusinessException
 
 

@@ -16,7 +16,7 @@ from app.models.crm import (
     CustomerRecommendation, CustomerSegment
 )
 from app.models.marketing import MarketingMessage
-from app.models.order import Order
+from app.models.order_core import Order
 from app.models.product import Product
 from app.services.ai.ai_manager import AIManager
 from app.core.exceptions import BusinessException

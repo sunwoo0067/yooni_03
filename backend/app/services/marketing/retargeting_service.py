@@ -10,7 +10,7 @@ import json
 
 from app.models.crm import Customer, CustomerBehavior
 from app.models.marketing import MarketingCampaign, MarketingMessage, CampaignType
-from app.models.order import Order
+from app.models.order_core import Order
 from app.models.product import Product
 from app.services.marketing.campaign_manager import CampaignManager
 from app.services.marketing.personalization_engine import PersonalizationEngine

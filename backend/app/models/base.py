@@ -3,10 +3,19 @@ Base model with common fields and functionality
 """
 from datetime import datetime
 from typing import Any, Dict, Optional
-from sqlalchemy import Boolean, Column, DateTime, Integer, Text
+from sqlalchemy import Boolean, Column, DateTime, Integer, Text, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 import uuid
+
+# Database-agnostic JSON type
+def get_json_type():
+    """Get appropriate JSON type based on database"""
+    from app.core.config import settings
+    if "sqlite" in settings.DATABASE_URL:
+        return JSON
+    else:
+        return JSONB
 
 Base = declarative_base()
 
@@ -40,7 +49,7 @@ class UUIDMixin:
 
 class MetadataMixin:
     """Mixin for flexible metadata storage"""
-    metadata = Column(JSONB, nullable=True)
+    metadata = Column(get_json_type(), nullable=True)
     
     def set_metadata(self, key: str, value: Any):
         """Set a metadata field"""

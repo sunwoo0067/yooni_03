@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-07-27T18:02:18.410642",
+  "results": {
+    "ownerclan": {
+      "status": "error",
+      "error": "Can't instantiate abstract class OwnerClanAPIFixed without an implementation for abstract methods 'base_url', 'get_product_detail', 'get_stock_info', 'name', 'rate_limit_per_minute', 'wholesaler_type'"
+    },
+    "zentrade": {
+      "status": "error",
+      "error": "Can't instantiate abstract class ZentradeAPIFixed without an implementation for abstract methods 'base_url', 'get_product_detail', 'get_stock_info', 'name', 'rate_limit_per_minute', 'wholesaler_type'"
+    }
+  }
+}

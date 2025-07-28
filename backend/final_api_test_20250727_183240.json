@@ -1,0 +1,72 @@
+{
+  "timestamp": "2025-07-27T18:32:40.257041",
+  "results": {
+    "ownerclan": {
+      "status": "success",
+      "count": 5,
+      "products": [
+        {
+          "id": "WFJ59EV",
+          "name": "(큰손할인) 돼지피규어 홈데코 복돼지 인테리어 책상꾸미기 꿀돼지 소품 미니 방꾸미기 귀여운 악세사리",
+          "price": 1820,
+          "status": "available"
+        },
+        {
+          "id": "WFJ59EU",
+          "name": "(큰손할인) 벌초모자 와이드챙 여름 메쉬 방풍 날파리방지 모기장 등산 양봉 벌레방지 낚시 방충망 사파리",
+          "price": 2970,
+          "status": "available"
+        },
+        {
+          "id": "WFJ59ET",
+          "name": "(큰손할인) 듀얼무드 에코백 여름 대용량 투웨이 보부상 숄더백 가방 캐주얼 여성 데일리백 비치백 캔버스",
+          "price": 11110,
+          "status": "available"
+        },
+        {
+          "id": "WFJ59ES",
+          "name": "전기 테스터기 비접촉 검전기 단전 전압 멀티미터 검",
+          "price": 19360,
+          "status": "available"
+        },
+        {
+          "id": "WFJ59ER",
+          "name": "925실버 로즈 장식 타원 후프귀걸이 장미디테일 포인트 데일리 하객룩용 여성용 귀걸이",
+          "price": 79860,
+          "status": "available"
+        }
+      ]
+    },
+    "zentrade": {
+      "status": "success",
+      "count": 5,
+      "products": [
+        {
+          "id": "5009",
+          "name": "PP 미니 소분 스페출라 10P",
+          "price": 220
+        },
+        {
+          "id": "5007",
+          "name": "옻칠 계란말이 뒤집개",
+          "price": 2330
+        },
+        {
+          "id": "5006",
+          "name": "띄움 실리콘 주방집게",
+          "price": 3630
+        },
+        {
+          "id": "5005",
+          "name": "네오 스푼 양념통 380ml",
+          "price": 1680
+        },
+        {
+          "id": "5004",
+          "name": "컬러 파티컵 4P",
+          "price": 2350
+        }
+      ]
+    }
+  }
+}

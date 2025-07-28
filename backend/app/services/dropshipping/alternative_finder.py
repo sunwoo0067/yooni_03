@@ -420,7 +420,7 @@ class AlternativeFinder:
         db = next(get_db())
         try:
             from app.models.product import Product
-            from app.models.order import Order
+            from app.models.order_core import Order
             
             # 원본 상품과 함께 구매된 상품들 분석
             cross_sell_products = db.query(Product).join(Order).filter(

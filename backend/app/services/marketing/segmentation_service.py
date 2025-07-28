@@ -10,7 +10,7 @@ import json
 
 from app.models.marketing import MarketingSegment
 from app.models.crm import Customer, CustomerSegment, RFMAnalysis
-from app.models.order import Order
+from app.models.order_core import Order
 from app.services.crm.segmentation_engine import SegmentationEngine
 from app.core.exceptions import BusinessException
 

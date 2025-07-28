@@ -6,9 +6,9 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status, Query, BackgroundTasks
 from sqlalchemy.orm import Session
 
-from ....services.database.database import get_db
-from ....services.platform_account_service import get_platform_account_service
-from ....schemas.platform_account import (
+from app.api.v1.dependencies.database import get_db
+from app.services.platform_account_service import get_platform_account_service
+from app.schemas.platform_account import (
     PlatformAccountCreate,
     PlatformAccountUpdate,
     PlatformAccountResponse,
@@ -21,7 +21,9 @@ from ....schemas.platform_account import (
     PlatformSyncLogResponse,
     AccountStatusEnum
 )
-from ....models.platform_account import AccountStatus
+from app.models.platform_account import AccountStatus
+from app.models.user import User
+from app.core.cache import cache_result, invalidate_cache
 import logging
 
 logger = logging.getLogger(__name__)
@@ -29,21 +31,17 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-# Dependency to get current user ID (placeholder - implement based on your auth system)
-async def get_current_user_id() -> UUID:
-    """Get current authenticated user ID"""
-    # TODO: Implement actual authentication logic
-    # This is a placeholder that should be replaced with your auth system
-    from uuid import uuid4
-    return uuid4()  # Replace with actual user ID from JWT token or session
+# Import proper authentication dependency
+from app.api.v1.dependencies.auth import get_current_user
 
 
 @router.post("/", response_model=PlatformAccountResponse, status_code=status.HTTP_201_CREATED)
+@invalidate_cache("platform_accounts_list:*")  # 생성 시 목록 캐시 무효화
 async def create_platform_account(
     account_data: PlatformAccountCreate,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
-    current_user_id: UUID = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Create a new platform account
@@ -56,13 +54,13 @@ async def create_platform_account(
     """
     try:
         service = get_platform_account_service(db)
-        account, connection_success = await service.create_account(current_user_id, account_data)
+        account, connection_success = await service.create_account(current_user.id, account_data)
         
         # Schedule a health check in the background
         background_tasks.add_task(
             schedule_health_check,
             str(account.id),
-            str(current_user_id)
+            str(current_user.id)
         )
         
         # Convert to response model
@@ -87,13 +85,14 @@ async def create_platform_account(
 
 
 @router.get("/", response_model=List[PlatformAccountSummary])
+@cache_result(prefix="platform_accounts_list", ttl=600)  # 10분 캐싱
 async def get_platform_accounts(
     platform_type: Optional[str] = Query(None, description="Filter by platform type"),
     status: Optional[AccountStatusEnum] = Query(None, description="Filter by account status"),
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(100, ge=1, le=500, description="Maximum number of records to return"),
     db: Session = Depends(get_db),
-    current_user_id: UUID = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get list of platform accounts for the current user
@@ -110,7 +109,7 @@ async def get_platform_accounts(
         status_filter = AccountStatus(status.value) if status else None
         
         accounts = service.get_user_accounts(
-            current_user_id, platform_type, status_filter, skip, limit
+            current_user.id, platform_type, status_filter, skip, limit
         )
         
         return [PlatformAccountSummary.from_orm(account) for account in accounts]
@@ -127,7 +126,7 @@ async def get_platform_accounts(
 async def get_platform_account(
     account_id: UUID,
     db: Session = Depends(get_db),
-    current_user_id: UUID = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get a specific platform account by ID
@@ -136,7 +135,7 @@ async def get_platform_account(
     """
     try:
         service = get_platform_account_service(db)
-        account = service.get_account(account_id, current_user_id)
+        account = service.get_account(account_id, current_user.id)
         
         if not account:
             raise HTTPException(
@@ -165,7 +164,7 @@ async def update_platform_account(
     account_id: UUID,
     update_data: PlatformAccountUpdate,
     db: Session = Depends(get_db),
-    current_user_id: UUID = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Update a platform account
@@ -175,7 +174,7 @@ async def update_platform_account(
     """
     try:
         service = get_platform_account_service(db)
-        account = service.update_account(account_id, current_user_id, update_data)
+        account = service.update_account(account_id, current_user.id, update_data)
         
         if not account:
             raise HTTPException(
@@ -209,7 +208,7 @@ async def update_platform_account(
 async def delete_platform_account(
     account_id: UUID,
     db: Session = Depends(get_db),
-    current_user_id: UUID = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Delete a platform account
@@ -220,7 +219,7 @@ async def delete_platform_account(
     """
     try:
         service = get_platform_account_service(db)
-        success = service.delete_account(account_id, current_user_id)
+        success = service.delete_account(account_id, current_user.id)
         
         if not success:
             raise HTTPException(
@@ -244,7 +243,7 @@ async def delete_platform_account(
 async def test_platform_account_connection(
     account_id: UUID,
     db: Session = Depends(get_db),
-    current_user_id: UUID = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Test connection to a platform account
@@ -256,7 +255,7 @@ async def test_platform_account_connection(
     """
     try:
         service = get_platform_account_service(db)
-        test_result = await service.test_connection(account_id, current_user_id)
+        test_result = await service.test_connection(account_id, current_user.id)
         
         return test_result
         
@@ -298,7 +297,7 @@ async def get_supported_platforms(
 @router.get("/statistics/summary", response_model=PlatformAccountStats)
 async def get_account_statistics(
     db: Session = Depends(get_db),
-    current_user_id: UUID = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get comprehensive statistics for user's platform accounts
@@ -311,7 +310,7 @@ async def get_account_statistics(
     """
     try:
         service = get_platform_account_service(db)
-        stats = service.get_user_account_statistics(current_user_id)
+        stats = service.get_user_account_statistics(current_user.id)
         
         return stats
         
@@ -328,7 +327,7 @@ async def bulk_test_connections(
     request: BulkOperationRequest,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
-    current_user_id: UUID = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Test connections for multiple platform accounts
@@ -348,7 +347,7 @@ async def bulk_test_connections(
         service = get_platform_account_service(db)
         account_ids = [UUID(id_str) for id_str in request.account_ids]
         
-        result = await service.bulk_test_connections(account_ids, current_user_id)
+        result = await service.bulk_test_connections(account_ids, current_user.id)
         
         return result
         
@@ -369,7 +368,7 @@ async def bulk_test_connections(
 async def bulk_update_sync_settings(
     request: BulkOperationRequest,
     db: Session = Depends(get_db),
-    current_user_id: UUID = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Bulk update synchronization settings for multiple accounts
@@ -405,7 +404,7 @@ async def bulk_update_sync_settings(
         
         result = service.bulk_update_sync_settings(
             account_ids,
-            current_user_id,
+            current_user.id,
             sync_enabled,
             request.parameters.get("auto_pricing_enabled"),
             request.parameters.get("auto_inventory_sync")
@@ -433,7 +432,7 @@ async def run_health_checks(
     background_tasks: BackgroundTasks,
     all_users: bool = Query(False, description="Run health checks for all users (admin only)"),
     db: Session = Depends(get_db),
-    current_user_id: UUID = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Trigger health checks for platform accounts
@@ -446,11 +445,16 @@ async def run_health_checks(
     try:
         # Add health check task to background
         if all_users:
-            # TODO: Add admin privilege check
+            # Check admin privilege
+            if not current_user.is_superuser:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Admin privileges required for all users health check"
+                )
             background_tasks.add_task(perform_health_checks, None)
             return {"message": "Health checks scheduled for all users"}
         else:
-            background_tasks.add_task(perform_health_checks, str(current_user_id))
+            background_tasks.add_task(perform_health_checks, str(current_user.id))
             return {"message": "Health checks scheduled for your accounts"}
         
     except Exception as e:
@@ -466,7 +470,7 @@ async def get_sync_logs(
     account_id: UUID,
     limit: int = Query(10, ge=1, le=100, description="Maximum number of logs to return"),
     db: Session = Depends(get_db),
-    current_user_id: UUID = Depends(get_current_user_id)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get synchronization logs for a platform account
@@ -478,7 +482,7 @@ async def get_sync_logs(
         service = get_platform_account_service(db)
         
         # Verify account ownership
-        account = service.get_account(account_id, current_user_id)
+        account = service.get_account(account_id, current_user.id)
         if not account:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,

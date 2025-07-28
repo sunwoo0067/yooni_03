@@ -24,12 +24,14 @@ from app.schemas.product import (
 from app.services.product_service import product_service
 from app.crud.product import product as product_crud, product_category as category_crud
 from app.utils.product_utils import generate_product_export_csv
+from app.core.cache import cache_result, invalidate_cache
 
-router = APIRouter(prefix="/products", tags=["products"])
+router = APIRouter()
 
 
 # Product CRUD endpoints
 @router.post("/", response_model=Product, status_code=status.HTTP_201_CREATED)
+@invalidate_cache("products_list:*")  # 상품 생성 시 목록 캐시 무효화
 async def create_product(
     *,
     db: Session = Depends(get_db),
@@ -54,7 +56,8 @@ async def create_product(
 
 
 @router.get("/", response_model=ProductListResponse)
-def get_products(
+@cache_result(prefix="products_list", ttl=300)  # 5분 캐싱
+async def get_products(
     *,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -114,7 +117,8 @@ def get_products(
 
 
 @router.get("/{product_id}", response_model=Product)
-def get_product(
+@cache_result(prefix="product_detail", ttl=600)  # 10분 캐싱
+async def get_product(
     *,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -128,6 +132,8 @@ def get_product(
 
 
 @router.put("/{product_id}", response_model=Product)
+@invalidate_cache("products_list:*")  # 목록 캐시 무효화
+@invalidate_cache("product_detail:*")  # 상세 캐시 무효화
 async def update_product(
     *,
     db: Session = Depends(get_db),

@@ -7,20 +7,49 @@ import json
 import logging
 from enum import Enum
 
-from langchain.chains import LLMChain, SequentialChain
-from langchain.prompts import PromptTemplate, ChatPromptTemplate
-from langchain.memory import ConversationBufferWindowMemory
-from langchain.schema import BaseMessage, HumanMessage, AIMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_community.llms import Ollama
-from langchain.callbacks.manager import CallbackManagerForChainRun
-from langchain.agents import AgentExecutor, create_structured_chat_agent
-from langchain.tools import Tool, StructuredTool
-from langchain.output_parsers import JsonOutputParser, PydanticOutputParser
+logger = logging.getLogger(__name__)
+
+# Optional AI dependencies - 설치되지 않은 경우 기본 동작으로 fallback
+try:
+    from langchain.chains import LLMChain, SequentialChain
+    from langchain.prompts import PromptTemplate, ChatPromptTemplate
+    from langchain.memory import ConversationBufferWindowMemory
+    from langchain.schema import BaseMessage, HumanMessage, AIMessage
+    from langchain_google_genai import ChatGoogleGenerativeAI
+    from langchain_community.llms import Ollama
+    from langchain.callbacks.manager import CallbackManagerForChainRun
+    from langchain.agents import AgentExecutor, create_structured_chat_agent
+    from langchain.tools import Tool, StructuredTool
+    from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser
+    LANGCHAIN_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"LangChain modules not available: {e}. Using fallback implementation.")
+    LANGCHAIN_AVAILABLE = False
+    # Dummy classes for fallback
+    class LLMChain: pass
+    class SequentialChain: pass
+    class PromptTemplate: pass
+    class ChatPromptTemplate: pass
+    class ConversationBufferWindowMemory: pass
+    class BaseMessage: pass
+    class HumanMessage: pass
+    class AIMessage: pass
+    class ChatGoogleGenerativeAI: pass
+    class Ollama: pass
+    class CallbackManagerForChainRun: pass
+    class AgentExecutor: pass
+    class Tool: pass
+    class StructuredTool: pass
+    class JsonOutputParser: 
+        def parse(self, text): return {}
+    class PydanticOutputParser: 
+        def parse(self, text): return {}
+    def create_structured_chat_agent(*args, **kwargs): return None
 from pydantic import BaseModel, Field
 
 from app.services.ai.gemini_service import GeminiService
 from app.services.ai.ollama_service import OllamaService
+from app.core.cache import cache_result
 
 logger = logging.getLogger(__name__)
 
@@ -114,9 +143,8 @@ class LangChainService:
         # 콘텐츠 생성 체인
         self.content_generation_chain = self._create_content_generation_chain()
     
-    def _create_product_optimization_chain(self) -> SequentialChain:
-        """상품 최적화 체인 생성"""
-        # Step 1: 키워드 추출 (Ollama - 로컬)
+    def _create_keyword_extraction_chain(self) -> LLMChain:
+        """키워드 추출 체인 생성"""
         keyword_prompt = PromptTemplate(
             input_variables=["product_name", "category", "features"],
             template="""
@@ -129,13 +157,14 @@ class LangChainService:
             각 키워드는 쉼표로 구분하여 나열해주세요.
             """
         )
-        keyword_chain = LLMChain(
+        return LLMChain(
             llm=self.ollama_llm,
             prompt=keyword_prompt,
             output_key="keywords"
         )
-        
-        # Step 2: 시장 트렌드 분석 (Gemini - 클라우드)
+    
+    def _create_trend_analysis_chain(self) -> LLMChain:
+        """시장 트렌드 분석 체인 생성"""
         trend_prompt = PromptTemplate(
             input_variables=["category", "keywords"],
             template="""
@@ -146,13 +175,14 @@ class LangChainService:
             상품 최적화를 위한 인사이트를 제공해주세요.
             """
         )
-        trend_chain = LLMChain(
+        return LLMChain(
             llm=self.gemini_llm,
             prompt=trend_prompt,
             output_key="market_insights"
         )
-        
-        # Step 3: 최종 최적화 (Ollama - 로컬)
+    
+    def _create_optimization_chain(self) -> LLMChain:
+        """최종 최적화 체인 생성"""
         optimization_prompt = PromptTemplate(
             input_variables=["product_name", "keywords", "market_insights"],
             template="""
@@ -169,11 +199,18 @@ class LangChainService:
             JSON 형식으로 응답해주세요.
             """
         )
-        optimization_chain = LLMChain(
+        return LLMChain(
             llm=self.ollama_llm,
             prompt=optimization_prompt,
             output_key="optimization_result"
         )
+    
+    def _create_product_optimization_chain(self) -> SequentialChain:
+        """상품 최적화 체인 생성"""
+        # 각 단계별 체인 생성
+        keyword_chain = self._create_keyword_extraction_chain()
+        trend_chain = self._create_trend_analysis_chain()
+        optimization_chain = self._create_optimization_chain()
         
         # 체인 연결
         return SequentialChain(
@@ -183,9 +220,8 @@ class LangChainService:
             verbose=True
         )
     
-    def _create_market_analysis_chain(self) -> SequentialChain:
-        """시장 분석 체인 생성"""
-        # Step 1: 경쟁사 분석 (Gemini)
+    def _create_competition_analysis_chain(self) -> LLMChain:
+        """경쟁사 분석 체인 생성"""
         competition_prompt = PromptTemplate(
             input_variables=["category", "product_type", "price_range"],
             template="""
@@ -197,13 +233,14 @@ class LangChainService:
             특히 성공적인 판매 전략과 차별화 포인트를 중심으로 분석해주세요.
             """
         )
-        competition_chain = LLMChain(
+        return LLMChain(
             llm=self.gemini_llm,
             prompt=competition_prompt,
             output_key="competition_analysis"
         )
-        
-        # Step 2: 수요 예측 (Ollama)
+    
+    def _create_demand_forecast_chain(self) -> LLMChain:
+        """수요 예측 체인 생성"""
         demand_prompt = PromptTemplate(
             input_variables=["category", "season", "competition_analysis"],
             template="""
@@ -215,13 +252,14 @@ class LangChainService:
             재고 관리 및 가격 전략을 제안해주세요.
             """
         )
-        demand_chain = LLMChain(
+        return LLMChain(
             llm=self.ollama_llm,
             prompt=demand_prompt,
             output_key="demand_forecast"
         )
-        
-        # Step 3: 종합 분석 (Gemini)
+    
+    def _create_market_synthesis_chain(self) -> LLMChain:
+        """시장 종합 분석 체인 생성"""
         synthesis_prompt = PromptTemplate(
             input_variables=["competition_analysis", "demand_forecast"],
             template="""
@@ -237,11 +275,18 @@ class LangChainService:
             JSON 형식으로 응답해주세요.
             """
         )
-        synthesis_chain = LLMChain(
+        return LLMChain(
             llm=self.gemini_llm,
             prompt=synthesis_prompt,
             output_key="market_synthesis"
         )
+    
+    def _create_market_analysis_chain(self) -> SequentialChain:
+        """시장 분석 체인 생성"""
+        # 각 단계별 체인 생성
+        competition_chain = self._create_competition_analysis_chain()
+        demand_chain = self._create_demand_forecast_chain()
+        synthesis_chain = self._create_market_synthesis_chain()
         
         return SequentialChain(
             chains=[competition_chain, demand_chain, synthesis_chain],
@@ -331,6 +376,7 @@ class LangChainService:
             verbose=True
         )
     
+    @cache_result(prefix="ai_product_optimization", ttl=3600)  # 1시간 캐싱
     async def optimize_product_workflow(self,
                                       product_data: Dict[str, Any]) -> Dict[str, Any]:
         """상품 최적화 워크플로우 실행"""
@@ -375,6 +421,7 @@ class LangChainService:
                 "timestamp": datetime.utcnow().isoformat()
             }
     
+    @cache_result(prefix="ai_market_analysis", ttl=7200)  # 2시간 캐싱
     async def analyze_market_workflow(self,
                                     market_data: Dict[str, Any]) -> Dict[str, Any]:
         """시장 분석 워크플로우 실행"""
@@ -414,6 +461,7 @@ class LangChainService:
                 "timestamp": datetime.utcnow().isoformat()
             }
     
+    @cache_result(prefix="ai_pricing_strategy", ttl=3600)  # 1시간 캐싱
     async def generate_pricing_strategy(self,
                                       pricing_data: Dict[str, Any]) -> Dict[str, Any]:
         """가격 전략 생성"""

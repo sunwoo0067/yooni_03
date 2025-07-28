@@ -8,10 +8,10 @@ from sqlalchemy.orm import Session
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 
-from ....services.database.database import get_db
-from ....services.performance.performance_optimizer import PerformanceOptimizer
-from ....services.performance.cache_manager import CacheManager, cache_invalidator
-from ....services.performance.monitoring_service import get_monitoring_service
+from app.api.v1.dependencies.database import get_db
+from app.services.performance.performance_optimizer import PerformanceOptimizer
+from app.services.performance.cache_manager import CacheManager, cache_invalidator
+from app.services.performance.monitoring_service import get_monitoring_service
 
 router = APIRouter()
 

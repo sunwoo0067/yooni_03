@@ -1,0 +1,57 @@
+{
+  "timestamp": "2025-07-27T19:12:47.302394",
+  "total_products": 5,
+  "products": [
+    {
+      "wholesaler": "Domeggook",
+      "product_id": "DG001",
+      "name": "도매매 샘플 의류 - 여성 블라우스",
+      "price": 12000,
+      "stock": 150,
+      "category": "의류/여성의류",
+      "supplier": "패션플러스",
+      "image_url": "https://sample.domeggook.com/image1.jpg"
+    },
+    {
+      "wholesaler": "Domeggook",
+      "product_id": "DG002",
+      "name": "도매매 샘플 가방 - 크로스백",
+      "price": 18000,
+      "stock": 80,
+      "category": "가방/지갑",
+      "supplier": "백앤백",
+      "image_url": "https://sample.domeggook.com/image2.jpg"
+    },
+    {
+      "wholesaler": "Domeggook",
+      "product_id": "DG003",
+      "name": "도매매 샘플 액세서리 - 목걸이",
+      "price": 8500,
+      "stock": 200,
+      "category": "액세서리/주얼리",
+      "supplier": "쥬얼리하우스",
+      "image_url": "https://sample.domeggook.com/image3.jpg"
+    },
+    {
+      "wholesaler": "Domeggook",
+      "product_id": "DG004",
+      "name": "도매매 샘플 신발 - 운동화",
+      "price": 35000,
+      "stock": 50,
+      "category": "신발/운동화",
+      "supplier": "슈즈마켓",
+      "image_url": "https://sample.domeggook.com/image4.jpg"
+    },
+    {
+      "wholesaler": "Domeggook",
+      "product_id": "DG005",
+      "name": "도매매 샘플 화장품 - 스킨케어 세트",
+      "price": 25000,
+      "stock": 100,
+      "category": "뷰티/화장품",
+      "supplier": "뷰티서플라이",
+      "image_url": "https://sample.domeggook.com/image5.jpg"
+    }
+  ],
+  "note": "도매매 API 연동이 실패하여 샘플 데이터를 생성했습니다."
+}

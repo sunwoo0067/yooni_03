@@ -21,69 +21,86 @@ from .product import (
     ProductStatus, ProductType, PricingStrategy
 )
 
-# Import order models
-from .order import (
+# Import order models - Core models only for Phase 1
+from .order_core import (
     Order, OrderItem, OrderPayment, OrderShipment, OrderShipmentItem, OrderStatusHistory,
     OrderStatus, PaymentStatus, ShippingStatus
 )
 
-# Import inventory models
+# Import inventory models - REACTIVATED IN PHASE 2.1
 from .inventory import (
     Warehouse, InventoryItem, InventoryMovement, StockAdjustment, StockAdjustmentItem,
     StockCount, StockCountItem, MovementType, InventoryStatus
 )
 
-# Import AI models
+# Import AI models - REACTIVATED IN PHASE 2.2
 from .ai_log import (
     AILog, AITrainingData, AIModel, AIPrediction, AIExperiment,
     AIOperationType, AIModelType, ExecutionStatus
 )
 
-# Import wholesaler models
+# Import wholesaler models - REACTIVATED IN PHASE 2.3
 from .wholesaler import (
     WholesalerAccount, WholesalerType, ConnectionStatus, CollectionStatus,
     CollectionLog, ScheduledCollection, WholesalerProduct, ExcelUploadLog
 )
 
-# Import dropshipping models
+# Import dropshipping models - REACTIVATED IN PHASE 2.3
 from .dropshipping import (
     OutOfStockHistory, SupplierReliability, RestockHistory, StockCheckLog,
     PriceHistory, ProfitProtectionLog, StockoutPredictionHistory, DemandAnalysisHistory,
-    AutomationRule, AutomationExecution, AlternativeRecommendation, DropshippingSettings
+    AutomationRule, AutomationExecution, AlternativeRecommendation, DropshippingSettings,
+    DuplicateProductGroup, DuplicateProduct
 )
 
-# Import CRM models
-from .crm import (
-    Customer, CustomerLifecycleStage, CustomerSegment, CustomerBehavior,
-    RFMAnalysis, CustomerInteraction, CustomerRecommendation, CustomerCampaign,
-    CustomerLifecycleEvent, CustomerPreference
+# Import collected product models
+from .collected_product import CollectedProduct, CollectionBatch, CollectionStatus as CollectedProductStatus, WholesalerSource
+from .collected_product_history import CollectedProductHistory, PriceAlert, ChangeType
+
+# Import security and audit models
+from .security_audit import (
+    SecurityAuditLog, TokenBlacklist, LoginAttempt, PasswordResetToken
 )
 
-# Import marketing models
-from .marketing import (
-    MarketingCampaign, MarketingSegment, MarketingMessage, MarketingAnalytics,
-    PromotionCode, AutomationWorkflow, WorkflowNode, WorkflowExecution,
-    AutomationTrigger, ABTestVariant, SocialMediaPost,
-    CampaignType, CampaignStatus, MessageStatus, TriggerType
+# Import RBAC models
+from .rbac import (
+    Permission, Role, PermissionCategory, PermissionAction, ResourceScope,
+    PermissionCondition, UserPermissionAudit, AccessRequest, PermissionDelegation,
+    role_permission_association, user_permission_override
 )
 
-# Import market trend models
-from .market import MarketTrend
+# Import CRM models - TEMPORARILY DISABLED FOR REFACTORING
+# from .crm import (
+#     Customer, CustomerLifecycleStage, CustomerSegment, CustomerBehavior,
+#     RFMAnalysis, CustomerInteraction, CustomerRecommendation, CustomerCampaign,
+#     CustomerLifecycleEvent, CustomerPreference
+# )
 
-# Import pipeline models
+# Import marketing models - TEMPORARILY DISABLED FOR REFACTORING
+# from .marketing import (
+#     MarketingCampaign, MarketingSegment, MarketingMessage, MarketingAnalytics,
+#     PromotionCode, AutomationWorkflow, WorkflowNode, WorkflowExecution,
+#     AutomationTrigger, ABTestVariant, SocialMediaPost,
+#     CampaignType, CampaignStatus, MessageStatus, TriggerType
+# )
+
+# Import market trend models - TEMPORARILY DISABLED FOR REFACTORING
+# from .market import MarketTrend
+
+# Import pipeline models - REACTIVATED IN PHASE 2.4
 from .pipeline import (
     PipelineExecution, PipelineStep, PipelineProductResult, WorkflowTemplate,
     PipelineAlert, PipelineSchedule, WorkflowStatus, StepStatus
 )
 
-# Import sales analytics models
-from .sales_analytics import (
-    SalesAnalytics, MarketplaceSession, TrafficSource, SearchKeyword,
-    CompetitorAnalysis, PerformanceReport, DataCollectionLog,
-    MarketplaceType, DataCollectionStatus
-)
+# Import sales analytics models - TEMPORARILY DISABLED FOR REFACTORING
+# from .sales_analytics import (
+#     SalesAnalytics, MarketplaceSession, TrafficSource, SearchKeyword,
+#     CompetitorAnalysis, PerformanceReport, DataCollectionLog,
+#     MarketplaceType, DataCollectionStatus
+# )
 
-# All models for easy import
+# Core models for Phase 1 - Essential functionality only
 __all__ = [
     # Base classes
     "Base",
@@ -128,7 +145,7 @@ __all__ = [
     "PaymentStatus",
     "ShippingStatus",
     
-    # Inventory models
+    # Inventory models - REACTIVATED IN PHASE 2.1
     "Warehouse",
     "InventoryItem",
     "InventoryMovement",
@@ -139,7 +156,7 @@ __all__ = [
     "MovementType",
     "InventoryStatus",
     
-    # AI models
+    # AI models - REACTIVATED IN PHASE 2.2
     "AILog",
     "AITrainingData",
     "AIModel",
@@ -149,17 +166,17 @@ __all__ = [
     "AIModelType",
     "ExecutionStatus",
     
-    # Wholesaler models
+    # Wholesaler models - REACTIVATED IN PHASE 2.3
     "WholesalerAccount",
     "WholesalerType",
     "ConnectionStatus",
     "CollectionStatus",
     "CollectionLog",
-    "ScheduledCollection", 
+    "ScheduledCollection",
     "WholesalerProduct",
     "ExcelUploadLog",
     
-    # Dropshipping models
+    # Dropshipping models - REACTIVATED IN PHASE 2.3
     "OutOfStockHistory",
     "SupplierReliability",
     "RestockHistory",
@@ -172,40 +189,10 @@ __all__ = [
     "AutomationExecution",
     "AlternativeRecommendation",
     "DropshippingSettings",
+    "DuplicateProductGroup",
+    "DuplicateProduct",
     
-    # CRM models
-    "Customer",
-    "CustomerLifecycleStage",
-    "CustomerSegment",
-    "CustomerBehavior",
-    "RFMAnalysis",
-    "CustomerInteraction",
-    "CustomerRecommendation",
-    "CustomerCampaign",
-    "CustomerLifecycleEvent",
-    "CustomerPreference",
-    
-    # Marketing models
-    "MarketingCampaign",
-    "MarketingSegment",
-    "MarketingMessage",
-    "MarketingAnalytics",
-    "PromotionCode",
-    "AutomationWorkflow",
-    "WorkflowNode",
-    "WorkflowExecution",
-    "AutomationTrigger",
-    "ABTestVariant",
-    "SocialMediaPost",
-    "CampaignType",
-    "CampaignStatus",
-    "MessageStatus",
-    "TriggerType",
-    
-    # Market trend models
-    "MarketTrend",
-    
-    # Pipeline models
+    # Pipeline models - REACTIVATED IN PHASE 2.4
     "PipelineExecution",
     "PipelineStep", 
     "PipelineProductResult",
@@ -215,19 +202,38 @@ __all__ = [
     "WorkflowStatus",
     "StepStatus",
     
-    # Sales analytics models
-    "SalesAnalytics",
-    "MarketplaceSession",
-    "TrafficSource",
-    "SearchKeyword",
-    "CompetitorAnalysis",
-    "PerformanceReport",
-    "DataCollectionLog",
-    "MarketplaceType",
-    "DataCollectionStatus",
+    # Collected product models
+    "CollectedProduct",
+    "CollectionBatch",
+    "CollectedProductStatus",
+    "WholesalerSource",
+    "CollectedProductHistory",
+    "PriceAlert",
+    "ChangeType",
+    
+    # Security and audit models
+    "SecurityAuditLog",
+    "TokenBlacklist", 
+    "LoginAttempt",
+    "PasswordResetToken",
+    
+    # RBAC models
+    "Permission",
+    "Role",
+    "PermissionCategory",
+    "PermissionAction",
+    "ResourceScope",
+    "PermissionCondition",
+    "UserPermissionAudit",
+    "AccessRequest",
+    "PermissionDelegation",
+    "role_permission_association",
+    "user_permission_override",
+    
+    # Additional models will be added in Phase 2.4
 ]
 
-# Model registry for database operations
+# Core model registry for Phase 1 - Essential functionality only
 MODELS = [
     # User models
     User,
@@ -254,7 +260,7 @@ MODELS = [
     OrderShipmentItem,
     OrderStatusHistory,
     
-    # Inventory models
+    # Inventory models - REACTIVATED IN PHASE 2.1
     Warehouse,
     InventoryItem,
     InventoryMovement,
@@ -263,21 +269,21 @@ MODELS = [
     StockCount,
     StockCountItem,
     
-    # AI models
-    AIModel,
+    # AI models - REACTIVATED IN PHASE 2.2
     AILog,
     AITrainingData,
+    AIModel,
     AIPrediction,
     AIExperiment,
     
-    # Wholesaler models
+    # Wholesaler models - REACTIVATED IN PHASE 2.3
     WholesalerAccount,
     CollectionLog,
     ScheduledCollection,
     WholesalerProduct,
     ExcelUploadLog,
     
-    # Dropshipping models
+    # Dropshipping models - REACTIVATED IN PHASE 2.3
     OutOfStockHistory,
     SupplierReliability,
     RestockHistory,
@@ -290,34 +296,10 @@ MODELS = [
     AutomationExecution,
     AlternativeRecommendation,
     DropshippingSettings,
+    DuplicateProductGroup,
+    DuplicateProduct,
     
-    # CRM models
-    Customer,
-    CustomerBehavior,
-    RFMAnalysis,
-    CustomerInteraction,
-    CustomerRecommendation,
-    CustomerCampaign,
-    CustomerLifecycleEvent,
-    CustomerPreference,
-    
-    # Marketing models
-    MarketingCampaign,
-    MarketingSegment,
-    MarketingMessage,
-    MarketingAnalytics,
-    PromotionCode,
-    AutomationWorkflow,
-    WorkflowNode,
-    WorkflowExecution,
-    AutomationTrigger,
-    ABTestVariant,
-    SocialMediaPost,
-    
-    # Market trend models
-    MarketTrend,
-    
-    # Pipeline models
+    # Pipeline models - REACTIVATED IN PHASE 2.4
     PipelineExecution,
     PipelineStep,
     PipelineProductResult,
@@ -325,14 +307,26 @@ MODELS = [
     PipelineAlert,
     PipelineSchedule,
     
-    # Sales analytics models
-    SalesAnalytics,
-    MarketplaceSession,
-    TrafficSource,
-    SearchKeyword,
-    CompetitorAnalysis,
-    PerformanceReport,
-    DataCollectionLog,
+    # Collected product models
+    CollectedProduct,
+    CollectionBatch,
+    CollectedProductHistory,
+    PriceAlert,
+    
+    # Security and audit models
+    SecurityAuditLog,
+    TokenBlacklist,
+    LoginAttempt,
+    PasswordResetToken,
+    
+    # RBAC models
+    Permission,
+    Role,
+    UserPermissionAudit,
+    AccessRequest,
+    PermissionDelegation,
+    
+    # Additional models will be added in Phase 2.4
 ]
 
 # Utility function to create all tables

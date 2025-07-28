@@ -1,0 +1,330 @@
+{
+  "timestamp": "2025-07-28T15:19:45.122105",
+  "sync_results": {
+    "total": 45,
+    "success": 45,
+    "failed": 0,
+    "details": [
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_DG005",
+        "status": "SUCCESS",
+        "selling_price": 32500,
+        "margin_rate": 30.0
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_DG005",
+        "status": "SUCCESS",
+        "selling_price": 32500,
+        "margin_rate": 30.0
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_DG005",
+        "status": "SUCCESS",
+        "selling_price": 32500,
+        "margin_rate": 30.0
+      },
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_DG004",
+        "status": "SUCCESS",
+        "selling_price": 45500,
+        "margin_rate": 30.0
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_DG004",
+        "status": "SUCCESS",
+        "selling_price": 45500,
+        "margin_rate": 30.0
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_DG004",
+        "status": "SUCCESS",
+        "selling_price": 45500,
+        "margin_rate": 30.0
+      },
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_DG003",
+        "status": "SUCCESS",
+        "selling_price": 11000,
+        "margin_rate": 29.411764705882355
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_DG003",
+        "status": "SUCCESS",
+        "selling_price": 11000,
+        "margin_rate": 29.411764705882355
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_DG003",
+        "status": "SUCCESS",
+        "selling_price": 11000,
+        "margin_rate": 29.411764705882355
+      },
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_DG002",
+        "status": "SUCCESS",
+        "selling_price": 23400,
+        "margin_rate": 30.0
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_DG002",
+        "status": "SUCCESS",
+        "selling_price": 23400,
+        "margin_rate": 30.0
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_DG002",
+        "status": "SUCCESS",
+        "selling_price": 23400,
+        "margin_rate": 30.0
+      },
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_DG001",
+        "status": "SUCCESS",
+        "selling_price": 15600,
+        "margin_rate": 30.0
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_DG001",
+        "status": "SUCCESS",
+        "selling_price": 15600,
+        "margin_rate": 30.0
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_DG001",
+        "status": "SUCCESS",
+        "selling_price": 15600,
+        "margin_rate": 30.0
+      },
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_5004",
+        "status": "SUCCESS",
+        "selling_price": 3000,
+        "margin_rate": 27.659574468085108
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_5004",
+        "status": "SUCCESS",
+        "selling_price": 3000,
+        "margin_rate": 27.659574468085108
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_5004",
+        "status": "SUCCESS",
+        "selling_price": 3000,
+        "margin_rate": 27.659574468085108
+      },
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_5005",
+        "status": "SUCCESS",
+        "selling_price": 2100,
+        "margin_rate": 25.0
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_5005",
+        "status": "SUCCESS",
+        "selling_price": 2100,
+        "margin_rate": 25.0
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_5005",
+        "status": "SUCCESS",
+        "selling_price": 2100,
+        "margin_rate": 25.0
+      },
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_5006",
+        "status": "SUCCESS",
+        "selling_price": 4700,
+        "margin_rate": 29.476584022038566
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_5006",
+        "status": "SUCCESS",
+        "selling_price": 4700,
+        "margin_rate": 29.476584022038566
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_5006",
+        "status": "SUCCESS",
+        "selling_price": 4700,
+        "margin_rate": 29.476584022038566
+      },
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_5007",
+        "status": "SUCCESS",
+        "selling_price": 3000,
+        "margin_rate": 28.75536480686695
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_5007",
+        "status": "SUCCESS",
+        "selling_price": 3000,
+        "margin_rate": 28.75536480686695
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_5007",
+        "status": "SUCCESS",
+        "selling_price": 3000,
+        "margin_rate": 28.75536480686695
+      },
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_5009",
+        "status": "SUCCESS",
+        "selling_price": 200,
+        "margin_rate": -9.090909090909092
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_5009",
+        "status": "SUCCESS",
+        "selling_price": 200,
+        "margin_rate": -9.090909090909092
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_5009",
+        "status": "SUCCESS",
+        "selling_price": 200,
+        "margin_rate": -9.090909090909092
+      },
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_WFJ59EN",
+        "status": "SUCCESS",
+        "selling_price": 62900,
+        "margin_rate": 29.958677685950413
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_WFJ59EN",
+        "status": "SUCCESS",
+        "selling_price": 62900,
+        "margin_rate": 29.958677685950413
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_WFJ59EN",
+        "status": "SUCCESS",
+        "selling_price": 62900,
+        "margin_rate": 29.958677685950413
+      },
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_WFJ59EO",
+        "status": "SUCCESS",
+        "selling_price": 34600,
+        "margin_rate": 29.97746055597295
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_WFJ59EO",
+        "status": "SUCCESS",
+        "selling_price": 34600,
+        "margin_rate": 29.97746055597295
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_WFJ59EO",
+        "status": "SUCCESS",
+        "selling_price": 34600,
+        "margin_rate": 29.97746055597295
+      },
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_WFJ59EP",
+        "status": "SUCCESS",
+        "selling_price": 40800,
+        "margin_rate": 29.688493324856964
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_WFJ59EP",
+        "status": "SUCCESS",
+        "selling_price": 40800,
+        "margin_rate": 29.688493324856964
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_WFJ59EP",
+        "status": "SUCCESS",
+        "selling_price": 40800,
+        "margin_rate": 29.688493324856964
+      },
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_WFJ59EQ",
+        "status": "SUCCESS",
+        "selling_price": 28300,
+        "margin_rate": 29.935720844811755
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_WFJ59EQ",
+        "status": "SUCCESS",
+        "selling_price": 28300,
+        "margin_rate": 29.935720844811755
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_WFJ59EQ",
+        "status": "SUCCESS",
+        "selling_price": 28300,
+        "margin_rate": 29.935720844811755
+      },
+      {
+        "marketplace": "coupang",
+        "product_id": "COUPANG_WFJ59ER",
+        "status": "SUCCESS",
+        "selling_price": 103800,
+        "margin_rate": 29.97746055597295
+      },
+      {
+        "marketplace": "naver",
+        "product_id": "NAVER_WFJ59ER",
+        "status": "SUCCESS",
+        "selling_price": 103800,
+        "margin_rate": 29.97746055597295
+      },
+      {
+        "marketplace": "11st",
+        "product_id": "11ST_WFJ59ER",
+        "status": "SUCCESS",
+        "selling_price": 103800,
+        "margin_rate": 29.97746055597295
+      }
+    ]
+  },
+  "notes": {
+    "info": "도매처 상품을 마켓플레이스에 등록하는 통합 시스템",
+    "margin": "기본 30% 마진 적용",
+    "status": "실제 API 연동은 인증 문제로 시뮬레이션으로 처리"
+  }
+}

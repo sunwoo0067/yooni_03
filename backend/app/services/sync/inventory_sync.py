@@ -8,15 +8,16 @@ import logging
 import asyncio
 
 from app.models.product import Product
-from app.models.inventory import InventoryLog, InventoryMovement
+from app.models.inventory import InventoryMovement
+# Note: InventoryMovement is not defined in the current model
 from app.models.platform_account import PlatformAccount, PlatformType
 from app.services.platforms.platform_manager import PlatformManager
 from app.crud.base import CRUDBase
 
 logger = logging.getLogger(__name__)
 
-# Create CRUD instance for InventoryLog
-inventory_log_crud = CRUDBase[InventoryLog](InventoryLog)
+# Create CRUD instance for InventoryMovement
+inventory_movement_crud = CRUDBase[InventoryMovement](InventoryMovement)
 
 
 class InventorySyncService:

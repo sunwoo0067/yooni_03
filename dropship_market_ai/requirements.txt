@@ -1,0 +1,64 @@
+# Core dependencies
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.5.0
+python-dotenv==1.0.0
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.12.1
+asyncpg==0.29.0
+psycopg2-binary==2.9.9
+redis==5.0.1
+
+# Data processing
+pandas==2.1.3
+numpy==1.26.2
+scipy==1.11.4
+
+# Machine Learning / Deep Learning
+torch==2.1.1
+transformers==4.35.2
+tensorflow==2.15.0
+scikit-learn==1.3.2
+xgboost==2.0.2
+prophet==1.1.5
+statsmodels==0.14.0
+
+# NLP (Korean)
+konlpy==0.6.0
+kiwipiepy==0.16.1
+soynlp==0.0.493
+
+# API clients
+httpx==0.25.2
+aiohttp==3.9.1
+beautifulsoup4==4.12.2
+selenium==4.15.2
+
+# Scheduling & Task Queue
+celery==5.3.4
+redis==5.0.1
+apscheduler==3.10.4
+
+# Monitoring & Logging
+prometheus-client==0.19.0
+structlog==23.2.0
+sentry-sdk==1.38.0
+
+# Visualization
+plotly==5.18.0
+dash==2.14.1
+matplotlib==3.8.2
+seaborn==0.13.0
+
+# Utils
+python-dateutil==2.8.2
+pytz==2023.3
+pyyaml==6.0.1
+python-json-logger==2.0.7
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0

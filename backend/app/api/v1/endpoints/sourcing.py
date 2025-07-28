@@ -6,13 +6,13 @@ from sqlalchemy.orm import Session
 from typing import List, Dict, Any, Optional
 import logging
 
-from ....core.deps import get_db
-from ....services.sourcing.smart_sourcing_engine import SmartSourcingEngine
-from ....services.sourcing.market_data_collector import MarketDataCollector
-from ....services.sourcing.trend_analyzer import TrendAnalyzer
-from ....services.sourcing.ai_product_analyzer import AIProductAnalyzer
-from ....models.market import MarketProduct, MarketCategory
-from ....models.trend import TrendKeyword, KeywordAnalysis
+from app.api.v1.dependencies.database import get_db
+from app.services.sourcing.smart_sourcing_engine import SmartSourcingEngine
+from app.services.sourcing.market_data_collector import MarketDataCollector
+from app.services.sourcing.trend_analyzer import TrendAnalyzer
+from app.services.sourcing.ai_product_analyzer import AIProductAnalyzer
+from app.models.market import MarketProduct, MarketCategory
+from app.models.trend import TrendKeyword, KeywordAnalysis
 
 router = APIRouter()
 logger = logging.getLogger(__name__)

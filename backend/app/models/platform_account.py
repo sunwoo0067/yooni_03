@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 import enum
 
-from .base import BaseModel
+from .base import BaseModel, get_json_type
 
 
 class PlatformType(enum.Enum):
@@ -71,7 +71,7 @@ class PlatformAccount(BaseModel):
     auto_inventory_sync = Column(Boolean, default=True, nullable=False)
     
     # Platform-specific settings
-    platform_settings = Column(JSONB, nullable=True)
+    platform_settings = Column(get_json_type(), nullable=True)
     
     # Rate limiting and quotas
     daily_api_quota = Column(Integer, nullable=True)
@@ -145,7 +145,7 @@ class PlatformSyncLog(BaseModel):
     
     # Details
     error_message = Column(Text, nullable=True)
-    sync_details = Column(JSONB, nullable=True)  # Detailed sync information
+    sync_details = Column(get_json_type(), nullable=True)  # Detailed sync information
     
     # Performance metrics
     processing_time_seconds = Column(Integer, nullable=True)

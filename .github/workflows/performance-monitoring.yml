@@ -1,0 +1,359 @@
+name: Performance Monitoring
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # 6시간마다 실행
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of performance test'
+        required: true
+        default: 'load'
+        type: choice
+        options:
+          - load
+          - stress
+          - spike
+          - soak
+
+env:
+  TARGET_URL: ${{ secrets.STAGING_URL || 'http://localhost:8000' }}
+
+jobs:
+  # 부하 테스트
+  load-test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up k6
+      run: |
+        sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+        echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+        sudo apt-get update
+        sudo apt-get install k6
+
+    - name: Prepare test scripts
+      run: |
+        mkdir -p scripts/performance
+        cat > scripts/performance/load-test.js << 'EOF'
+        import http from 'k6/http';
+        import { check, sleep } from 'k6';
+        import { Rate } from 'k6/metrics';
+
+        const errorRate = new Rate('errors');
+
+        export const options = {
+          stages: [
+            { duration: '5m', target: 100 },   // Ramp up
+            { duration: '10m', target: 100 },  // Stay at 100 users
+            { duration: '5m', target: 200 },   // Ramp up to 200
+            { duration: '10m', target: 200 },  // Stay at 200 users
+            { duration: '5m', target: 0 },     // Ramp down
+          ],
+          thresholds: {
+            http_req_duration: ['p(95)<500', 'p(99)<1000'],
+            http_req_failed: ['rate<0.1'],
+            errors: ['rate<0.1'],
+          },
+        };
+
+        export default function () {
+          // 상품 목록 조회
+          let res = http.get(`${__ENV.TARGET_URL}/api/v1/products`);
+          check(res, {
+            'status is 200': (r) => r.status === 200,
+            'response time < 500ms': (r) => r.timings.duration < 500,
+          }) || errorRate.add(1);
+          
+          sleep(1);
+          
+          // 상품 검색
+          res = http.get(`${__ENV.TARGET_URL}/api/v1/products/search?q=test`);
+          check(res, {
+            'search status is 200': (r) => r.status === 200,
+          }) || errorRate.add(1);
+          
+          sleep(1);
+          
+          // 상품 상세 조회
+          if (res.status === 200 && res.json().results && res.json().results.length > 0) {
+            const productId = res.json().results[0].id;
+            res = http.get(`${__ENV.TARGET_URL}/api/v1/products/${productId}`);
+            check(res, {
+              'product detail status is 200': (r) => r.status === 200,
+            }) || errorRate.add(1);
+          }
+          
+          sleep(2);
+        }
+        EOF
+
+    - name: Run performance test
+      run: |
+        k6 run \
+          -e TARGET_URL=${{ env.TARGET_URL }} \
+          --out json=test-results.json \
+          --out csv=test-results.csv \
+          scripts/performance/load-test.js
+
+    - name: Generate HTML report
+      run: |
+        npm install -g k6-html-reporter
+        k6-html-reporter --input test-results.json --output test-report.html
+
+    - name: Analyze results
+      run: |
+        python << 'EOF'
+        import json
+        import csv
+        import statistics
+
+        # JSON 결과 분석
+        with open('test-results.json', 'r') as f:
+            results = [json.loads(line) for line in f if line.strip()]
+        
+        # 메트릭 추출
+        durations = [r['data']['value'] for r in results if r['type'] == 'Point' and r['metric'] == 'http_req_duration']
+        errors = [r for r in results if r['type'] == 'Point' and r['metric'] == 'http_req_failed' and r['data']['value'] == 1]
+        
+        if durations:
+            print(f"평균 응답 시간: {statistics.mean(durations):.2f}ms")
+            print(f"중간값 응답 시간: {statistics.median(durations):.2f}ms")
+            print(f"95 백분위수: {statistics.quantiles(durations, n=20)[18]:.2f}ms")
+            print(f"99 백분위수: {statistics.quantiles(durations, n=100)[98]:.2f}ms")
+        
+        print(f"에러율: {len(errors) / len(results) * 100:.2f}%")
+        
+        # 임계값 검사
+        p95 = statistics.quantiles(durations, n=20)[18] if durations else 0
+        error_rate = len(errors) / len(results) if results else 0
+        
+        if p95 > 500:
+            print("⚠️ 경고: P95 응답 시간이 500ms를 초과했습니다!")
+        
+        if error_rate > 0.1:
+            print("⚠️ 경고: 에러율이 10%를 초과했습니다!")
+        EOF
+
+    - name: Upload results
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-test-results
+        path: |
+          test-results.json
+          test-results.csv
+          test-report.html
+
+  # 벤치마크 테스트
+  benchmark-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test123
+          POSTGRES_USER: test
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        pip install -r requirements-dev.txt
+
+    - name: Run benchmark tests
+      env:
+        DATABASE_URL: postgresql://test:test123@localhost:5432/test_db
+        REDIS_URL: redis://localhost:6379/0
+        SECRET_KEY: test-secret-key
+        USE_V2_SERVICES: true
+      run: |
+        cd backend
+        pytest tests/benchmarks -v --benchmark-only --benchmark-json=benchmark-results.json
+
+    - name: Compare with baseline
+      run: |
+        cd backend
+        if [ -f benchmark-baseline.json ]; then
+          pytest-benchmark compare benchmark-baseline.json benchmark-results.json --histogram
+        fi
+
+    - name: Store benchmark results
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        tool: 'pytest'
+        output-file-path: backend/benchmark-results.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: true
+        alert-threshold: '200%'
+        comment-on-alert: true
+        fail-on-alert: true
+
+  # 실시간 모니터링
+  synthetic-monitoring:
+    runs-on: ubuntu-latest
+    if: github.event.schedule || github.event_name == 'workflow_dispatch'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install monitoring tools
+      run: |
+        npm install -g @datadog/synthetics-ci-cli
+        pip install newrelic-api
+
+    - name: Run Datadog Synthetics
+      env:
+        DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+        DATADOG_APP_KEY: ${{ secrets.DATADOG_APP_KEY }}
+      run: |
+        datadog-ci synthetics run-tests --config .datadog-ci.json
+
+    - name: Check New Relic metrics
+      env:
+        NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
+      run: |
+        python << 'EOF'
+        import requests
+        import os
+        from datetime import datetime, timedelta
+
+        api_key = os.environ['NEW_RELIC_API_KEY']
+        headers = {'Api-Key': api_key}
+        
+        # 최근 1시간 메트릭 조회
+        end_time = datetime.utcnow()
+        start_time = end_time - timedelta(hours=1)
+        
+        query = """
+        {
+          actor {
+            account(id: 1234567) {
+              nrql(query: "SELECT average(duration) FROM Transaction WHERE appName = 'dropshipping-backend' SINCE 1 hour ago") {
+                results
+              }
+            }
+          }
+        }
+        """
+        
+        response = requests.post(
+            'https://api.newrelic.com/graphql',
+            headers=headers,
+            json={'query': query}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            avg_duration = data['data']['actor']['account']['nrql']['results'][0]['average.duration']
+            print(f"평균 트랜잭션 시간: {avg_duration:.2f}ms")
+            
+            if avg_duration > 500:
+                print("⚠️ 경고: 평균 응답 시간이 500ms를 초과했습니다!")
+        EOF
+
+  # 성능 리포트 생성
+  generate-report:
+    runs-on: ubuntu-latest
+    needs: [load-test, benchmark-test]
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+
+    - name: Generate consolidated report
+      run: |
+        python << 'EOF'
+        import json
+        import matplotlib.pyplot as plt
+        import pandas as pd
+        from datetime import datetime
+
+        # 리포트 생성
+        report = {
+            'timestamp': datetime.utcnow().isoformat(),
+            'summary': {},
+            'recommendations': []
+        }
+
+        # 부하 테스트 결과 분석
+        try:
+            with open('performance-test-results/test-results.json', 'r') as f:
+                load_results = [json.loads(line) for line in f if line.strip()]
+            
+            durations = [r['data']['value'] for r in load_results if r['type'] == 'Point' and r['metric'] == 'http_req_duration']
+            if durations:
+                report['summary']['load_test'] = {
+                    'avg_response_time': sum(durations) / len(durations),
+                    'max_response_time': max(durations),
+                    'min_response_time': min(durations)
+                }
+        except:
+            pass
+
+        # 권장사항 생성
+        if report['summary'].get('load_test', {}).get('avg_response_time', 0) > 300:
+            report['recommendations'].append('평균 응답 시간이 300ms를 초과합니다. 캐싱 전략을 검토하세요.')
+
+        # 리포트 저장
+        with open('performance-report.json', 'w') as f:
+            json.dump(report, f, indent=2)
+
+        print("성능 리포트가 생성되었습니다.")
+        EOF
+
+    - name: Create issue if performance degrades
+      uses: actions/github-script@v6
+      if: failure()
+      with:
+        script: |
+          const title = `🚨 성능 저하 감지 - ${new Date().toISOString().split('T')[0]}`;
+          const body = `## 성능 모니터링 결과
+          
+          성능 테스트에서 임계값을 초과하는 지표가 발견되었습니다.
+          
+          ### 상세 내용
+          - 테스트 시간: ${new Date().toISOString()}
+          - 워크플로우: [${context.workflow}](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+          
+          ### 조치 필요
+          1. 성능 테스트 결과 확인
+          2. 병목 지점 분석
+          3. 최적화 방안 수립
+          
+          @${context.repo.owner} 확인 부탁드립니다.`;
+          
+          await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: title,
+            body: body,
+            labels: ['performance', 'bug', 'high-priority']
+          });

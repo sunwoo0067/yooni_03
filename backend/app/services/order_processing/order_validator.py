@@ -7,7 +7,7 @@ from decimal import Decimal
 from sqlalchemy.orm import Session
 from datetime import datetime
 
-from app.models.order import Order, OrderItem, OrderStatus, PaymentStatus
+from app.models.order_core import Order, OrderItem, OrderStatus, PaymentStatus
 from app.models.product import Product
 from app.models.wholesaler import Wholesaler
 from app.models.platform_account import PlatformAccount
@@ -238,7 +238,7 @@ class OrderValidator:
         issues = []
         
         # 이미 처리 중인 주문인지 확인
-        from app.models.order import DropshippingOrder
+        from app.models.order_core import DropshippingOrder
         existing = self.db.query(DropshippingOrder).filter(
             DropshippingOrder.order_id == order.id
         ).first()
@@ -327,7 +327,7 @@ class OrderValidator:
     async def validate_order_for_retry(self, order_id: str) -> Dict:
         """재시도 가능 여부 검증"""
         try:
-            from app.models.order import DropshippingOrder
+            from app.models.order_core import DropshippingOrder
             
             dropshipping_order = self.db.query(DropshippingOrder).join(Order).filter(
                 Order.id == order_id

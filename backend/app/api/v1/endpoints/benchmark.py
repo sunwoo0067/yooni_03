@@ -7,10 +7,10 @@ from sqlalchemy.orm import Session
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta
 
-from ....core.database import get_db
-from ....services.benchmark.benchmark_manager import BenchmarkManager
-from ....services.sourcing.smart_sourcing_engine_v2 import SmartSourcingEngine
-from ....models.benchmark import BenchmarkProduct
+from app.api.v1.dependencies.database import get_db
+from app.services.benchmark.benchmark_manager import BenchmarkManager
+from app.services.sourcing.smart_sourcing_engine_v2 import SmartSourcingEngine
+from app.models.benchmark import BenchmarkProduct
 
 router = APIRouter()
 

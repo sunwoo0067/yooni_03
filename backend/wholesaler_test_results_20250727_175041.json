@@ -1,0 +1,17 @@
+{
+  "ownerclan": {
+    "status": "failed",
+    "products": [],
+    "error": "인증 중 오류 발생: Connection closed"
+  },
+  "domeggook": {
+    "status": "failed",
+    "products": [],
+    "error": "인증 실패"
+  },
+  "summary": {
+    "total_products": 0,
+    "execution_time": 0.195182,
+    "timestamp": "2025-07-27T17:50:41.801208"
+  }
+}

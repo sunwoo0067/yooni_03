@@ -7,7 +7,7 @@ from decimal import Decimal
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 
-from app.models.order import Order, DropshippingOrder, OrderItem
+from app.models.order_core import Order, DropshippingOrder, OrderItem
 from app.models.product import Product
 from app.models.wholesaler import Wholesaler
 from app.services.order_processing.margin_calculator import MarginCalculator

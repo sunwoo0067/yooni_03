@@ -1,0 +1,220 @@
+name: Code Quality
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [develop]
+
+jobs:
+  # SonarQube 분석
+  sonarqube:
+    name: SonarQube Analysis
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        pip install -r requirements-dev.txt
+        pip install pytest-cov
+
+    - name: Run tests with coverage
+      run: |
+        cd backend
+        pytest --cov=app --cov-report=xml --cov-report=term
+
+    - name: SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      with:
+        args: >
+          -Dsonar.projectKey=dropshipping-backend
+          -Dsonar.sources=backend/app
+          -Dsonar.tests=backend/tests
+          -Dsonar.python.coverage.reportPaths=backend/coverage.xml
+          -Dsonar.python.version=3.11
+
+  # CodeQL 분석
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'python', 'javascript' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+        queries: security-extended,security-and-quality
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{matrix.language}}"
+
+  # 의존성 검사
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Dependency Review
+      uses: actions/dependency-review-action@v3
+      with:
+        fail-on-severity: moderate
+        deny-licenses: GPL-3.0, AGPL-3.0
+        
+  # 라이센스 검사
+  license-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Check Python licenses
+      run: |
+        cd backend
+        pip install pip-licenses
+        pip-licenses --fail-on="GPL;AGPL" --format=markdown > licenses.md
+        
+    - name: Check Node licenses
+      run: |
+        cd frontend
+        npx license-checker --production --onlyAllow "MIT;Apache-2.0;BSD;ISC" --excludePrivatePackages
+
+  # 코드 복잡도 분석
+  complexity-analysis:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install analysis tools
+      run: |
+        pip install radon xenon
+        
+    - name: Cyclomatic Complexity
+      run: |
+        cd backend
+        radon cc app -a -nb --total-average
+        
+    - name: Maintainability Index
+      run: |
+        cd backend
+        radon mi app -s
+        
+    - name: Complexity threshold check
+      run: |
+        cd backend
+        xenon --max-absolute B --max-modules B --max-average A app
+
+  # 코드 중복 검사
+  duplication-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install jscpd
+      run: npm install -g jscpd
+      
+    - name: Run duplication check
+      run: |
+        jscpd backend/app \
+          --min-lines 5 \
+          --min-tokens 50 \
+          --threshold 5 \
+          --reporters "html,console" \
+          --output "duplication-report"
+          
+    - name: Upload duplication report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: duplication-report
+        path: duplication-report/
+
+  # Pull Request 코멘트
+  pr-comment:
+    runs-on: ubuntu-latest
+    needs: [sonarqube, codeql, dependency-review, complexity-analysis]
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Comment PR
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+          
+          const botComment = comments.find(comment => {
+            return comment.user.type === 'Bot' && comment.body.includes('## 🔍 코드 품질 분석 결과')
+          });
+          
+          const body = `## 🔍 코드 품질 분석 결과
+          
+          ### ✅ 완료된 검사
+          - SonarQube 분석
+          - CodeQL 보안 스캔
+          - 의존성 취약점 검사
+          - 코드 복잡도 분석
+          - 라이센스 검사
+          
+          ### 📊 상세 결과
+          - [SonarQube 대시보드](${{ secrets.SONAR_HOST_URL }}/dashboard?id=dropshipping-backend)
+          - [보안 알림](https://github.com/${{ github.repository }}/security/code-scanning)
+          - [의존성 그래프](https://github.com/${{ github.repository }}/network/dependencies)
+          
+          ### 📝 개선 제안
+          코드 품질 개선을 위한 제안사항은 각 분석 도구의 상세 페이지를 참고하세요.
+          
+          _커밋: ${{ github.event.pull_request.head.sha }}_`;
+          
+          if (botComment) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: body
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
+          }

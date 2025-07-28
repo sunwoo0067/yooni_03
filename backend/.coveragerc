@@ -1,0 +1,41 @@
+# pytest-cov 설정 파일
+[run]
+source = app
+omit = 
+    */tests/*
+    */venv/*
+    */env/*
+    */migrations/*
+    */alembic/*
+    */__pycache__/*
+    */conftest.py
+    */test_*.py
+    app/main.py
+    app/config/settings.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if settings.DEBUG
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
+    class .*\(Protocol\):
+    @(abc\.)?abstractmethod
+
+precision = 2
+show_missing = True
+skip_covered = False
+
+[html]
+directory = htmlcov
+title = Backend Coverage Report
+
+[xml]
+output = coverage.xml
+
+[json]
+output = coverage.json

@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 from datetime import datetime
 from sqlalchemy.orm import Session
 
-from app.models.order import DropshippingOrder, SupplierOrderStatus, DropshippingOrderLog
+from app.models.order_core import DropshippingOrder, SupplierOrderStatus, DropshippingOrderLog
 from app.models.wholesaler import Wholesaler
 from app.services.ordering.domeggook_ordering import DomeggookOrderingService
 from app.services.ordering.ownerclan_ordering import OwnerClanOrderingService

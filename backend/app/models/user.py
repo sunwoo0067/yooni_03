@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 import enum
 
-from .base import BaseModel, Base
+from .base import BaseModel, Base, get_json_type
 
 
 class UserRole(enum.Enum):
@@ -56,44 +56,79 @@ class User(BaseModel):
     password_changed_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     # Settings
-    preferences = Column(JSONB, nullable=True)
+    preferences = Column(get_json_type(), nullable=True)
     timezone = Column(String(50), default="UTC", nullable=False)
     language = Column(String(10), default="ko", nullable=False)
     
     # Notification settings
-    notification_settings = Column(JSONB, nullable=True)
+    notification_settings = Column(get_json_type(), nullable=True)
+    
+    # RBAC Relationships
+    role_ref = relationship("Role", foreign_keys="User.role", uselist=False)
     
     # Relationships
     platform_accounts = relationship("PlatformAccount", back_populates="user", cascade="all, delete-orphan")
     ai_logs = relationship("AILog", back_populates="user", cascade="all, delete-orphan")
     user_sessions = relationship("UserSession", back_populates="user", cascade="all, delete-orphan")
-    notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
+    # notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")  # Temporarily disabled - model not implemented
     wholesaler_accounts = relationship("WholesalerAccount", back_populates="user", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<User(username={self.username}, email={self.email})>"
     
+    @property
+    def is_superuser(self) -> bool:
+        """Check if user is a superuser"""
+        return self.role == UserRole.SUPER_ADMIN
+    
     def has_permission(self, permission: str) -> bool:
-        """Check if user has specific permission"""
+        """
+        Legacy permission check - maintained for backward compatibility
+        Use the new RBAC service for granular permission checking
+        """
+        # Super admin has all permissions
+        if self.role == UserRole.SUPER_ADMIN:
+            return True
+            
+        # Basic role-based permissions (legacy)
         role_permissions = {
-            UserRole.SUPER_ADMIN: ["*"],  # All permissions
             UserRole.ADMIN: [
-                "user_manage", "platform_manage", "product_manage", 
-                "order_manage", "inventory_manage", "report_view"
+                "users.read", "users.create", "users.update",
+                "products.read.all", "products.manage.all", "products.bulk_update",
+                "orders.read.all", "orders.process", "orders.approve", 
+                "inventory.read", "inventory.update", "inventory.sync",
+                "reports.read", "reports.create", "analytics.read",
+                "marketplaces.read", "marketplaces.configure", "marketplaces.sync",
+                "wholesalers.read", "wholesalers.configure", "wholesalers.sync",
+                "pricing.read", "pricing.update", "pricing.manage",
+                "ai_services.read", "ai_services.use", "ai_services.configure"
             ],
             UserRole.MANAGER: [
-                "product_manage", "order_manage", "inventory_manage", "report_view"
+                "products.read.all", "products.update.own", "products.create.own",
+                "orders.read.all", "orders.process", "orders.approve",
+                "inventory.read", "inventory.update",
+                "reports.read", "reports.create", "analytics.read",
+                "marketplaces.read", "marketplaces.sync",
+                "wholesalers.read", "wholesalers.sync",
+                "pricing.read", "pricing.update",
+                "ai_services.read", "ai_services.use"
             ],
             UserRole.OPERATOR: [
-                "product_edit", "order_edit", "inventory_edit"
+                "products.read.own", "products.update.own", "products.create.own",
+                "orders.read.own", "orders.create",
+                "inventory.read", "reports.read", "analytics.read",
+                "marketplaces.read", "wholesalers.read",
+                "pricing.read", "ai_services.read", "ai_services.use"
             ],
             UserRole.VIEWER: [
-                "product_view", "order_view", "inventory_view", "report_view"
+                "products.read.own", "orders.read.own", "inventory.read",
+                "reports.read", "analytics.read", "marketplaces.read",
+                "wholesalers.read", "pricing.read", "ai_services.read"
             ]
         }
         
         user_permissions = role_permissions.get(self.role, [])
-        return "*" in user_permissions or permission in user_permissions
+        return permission in user_permissions
 
 
 class UserSession(BaseModel):
@@ -112,7 +147,7 @@ class UserSession(BaseModel):
     city = Column(String(100), nullable=True)
     
     # Session data
-    session_data = Column(JSONB, nullable=True)
+    session_data = Column(get_json_type(), nullable=True)
     
     # Relationships
     user = relationship("User", back_populates="user_sessions")
@@ -134,9 +169,9 @@ class UserAPIKey(BaseModel):
     key_hash = Column(String(255), unique=True, nullable=False, index=True)
     
     # Permissions and restrictions
-    permissions = Column(JSONB, nullable=True)  # Specific permissions for this key
+    permissions = Column(get_json_type(), nullable=True)  # Specific permissions for this key
     rate_limit = Column(Integer, default=1000, nullable=False)  # Requests per hour
-    allowed_ips = Column(JSONB, nullable=True)  # Whitelist of IPs
+    allowed_ips = Column(get_json_type(), nullable=True)  # Whitelist of IPs
     
     # Usage tracking
     last_used_at = Column(DateTime, nullable=True)

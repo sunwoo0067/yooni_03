@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "D:\new\win_with_claude\yooni_03\backend\main.py", line 28, in <module>
+    from app.middleware.logging_middleware import LoggingMiddleware, RequestContextMiddleware
+  File "D:\new\win_with_claude\yooni_03\backend\app\middleware\logging_middleware.py", line 17, in <module>
+    from app.core.logger import logger
+ModuleNotFoundError: No module named 'app.core.logger'

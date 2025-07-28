@@ -28,7 +28,7 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 # JWT 설정
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 class SecurityManager:
@@ -84,14 +84,14 @@ class SecurityManager:
             "jti": secrets.token_urlsafe(16)  # JWT ID for token revocation
         })
         
-        encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
+        encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY.get_secret_value(), algorithm=ALGORITHM)
         return encoded_jwt
     
     @staticmethod
     def create_refresh_token(data: Dict[str, Any]) -> str:
         """리프레시 토큰 생성"""
         to_encode = data.copy()
-        expire = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+        expire = datetime.utcnow() + timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
         
         to_encode.update({
             "exp": expire,
@@ -100,14 +100,14 @@ class SecurityManager:
             "jti": secrets.token_urlsafe(16)
         })
         
-        encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
+        encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY.get_secret_value(), algorithm=ALGORITHM)
         return encoded_jwt
     
     @staticmethod
     def decode_token(token: str) -> Dict[str, Any]:
         """토큰 디코딩"""
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
+            payload = jwt.decode(token, settings.SECRET_KEY.get_secret_value(), algorithms=[ALGORITHM])
             return payload
         except JWTError:
             raise HTTPException(

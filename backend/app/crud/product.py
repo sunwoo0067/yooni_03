@@ -88,7 +88,11 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         limit: int = 100
     ) -> tuple[List[Product], int]:
         """Get products with filtering and sorting"""
-        query = db.query(Product)
+        query = db.query(Product).options(
+            selectinload(Product.variants),
+            selectinload(Product.platform_listings),
+            selectinload(Product.price_history)
+        )
         
         # Apply filters
         conditions = []
@@ -627,6 +631,7 @@ class CRUDProductCategory(CRUDBase[ProductCategory, CategoryCreate, CategoryUpda
 
 # Create instances
 product = CRUDProduct(Product)
+product_crud = product  # Alias for backward compatibility
 product_variant = CRUDProductVariant(ProductVariant)
 platform_listing = CRUDPlatformListing(PlatformListing)
 product_category = CRUDProductCategory(ProductCategory)

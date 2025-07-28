@@ -1,0 +1,156 @@
+{
+  "timestamp": "20250725_160612",
+  "summary": {
+    "total_tests": 16,
+    "passed": 1,
+    "failed": 15,
+    "warnings": 0,
+    "success_rate": 6.25
+  },
+  "results": [
+    {
+      "test_name": "Database Models - Product Model Import and Instantiation",
+      "expected_behavior": "Product model should import successfully and allow instantiation with required fields",
+      "status": "FAIL",
+      "actual_result": "Error instantiating Product model",
+      "error_details": "When initializing mapper Mapper[User(users)], expression 'Notification' failed to locate a name ('Notification'). If this is a class name, consider adding this relationship() to the <class 'app.models.user.User'> class after both dependent classes have been defined.",
+      "recommendations": [],
+      "execution_time": 0.592205
+    },
+    {
+      "test_name": "Database Models - Wholesaler Model Import and Instantiation",
+      "expected_behavior": "Wholesaler model should import successfully and support CRUD operations",
+      "status": "FAIL",
+      "actual_result": "Failed to import Wholesaler model",
+      "error_details": "cannot import name 'Wholesaler' from 'app.models.wholesaler' (D:\\new\\win_with_claude\\yooni_03\\backend\\app\\models\\wholesaler.py)",
+      "recommendations": [],
+      "execution_time": 1.2e-05
+    },
+    {
+      "test_name": "Database Models - Order Model Relationships",
+      "expected_behavior": "Order model should have proper relationships with Product and User models",
+      "status": "FAIL",
+      "actual_result": "Error with Order model relationships",
+      "error_details": "One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[User(users)]'. Original exception was: When initializing mapper Mapper[User(users)], expression 'Notification' failed to locate a name ('Notification'). If this is a class name, consider adding this relationship() to the <class 'app.models.user.User'> class after both dependent classes have been defined.",
+      "recommendations": [],
+      "execution_time": 5.6e-05
+    },
+    {
+      "test_name": "API Endpoints - Products Router Loading",
+      "expected_behavior": "Products router should load successfully with all CRUD endpoints defined",
+      "status": "FAIL",
+      "actual_result": "Error loading products router",
+      "error_details": "2 validation errors for Settings\nSECRET_KEY\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nJWT_SECRET_KEY\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing",
+      "recommendations": [],
+      "execution_time": 0.401973
+    },
+    {
+      "test_name": "API Endpoints - Wholesaler Router Loading",
+      "expected_behavior": "Wholesaler router should load with endpoints for wholesaler management",
+      "status": "FAIL",
+      "actual_result": "Error loading wholesaler router",
+      "error_details": "2 validation errors for Settings\nSECRET_KEY\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nJWT_SECRET_KEY\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing",
+      "recommendations": [],
+      "execution_time": 0.01412
+    },
+    {
+      "test_name": "API Endpoints - Pydantic Schema Validation",
+      "expected_behavior": "Pydantic schemas should be defined for request/response validation",
+      "status": "FAIL",
+      "actual_result": "Error with product schemas",
+      "error_details": "1 validation error for ProductCreate\nproduct_code\n  Field required [type=missing, input_value={'name': 'Test Product', ...01', 'platform': 'test'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing",
+      "recommendations": [],
+      "execution_time": 0.015333
+    },
+    {
+      "test_name": "Service Layer - Product Service Instantiation",
+      "expected_behavior": "Product service should instantiate and provide business logic methods",
+      "status": "PASS",
+      "actual_result": "Product service instantiated with methods: ['create_product', 'update_product']",
+      "error_details": "",
+      "recommendations": [],
+      "execution_time": 0.005439
+    },
+    {
+      "test_name": "Service Layer - Dropshipping Service Core Functions",
+      "expected_behavior": "Dropshipping service should provide order processing and inventory management",
+      "status": "FAIL",
+      "actual_result": "Error with DropshippingService",
+      "error_details": "2 validation errors for Settings\nSECRET_KEY\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nJWT_SECRET_KEY\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing",
+      "recommendations": [],
+      "execution_time": 0.118807
+    },
+    {
+      "test_name": "Wholesale System - Analysis Service Functionality",
+      "expected_behavior": "Wholesale analysis service should calculate profitability and generate reports",
+      "status": "FAIL",
+      "actual_result": "Failed to import WholesaleAnalysisService",
+      "error_details": "cannot import name 'WholesaleAnalysisService' from 'app.services.wholesale.analysis_service' (D:\\new\\win_with_claude\\yooni_03\\backend\\app\\services\\wholesale\\analysis_service.py)",
+      "recommendations": [],
+      "execution_time": 2.093821
+    },
+    {
+      "test_name": "Wholesale System - Excel Export Functionality",
+      "expected_behavior": "Excel service should export wholesale data to Excel format",
+      "status": "FAIL",
+      "actual_result": "Error with Excel service",
+      "error_details": "ExcelService.__init__() missing 1 required positional argument: 'db'",
+      "recommendations": [],
+      "execution_time": 0.007672
+    },
+    {
+      "test_name": "Notification System - Dashboard Notification Service",
+      "expected_behavior": "Notification service should support multiple channels and templates",
+      "status": "FAIL",
+      "actual_result": "Failed to import NotificationService",
+      "error_details": "No module named 'app.core.database'",
+      "recommendations": [],
+      "execution_time": 0.00846
+    },
+    {
+      "test_name": "Notification System - Marketing Email Service",
+      "expected_behavior": "Email service should handle marketing campaigns and customer notifications",
+      "status": "FAIL",
+      "actual_result": "Failed to import EmailService",
+      "error_details": "No module named 'app.core.exceptions'",
+      "recommendations": [],
+      "execution_time": 0.005758
+    },
+    {
+      "test_name": "Performance System - Cache Manager Functionality",
+      "expected_behavior": "Cache manager should provide caching decorators and cache management",
+      "status": "FAIL",
+      "actual_result": "Error with cache manager",
+      "error_details": "2 validation errors for Settings\nSECRET_KEY\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nJWT_SECRET_KEY\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing",
+      "recommendations": [],
+      "execution_time": 0.011035
+    },
+    {
+      "test_name": "Performance System - Monitoring Service",
+      "expected_behavior": "Monitoring service should track performance metrics and alerts",
+      "status": "FAIL",
+      "actual_result": "Error with monitoring service",
+      "error_details": "2 validation errors for Settings\nSECRET_KEY\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nJWT_SECRET_KEY\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing",
+      "recommendations": [],
+      "execution_time": 0.590158
+    },
+    {
+      "test_name": "Integration Points - Service Dependency Injection",
+      "expected_behavior": "Services should properly inject dependencies and communicate",
+      "status": "FAIL",
+      "actual_result": "Error with service integration",
+      "error_details": "2 validation errors for Settings\nSECRET_KEY\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nJWT_SECRET_KEY\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing",
+      "recommendations": [],
+      "execution_time": 0.006693
+    },
+    {
+      "test_name": "Integration Points - Platform API Integration",
+      "expected_behavior": "Platform APIs should be properly configured and accessible",
+      "status": "FAIL",
+      "actual_result": "Error with platform integration",
+      "error_details": "2 validation errors for Settings\nSECRET_KEY\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing\nJWT_SECRET_KEY\n  Field required [type=missing, input_value={}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing",
+      "recommendations": [],
+      "execution_time": 0.141156
+    }
+  ]
+}

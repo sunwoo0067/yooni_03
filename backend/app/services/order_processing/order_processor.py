@@ -8,7 +8,7 @@ from decimal import Decimal
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 
-from app.models.order import (
+from app.models.order_core import (
     Order, OrderStatus, DropshippingOrder, SupplierOrderStatus, 
     DropshippingOrderLog, OrderItem
 )

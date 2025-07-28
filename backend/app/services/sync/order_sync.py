@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import logging
 
-from app.models.order import Order, OrderStatus, OrderItem
+from app.models.order_core import Order, OrderStatus, OrderItem
 from app.models.platform_account import PlatformAccount, PlatformType
 from app.models.product import Product
 from app.services.platforms.platform_manager import PlatformManager
@@ -14,9 +14,9 @@ from app.crud.base import CRUDBase
 
 logger = logging.getLogger(__name__)
 
-# Create CRUD instance for Order
-order_crud = CRUDBase[Order](Order)
-order_item_crud = CRUDBase[OrderItem](OrderItem)
+# Temporarily use direct database operations instead of CRUD
+# order_crud = CRUDBase[Order](Order)  # Requires Order schema definitions
+# order_item_crud = CRUDBase[OrderItem](OrderItem)  # Requires OrderItem schema definitions
 
 
 class OrderSyncService:

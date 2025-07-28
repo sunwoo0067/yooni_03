@@ -1,20 +1,27 @@
 """
 고성능 캐시 관리 시스템
 Redis를 활용한 다층 캐싱 및 캐시 최적화
+압축, 분산 캐싱, 스마트 무효화 지원
 """
 
 import json
-import pickle
 import hashlib
 import asyncio
-from typing import Any, Dict, List, Optional, Union, Callable
+import gzip
+import pickle
+import time
+from typing import Any, Dict, List, Optional, Union, Callable, TypeVar
 from datetime import datetime, timedelta
 from functools import wraps
+from dataclasses import dataclass
+from enum import Enum
 import redis
 from redis.exceptions import RedisError
 import logging
 
 from ...core.config import get_settings
+
+T = TypeVar('T')
 
 
 class CacheManager:
@@ -51,38 +58,31 @@ class CacheManager:
         return f"{self.cache_prefix}{namespace}:{key}"
     
     def _serialize_value(self, value: Any) -> str:
-        """값 직렬화"""
+        """값 직렬화 - JSON만 사용"""
         try:
             if isinstance(value, (dict, list)):
                 return json.dumps(value, ensure_ascii=False)
-            elif isinstance(value, (int, float, str, bool)):
-                return str(value)
+            elif isinstance(value, (int, float, str, bool, type(None))):
+                return json.dumps(value)
+            elif hasattr(value, '__dict__'):
+                # 객체를 딕셔너리로 변환하여 직렬화
+                return json.dumps(value.__dict__, ensure_ascii=False)
             else:
-                # 복잡한 객체는 pickle 사용
-                return pickle.dumps(value).hex()
+                # 기타 타입은 문자열로 변환
+                return json.dumps(str(value))
         except Exception as e:
             logging.error(f"Serialization failed: {str(e)}")
-            return str(value)
+            return json.dumps(str(value))
     
     def _deserialize_value(self, value: str, value_type: str = "auto") -> Any:
-        """값 역직렬화"""
+        """값 역직렬화 - JSON만 사용"""
         try:
-            if value_type == "json" or (value_type == "auto" and (value.startswith('{') or value.startswith('['))):
-                return json.loads(value)
-            elif value_type == "pickle" or (value_type == "auto" and len(value) > 100 and value.isalnum()):
-                return pickle.loads(bytes.fromhex(value))
-            else:
-                # 기본 타입 처리
-                if value.lower() == 'true':
-                    return True
-                elif value.lower() == 'false':
-                    return False
-                elif value.isdigit():
-                    return int(value)
-                elif '.' in value and value.replace('.', '').replace('-', '').isdigit():
-                    return float(value)
-                else:
-                    return value
+            # 모든 값을 JSON으로 역직렬화 시도
+            return json.loads(value)
+        except json.JSONDecodeError:
+            # JSON 파싱 실패 시 문자열로 반환
+            logging.warning(f"Failed to deserialize value as JSON, returning as string: {value[:50]}...")
+            return value
         except Exception as e:
             logging.error(f"Deserialization failed: {str(e)}")
             return value

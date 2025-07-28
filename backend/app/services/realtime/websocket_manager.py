@@ -1,16 +1,26 @@
 """
 WebSocket 연결 관리자
 실시간 대시보드 데이터 푸시 관리
+강화된 기능: 하트비트, 메시지 큐잉, 연결 상태 모니터링
 """
 from typing import Dict, List, Set, Optional, Any
 from fastapi import WebSocket, WebSocketDisconnect
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import asyncio
-from collections import defaultdict
+from collections import defaultdict, deque
+from enum import Enum
 
 from app.core.logging import logger
 from app.services.cache_service import CacheService
+
+
+class ConnectionState(Enum):
+    """연결 상태"""
+    CONNECTED = "connected"
+    DISCONNECTED = "disconnected"
+    RECONNECTING = "reconnecting"
+    SUSPENDED = "suspended"
 
 
 class ConnectionManager:
@@ -21,9 +31,17 @@ class ConnectionManager:
         self.active_connections: Dict[int, Dict[str, WebSocket]] = defaultdict(dict)
         # 구독 정보: {channel: {user_id: Set[connection_id]}}
         self.subscriptions: Dict[str, Dict[int, Set[str]]] = defaultdict(lambda: defaultdict(set))
-        # 연결별 정보: {connection_id: {"user_id": int, "channels": Set[str]}}
+        # 연결별 정보: {connection_id: {"user_id": int, "channels": Set[str], ...}}
         self.connection_info: Dict[str, Dict[str, Any]] = {}
+        # 메시지 큐: {user_id: deque[message]}
+        self.message_queues: Dict[int, deque] = defaultdict(lambda: deque(maxlen=100))
+        # 하트비트 태스크: {connection_id: asyncio.Task}
+        self.heartbeat_tasks: Dict[str, asyncio.Task] = {}
+        # 연결 상태: {connection_id: ConnectionState}
+        self.connection_states: Dict[str, ConnectionState] = {}
         self.cache = CacheService()
+        self.heartbeat_interval = 30  # 30초
+        self.heartbeat_timeout = 60  # 60초
         
     async def connect(
         self,
@@ -40,8 +58,11 @@ class ConnectionManager:
             self.connection_info[connection_id] = {
                 "user_id": user_id,
                 "channels": set(),
-                "connected_at": datetime.now()
+                "connected_at": datetime.now(),
+                "last_heartbeat": datetime.now(),
+                "last_activity": datetime.now()
             }
+            self.connection_states[connection_id] = ConnectionState.CONNECTED
             
             # 환영 메시지 전송
             await self.send_personal_message(
@@ -52,6 +73,14 @@ class ConnectionManager:
                     "timestamp": datetime.now().isoformat()
                 },
                 websocket
+            )
+            
+            # 큐에 있던 메시지 전송
+            await self._send_queued_messages(user_id, websocket)
+            
+            # 하트비트 시작
+            self.heartbeat_tasks[connection_id] = asyncio.create_task(
+                self._heartbeat_loop(connection_id, websocket)
             )
             
             logger.info(f"WebSocket 연결 성공: user_id={user_id}, connection_id={connection_id}")
@@ -84,6 +113,14 @@ class ConnectionManager:
                         
             # 연결 정보 제거
             del self.connection_info[connection_id]
+            
+            # 하트비트 태스크 취소
+            if connection_id in self.heartbeat_tasks:
+                self.heartbeat_tasks[connection_id].cancel()
+                del self.heartbeat_tasks[connection_id]
+                
+            # 연결 상태 업데이트
+            self.connection_states[connection_id] = ConnectionState.DISCONNECTED
             
             logger.info(f"WebSocket 연결 해제: connection_id={connection_id}")
             
@@ -253,6 +290,9 @@ class ConnectionManager:
                         {"type": "pong", "timestamp": datetime.now().isoformat()},
                         websocket
                     )
+                    # 하트비트 시간 업데이트
+                    if connection_id in self.connection_info:
+                        self.connection_info[connection_id]["last_heartbeat"] = datetime.now()
                     
                 elif message_type == "subscribe":
                     # 채널 구독
@@ -381,6 +421,192 @@ class ConnectionManager:
             
         except Exception as e:
             logger.error(f"알림 전송 실패: {str(e)}")
+            
+    async def _heartbeat_loop(
+        self,
+        connection_id: str,
+        websocket: WebSocket
+    ) -> None:
+        """하트비트 루프"""
+        try:
+            while connection_id in self.connection_info:
+                await asyncio.sleep(self.heartbeat_interval)
+                
+                # 하트비트 전송
+                try:
+                    await self.send_personal_message(
+                        {
+                            "type": "heartbeat",
+                            "timestamp": datetime.now().isoformat()
+                        },
+                        websocket
+                    )
+                    
+                    # 타임아웃 체크
+                    if connection_id in self.connection_info:
+                        last_heartbeat = self.connection_info[connection_id]["last_heartbeat"]
+                        if datetime.now() - last_heartbeat > timedelta(seconds=self.heartbeat_timeout):
+                            logger.warning(f"하트비트 타임아웃: connection_id={connection_id}")
+                            await self.disconnect(connection_id)
+                            break
+                            
+                except Exception as e:
+                    logger.error(f"하트비트 전송 실패: {str(e)}")
+                    await self.disconnect(connection_id)
+                    break
+                    
+        except asyncio.CancelledError:
+            logger.info(f"하트비트 루프 취소: connection_id={connection_id}")
+        except Exception as e:
+            logger.error(f"하트비트 루프 오류: {str(e)}")
+            
+    async def _send_queued_messages(
+        self,
+        user_id: int,
+        websocket: WebSocket
+    ) -> None:
+        """큐에 있는 메시지 전송"""
+        try:
+            if user_id not in self.message_queues:
+                return
+                
+            queue = self.message_queues[user_id]
+            while queue:
+                message = queue.popleft()
+                try:
+                    await websocket.send_json(message)
+                    await asyncio.sleep(0.1)  # 짧은 딜레이로 메시지 플러딩 방지
+                except Exception as e:
+                    # 전송 실패한 메시지는 다시 큐에 추가
+                    queue.appendleft(message)
+                    logger.error(f"큐 메시지 전송 실패: {str(e)}")
+                    break
+                    
+        except Exception as e:
+            logger.error(f"큐 메시지 처리 실패: {str(e)}")
+            
+    async def queue_message(
+        self,
+        user_id: int,
+        message: Dict[str, Any]
+    ) -> None:
+        """메시지를 큐에 추가"""
+        try:
+            self.message_queues[user_id].append(message)
+            logger.debug(f"메시지 큐에 추가: user_id={user_id}")
+        except Exception as e:
+            logger.error(f"메시지 큐 추가 실패: {str(e)}")
+            
+    async def send_user_message_with_queue(
+        self,
+        message: Dict[str, Any],
+        user_id: int
+    ) -> None:
+        """특정 사용자에게 메시지 전송 (연결이 없으면 큐에 저장)"""
+        try:
+            if user_id in self.active_connections and self.active_connections[user_id]:
+                # 활성 연결이 있으면 직접 전송
+                await self.send_user_message(message, user_id)
+            else:
+                # 연결이 없으면 큐에 저장
+                await self.queue_message(user_id, message)
+                logger.info(f"사용자 오프라인, 메시지 큐에 저장: user_id={user_id}")
+                
+        except Exception as e:
+            logger.error(f"메시지 전송/큐잉 실패: {str(e)}")
+            
+    async def get_connection_status(
+        self,
+        connection_id: Optional[str] = None,
+        user_id: Optional[int] = None
+    ) -> Dict[str, Any]:
+        """연결 상태 조회"""
+        try:
+            if connection_id:
+                if connection_id not in self.connection_info:
+                    return {"status": "not_found"}
+                    
+                info = self.connection_info[connection_id]
+                state = self.connection_states.get(connection_id, ConnectionState.DISCONNECTED)
+                
+                return {
+                    "connection_id": connection_id,
+                    "user_id": info["user_id"],
+                    "state": state.value,
+                    "connected_at": info["connected_at"].isoformat(),
+                    "last_heartbeat": info["last_heartbeat"].isoformat(),
+                    "last_activity": info["last_activity"].isoformat(),
+                    "channels": list(info["channels"]),
+                    "uptime": (datetime.now() - info["connected_at"]).total_seconds()
+                }
+                
+            elif user_id:
+                connections = []
+                for conn_id, websocket in self.active_connections.get(user_id, {}).items():
+                    connections.append(await self.get_connection_status(connection_id=conn_id))
+                    
+                return {
+                    "user_id": user_id,
+                    "total_connections": len(connections),
+                    "connections": connections,
+                    "queued_messages": len(self.message_queues.get(user_id, []))
+                }
+                
+            else:
+                # 전체 상태
+                total_connections = sum(len(conns) for conns in self.active_connections.values())
+                total_users = len(self.active_connections)
+                total_channels = len(self.subscriptions)
+                
+                return {
+                    "total_connections": total_connections,
+                    "total_users": total_users,
+                    "total_channels": total_channels,
+                    "connections_by_state": self._count_connections_by_state()
+                }
+                
+        except Exception as e:
+            logger.error(f"연결 상태 조회 실패: {str(e)}")
+            return {"error": str(e)}
+            
+    def _count_connections_by_state(self) -> Dict[str, int]:
+        """상태별 연결 수 계산"""
+        counts = defaultdict(int)
+        for state in self.connection_states.values():
+            counts[state.value] += 1
+        return dict(counts)
+        
+    async def monitor_connections(self) -> None:
+        """연결 상태 모니터링 (백그라운드 태스크)"""
+        try:
+            while True:
+                await asyncio.sleep(60)  # 1분마다 체크
+                
+                now = datetime.now()
+                disconnected = []
+                
+                for connection_id, info in self.connection_info.items():
+                    # 2분 이상 활동이 없으면 경고
+                    if now - info["last_activity"] > timedelta(minutes=2):
+                        logger.warning(f"연결 비활성: connection_id={connection_id}")
+                        
+                    # 3분 이상 하트비트가 없으면 연결 해제
+                    if now - info["last_heartbeat"] > timedelta(minutes=3):
+                        logger.warning(f"하트비트 없음, 연결 해제: connection_id={connection_id}")
+                        disconnected.append(connection_id)
+                        
+                # 비활성 연결 해제
+                for connection_id in disconnected:
+                    await self.disconnect(connection_id)
+                    
+                # 상태 로그
+                status = await self.get_connection_status()
+                logger.info(f"WebSocket 상태: {status}")
+                
+        except asyncio.CancelledError:
+            logger.info("연결 모니터링 중지")
+        except Exception as e:
+            logger.error(f"연결 모니터링 오류: {str(e)}")
 
 
 # 전역 연결 관리자 인스턴스

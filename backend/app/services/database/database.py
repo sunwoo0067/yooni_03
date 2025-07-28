@@ -10,25 +10,41 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
 
-from app.core.config import settings, DatabaseConfig
+from app.core.config import settings
 from app.models.base import Base
+from app.core.database import DatabasePoolConfig
 
 # Setup logging
 logger = logging.getLogger(__name__)
 
 # Synchronous database engine
 engine = create_engine(
-    DatabaseConfig.get_url(async_mode=False),
-    **DatabaseConfig.get_connection_args(),
+    settings.DATABASE_URL,
     echo=settings.DEBUG,
 )
 
-# Asynchronous database engine
-async_engine = create_async_engine(
-    DatabaseConfig.get_url(async_mode=True),
-    **DatabaseConfig.get_async_connection_args(),
-    echo=settings.DEBUG,
-)
+# Asynchronous database engine - SQLite 및 PostgreSQL 지원
+try:
+    if "sqlite" in settings.DATABASE_URL:
+        async_engine = create_async_engine(
+            settings.DATABASE_URL.replace("sqlite://", "sqlite+aiosqlite://"),
+            echo=settings.DEBUG,
+        )
+    elif "postgresql" in settings.DATABASE_URL:
+        # PostgreSQL async 엔진 지원
+        async_db_url = settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+        async_engine = create_async_engine(
+            async_db_url,
+            echo=settings.DEBUG,
+            **DatabasePoolConfig.get_async_pool_args()
+        )
+    else:
+        # 다른 DB의 경우 async 엔진 비활성화
+        async_engine = None
+        logger.warning(f"Unsupported database for async operations: {settings.DATABASE_URL}")
+except Exception as e:
+    logger.warning(f"Async engine 초기화 실패, 동기 모드만 사용: {e}")
+    async_engine = None
 
 # Session makers
 SessionLocal = sessionmaker(
@@ -278,6 +294,16 @@ class DatabaseManager:
 # Initialize database manager
 db_manager = DatabaseManager()
 
+# Simple init_db function for compatibility
+def init_db():
+    """Initialize database tables."""
+    try:
+        db_manager.create_tables()
+        logger.info("Database initialized successfully")
+    except Exception as e:
+        logger.error(f"Database initialization failed: {e}")
+        raise
+
 
 # Health check function
 async def health_check() -> dict:
@@ -318,5 +344,6 @@ __all__ = [
     "get_async_db_context",
     "DatabaseManager",
     "db_manager",
+    "init_db",
     "health_check",
 ]

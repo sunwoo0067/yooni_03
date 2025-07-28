@@ -1,0 +1,245 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [ develop ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Staging environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - staging-eu
+        - staging-asia
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # 빠른 검증
+  quick-check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Quick lint check
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install flake8
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Quick frontend check
+      run: |
+        cd frontend
+        npm ci
+        npm run lint
+        npx tsc --noEmit
+
+  # 스테이징 이미지 빌드
+  build-staging-images:
+    runs-on: ubuntu-latest
+    needs: quick-check
+
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        component: [backend, frontend]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.component }}
+        tags: |
+          type=ref,event=branch,suffix=-staging
+          type=sha,prefix=staging-
+          type=raw,value=staging-latest
+
+    - name: Build and push staging image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./${{ matrix.component }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  # 스테이징 배포
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: build-staging-images
+    environment: staging
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.STAGING_SSH_KEY }}
+
+    - name: Deploy to staging
+      run: |
+        STAGING_ENV="${{ github.event.inputs.environment || 'staging' }}"
+        
+        ssh -o StrictHostKeyChecking=no ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} "
+          cd /opt/dropshipping-${STAGING_ENV} &&
+          git pull origin develop &&
+          
+          # 환경별 설정 파일 복사
+          cp .env.staging .env &&
+          
+          # 스테이징 전용 설정 적용
+          sed -i 's/DEBUG=false/DEBUG=true/' .env &&
+          sed -i 's/LOG_LEVEL=INFO/LOG_LEVEL=DEBUG/' .env &&
+          
+          # 컨테이너 업데이트
+          docker compose -f docker-compose.staging.yml pull &&
+          docker compose -f docker-compose.staging.yml up -d --remove-orphans &&
+          
+          # 헬스 체크
+          sleep 30 &&
+          curl -f http://localhost:8000/health || exit 1
+        "
+
+    - name: Run smoke tests
+      run: |
+        sleep 60  # 배포 완료 대기
+        
+        # 기본 API 테스트
+        curl -f https://staging.${{ secrets.STAGING_DOMAIN }}/health
+        curl -f https://staging.${{ secrets.STAGING_DOMAIN }}/api/v1/health
+        
+        # 데이터베이스 연결 테스트
+        curl -f https://staging.${{ secrets.STAGING_DOMAIN }}/api/v1/system/status
+
+    - name: Notify deployment
+      uses: 8398a7/action-slack@v3
+      if: always()
+      with:
+        status: ${{ job.status }}
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        text: |
+          스테이징 배포가 ${{ job.status }}되었습니다.
+          환경: ${{ github.event.inputs.environment || 'staging' }}
+          브랜치: ${{ github.ref_name }}
+          커밋: ${{ github.sha }}
+          URL: https://staging.${{ secrets.STAGING_DOMAIN }}
+
+  # 자동화된 테스트 실행
+  staging-tests:
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: success()
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install test dependencies
+      run: |
+        cd backend
+        pip install -r requirements-dev.txt
+
+    - name: Run integration tests against staging
+      env:
+        STAGING_BASE_URL: https://staging.${{ secrets.STAGING_DOMAIN }}
+        STAGING_API_KEY: ${{ secrets.STAGING_API_KEY }}
+      run: |
+        cd backend
+        pytest tests/integration/ -v --base-url=$STAGING_BASE_URL
+
+    - name: Run API tests
+      run: |
+        cd backend
+        python scripts/staging_api_test.py
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: staging-test-results
+        path: backend/test-results/
+
+  # 롤백 워크플로우 (실패 시)
+  rollback-staging:
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, staging-tests]
+    if: failure()
+    environment: staging
+
+    steps:
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.STAGING_SSH_KEY }}
+
+    - name: Rollback staging deployment
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} '
+          cd /opt/dropshipping-staging &&
+          
+          # 이전 버전으로 롤백
+          git reset --hard HEAD~1 &&
+          docker compose -f docker-compose.staging.yml up -d --remove-orphans &&
+          
+          # 헬스 체크
+          sleep 30 &&
+          curl -f http://localhost:8000/health || exit 1
+        '
+
+    - name: Notify rollback
+      uses: 8398a7/action-slack@v3
+      with:
+        status: 'warning'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        text: |
+          ⚠️ 스테이징 배포 실패로 인한 롤백이 수행되었습니다.
+          브랜치: ${{ github.ref_name }}
+          커밋: ${{ github.sha }}
+          
+          실패한 작업: ${{ needs.deploy-staging.result == 'failure' && '배포' || '테스트' }}
+          
+          로그를 확인해주세요: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

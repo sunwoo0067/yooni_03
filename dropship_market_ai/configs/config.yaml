@@ -1,0 +1,149 @@
+app:
+  name: "Dropship Market AI System"
+  version: "1.0.0"
+  environment: "development"
+  debug: true
+
+database:
+  host: "localhost"
+  port: 5432
+  name: "dropship_market_ai"
+  user: "postgres"
+  password: "password"
+  pool_size: 20
+  max_overflow: 40
+
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  decode_responses: true
+
+marketplace:
+  coupang:
+    api_key: "${COUPANG_API_KEY}"
+    secret_key: "${COUPANG_SECRET_KEY}"
+    base_url: "https://api.coupang.com"
+    rate_limit: 100  # requests per minute
+  
+  naver:
+    client_id: "${NAVER_CLIENT_ID}"
+    client_secret: "${NAVER_CLIENT_SECRET}"
+    base_url: "https://openapi.naver.com"
+    rate_limit: 100
+  
+  gmarket:
+    api_key: "${GMARKET_API_KEY}"
+    base_url: "https://api.gmarket.co.kr"
+    rate_limit: 60
+  
+  eleven_street:
+    api_key: "${11ST_API_KEY}"
+    base_url: "https://api.11st.co.kr"
+    rate_limit: 60
+
+data_collection:
+  schedule:
+    product_info: "*/30 * * * *"  # Every 30 minutes
+    reviews: "0 */2 * * *"        # Every 2 hours
+    rankings: "*/10 * * * *"      # Every 10 minutes
+    competitors: "0 */6 * * *"    # Every 6 hours
+  
+  batch_size: 100
+  max_retries: 3
+  timeout: 30
+
+product_rotation:
+  strategies:
+    - name: "ranking_based"
+      threshold_rank: 50
+      rotation_interval_hours: 72
+    - name: "performance_based"
+      min_conversion_rate: 0.02
+      rotation_interval_hours: 168
+    - name: "seasonal"
+      seasons:
+        spring: [3, 4, 5]
+        summer: [6, 7, 8]
+        fall: [9, 10, 11]
+        winter: [12, 1, 2]
+
+ml_models:
+  sales_prediction:
+    model_type: "lstm"
+    sequence_length: 30
+    features:
+      - "views"
+      - "clicks"
+      - "conversions"
+      - "price"
+      - "ranking"
+      - "review_score"
+      - "competitor_price"
+    update_frequency: "daily"
+  
+  review_analysis:
+    model_type: "kobert"
+    max_length: 512
+    batch_size: 32
+    update_frequency: "weekly"
+  
+  price_optimization:
+    model_type: "xgboost"
+    features:
+      - "cost"
+      - "competitor_price"
+      - "demand_elasticity"
+      - "inventory_level"
+      - "season"
+    update_frequency: "daily"
+
+optimization:
+  price:
+    min_margin: 0.15
+    max_margin: 0.50
+    adjustment_step: 0.05
+    competitor_threshold: 0.10
+  
+  keyword:
+    max_keywords: 50
+    min_search_volume: 100
+    update_frequency: "weekly"
+  
+  image:
+    max_images: 10
+    ab_test_duration_days: 7
+    min_sample_size: 100
+
+monitoring:
+  alerts:
+    sales_drop_threshold: -0.20  # 20% drop
+    review_score_threshold: 3.5
+    inventory_threshold: 10
+    ranking_drop_threshold: 20
+  
+  notification:
+    email:
+      enabled: true
+      smtp_server: "smtp.gmail.com"
+      smtp_port: 587
+      from_email: "alerts@dropship-ai.com"
+      to_emails:
+        - "admin@dropship-ai.com"
+    
+    slack:
+      enabled: true
+      webhook_url: "${SLACK_WEBHOOK_URL}"
+
+logging:
+  level: "INFO"
+  format: "json"
+  file:
+    enabled: true
+    path: "logs/app.log"
+    max_size: "100MB"
+    backup_count: 10
+  
+  sentry:
+    enabled: false
+    dsn: "${SENTRY_DSN}"

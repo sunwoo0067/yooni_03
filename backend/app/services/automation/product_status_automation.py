@@ -7,6 +7,8 @@
 
 import asyncio
 import logging
+import ast
+import operator
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
@@ -206,15 +208,66 @@ class ProductStatusAutomation:
             return False
             
     def _evaluate_condition(self, condition: str, variables: Dict) -> bool:
-        """조건식 평가"""
+        """조건식 평가 - AST를 사용한 안전한 평가"""
         try:
-            # 안전한 조건 평가를 위한 제한된 네임스페이스
-            safe_dict = {
-                '__builtins__': {},
-                **variables
+            # 조건식을 AST로 파싱
+            tree = ast.parse(condition, mode='eval')
+            
+            # 안전한 연산자만 허용
+            allowed_operators = {
+                ast.And: operator.and_,
+                ast.Or: operator.or_,
+                ast.Not: operator.not_,
+                ast.Eq: operator.eq,
+                ast.NotEq: operator.ne,
+                ast.Lt: operator.lt,
+                ast.LtE: operator.le,
+                ast.Gt: operator.gt,
+                ast.GtE: operator.ge,
+                ast.Is: operator.is_,
+                ast.IsNot: operator.is_not,
+                ast.In: operator.contains,
+                ast.NotIn: lambda x, y: not operator.contains(y, x)
             }
             
-            return eval(condition, safe_dict)
+            def safe_eval(node):
+                if isinstance(node, ast.Expression):
+                    return safe_eval(node.body)
+                elif isinstance(node, ast.BoolOp):
+                    op = allowed_operators.get(type(node.op))
+                    if op:
+                        values = [safe_eval(value) for value in node.values]
+                        return all(values) if isinstance(node.op, ast.And) else any(values)
+                elif isinstance(node, ast.UnaryOp):
+                    op = allowed_operators.get(type(node.op))
+                    if op:
+                        return op(safe_eval(node.operand))
+                elif isinstance(node, ast.Compare):
+                    left = safe_eval(node.left)
+                    for op, comparator in zip(node.ops, node.comparators):
+                        op_func = allowed_operators.get(type(op))
+                        if op_func:
+                            right = safe_eval(comparator)
+                            if not op_func(left, right):
+                                return False
+                            left = right
+                        else:
+                            raise ValueError(f"Unsupported operator: {type(op).__name__}")
+                    return True
+                elif isinstance(node, ast.Name):
+                    return variables.get(node.id, None)
+                elif isinstance(node, ast.Constant):
+                    return node.value
+                elif isinstance(node, ast.Num):  # Python 3.7 compatibility
+                    return node.n
+                elif isinstance(node, ast.Str):  # Python 3.7 compatibility
+                    return node.s
+                elif isinstance(node, ast.NameConstant):  # Python 3.7 compatibility
+                    return node.value
+                else:
+                    raise ValueError(f"Unsupported AST node: {type(node).__name__}")
+            
+            return safe_eval(tree)
             
         except Exception as e:
             self.logger.error(f"조건 평가 실패 - {condition}: {e}")

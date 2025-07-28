@@ -1,0 +1,363 @@
+name: Security Scan
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 매일 오전 2시
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # 의존성 취약점 스캔
+  dependency-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Python dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install safety bandit semgrep
+
+    - name: Python dependency security check with Safety
+      run: |
+        cd backend
+        safety check --json --output safety-report.json || true
+        safety check
+
+    - name: Node.js dependency check
+      run: |
+        cd frontend
+        npm ci
+        npm audit --audit-level high
+
+    - name: Upload dependency reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: dependency-reports
+        path: |
+          backend/safety-report.json
+          frontend/npm-audit.json
+
+  # 코드 보안 스캔
+  code-security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install bandit[toml] semgrep
+
+    - name: Run Bandit security scan
+      run: |
+        cd backend
+        bandit -r . -f json -o bandit-report.json || true
+        bandit -r . --severity-level medium
+
+    - name: Run Semgrep SAST
+      run: |
+        cd backend
+        semgrep --config=auto --json --output=semgrep-report.json . || true
+        semgrep --config=auto .
+
+    - name: CodeQL Analysis
+      uses: github/codeql-action/init@v2
+      with:
+        languages: python, javascript
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+
+    - name: Upload security scan results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-scan-reports
+        path: |
+          backend/bandit-report.json
+          backend/semgrep-report.json
+
+  # 컨테이너 이미지 보안 스캔
+  container-security-scan:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    needs: [dependency-check, code-security-scan]
+    
+    strategy:
+      matrix:
+        component: [backend, frontend]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build test image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./${{ matrix.component }}
+        push: false
+        tags: ${{ matrix.component }}:test
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: '${{ matrix.component }}:test'
+        format: 'sarif'
+        output: 'trivy-${{ matrix.component }}.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-${{ matrix.component }}.sarif'
+
+    - name: Run Grype vulnerability scanner
+      run: |
+        curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+        grype ${{ matrix.component }}:test -o json > grype-${{ matrix.component }}.json
+        grype ${{ matrix.component }}:test
+
+    - name: Upload container scan results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: container-scan-${{ matrix.component }}
+        path: |
+          trivy-${{ matrix.component }}.sarif
+          grype-${{ matrix.component }}.json
+
+  # 시크릿 스캔
+  secret-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: TruffleHog OSS Secret Scan
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: main
+        head: HEAD
+        extra_args: --debug --only-verified
+
+    - name: GitLeaks Secret Scan
+      run: |
+        docker run --rm -v "$PWD:/path" zricethezav/gitleaks:latest detect \
+          --source="/path" \
+          --report-format=json \
+          --report-path="/path/gitleaks-report.json" \
+          --verbose || true
+        
+        if [ -f gitleaks-report.json ]; then
+          echo "GitLeaks report found, checking for secrets..."
+          cat gitleaks-report.json
+        fi
+
+    - name: Upload secret scan results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: secret-scan-reports
+        path: gitleaks-report.json
+
+  # 라이선스 컴플라이언스 체크
+  license-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Python license check
+      run: |
+        cd backend
+        pip install pip-licenses
+        pip install -r requirements.txt
+        pip-licenses --format=json --output-file=python-licenses.json
+        pip-licenses --fail-on="GPL"  # GPL 라이선스 패키지 발견 시 실패
+
+    - name: Node.js license check
+      run: |
+        cd frontend
+        npm ci
+        npm install -g license-checker
+        license-checker --json --out npm-licenses.json
+        license-checker --onlyAllow "MIT;BSD;Apache-2.0;ISC;Unlicense"
+
+    - name: Upload license reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: license-reports
+        path: |
+          backend/python-licenses.json
+          frontend/npm-licenses.json
+
+  # 구성 보안 체크
+  config-security-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Docker configuration security check
+      run: |
+        # Dockerfile 보안 모범 사례 체크
+        docker run --rm -v "$PWD:/project" \
+          hadolint/hadolint:latest \
+          hadolint /project/backend/Dockerfile > hadolint-backend.txt || true
+        
+        docker run --rm -v "$PWD:/project" \
+          hadolint/hadolint:latest \
+          hadolint /project/frontend/Dockerfile > hadolint-frontend.txt || true
+
+    - name: Kubernetes/Docker Compose security check
+      run: |
+        # kube-score 설치 및 실행 (있는 경우)
+        if [ -f "k8s-manifests.yaml" ]; then
+          curl -L https://github.com/zegl/kube-score/releases/latest/download/kube-score_linux_amd64.tar.gz | tar xz
+          ./kube-score score k8s-manifests.yaml
+        fi
+        
+        # docker-compose 설정 검증
+        docker-compose -f docker-compose.prod.yml config > /dev/null
+
+    - name: Nginx configuration security check
+      run: |
+        # gixy를 사용한 Nginx 설정 보안 체크
+        pip install gixy
+        gixy nginx/nginx.conf || true
+
+    - name: Upload config check results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: config-security-reports
+        path: |
+          hadolint-*.txt
+          gixy-report.*
+
+  # 종합 보안 리포트 생성
+  security-report:
+    runs-on: ubuntu-latest
+    needs: [dependency-check, code-security-scan, container-security-scan, secret-scan, license-check, config-security-check]
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+
+    - name: Generate security report
+      run: |
+        python3 scripts/generate_security_report.py \
+          --output security-report.html \
+          --format html \
+          --artifacts-dir .
+
+    - name: Upload comprehensive security report
+      uses: actions/upload-artifact@v3
+      with:
+        name: comprehensive-security-report
+        path: security-report.html
+
+    - name: Comment PR with security summary
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          
+          // 보안 스캔 결과 요약 생성
+          let summary = '## 🔒 Security Scan Results\n\n';
+          
+          // 각 스캔 결과를 확인하고 요약 추가
+          const artifacts = ['dependency-reports', 'security-scan-reports', 'container-scan-backend', 'container-scan-frontend'];
+          
+          for (const artifact of artifacts) {
+            if (fs.existsSync(artifact)) {
+              summary += `✅ ${artifact} - Completed\n`;
+            } else {
+              summary += `❌ ${artifact} - Failed or Not Found\n`;
+            }
+          }
+          
+          summary += '\n📊 Detailed reports are available in the workflow artifacts.';
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: summary
+          });
+
+  # 보안 이슈 알림
+  security-notification:
+    runs-on: ubuntu-latest
+    needs: [security-report]
+    if: failure() && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Notify security team
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        webhook_url: ${{ secrets.SECURITY_SLACK_WEBHOOK }}
+        text: |
+          🚨 Security scan failed on main branch!
+          
+          Repository: ${{ github.repository }}
+          Commit: ${{ github.sha }}
+          Actor: ${{ github.actor }}
+          
+          Please review the security reports immediately.
+          
+          Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

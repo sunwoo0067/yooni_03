@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도매처 상품 수집 테스트</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .results {
+            margin-top: 30px;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background: #f9f9f9;
+        }
+        .product-card h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 16px;
+        }
+        .product-price {
+            color: #007bff;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .product-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .stats {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛒 도매처 상품 수집 테스트</h1>
+        
+        <form id="collectionForm">
+            <div class="form-group">
+                <label for="source">도매처 선택:</label>
+                <select id="source" name="source" required>
+                    <option value="">선택하세요</option>
+                    <option value="ownerclan">오너클랜</option>
+                    <option value="domeme">도매매</option>
+                    <option value="gentrade">젠트레이드</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="keyword">검색 키워드:</label>
+                <input type="text" id="keyword" name="keyword" placeholder="예: 이어폰, 스마트워치" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="limit">수집 개수:</label>
+                <input type="number" id="limit" name="limit" value="10" min="1" max="100">
+            </div>
+            
+            <button type="submit" id="collectBtn">상품 수집 시작</button>
+        </form>
+        
+        <div id="results" class="results"></div>
+    </div>
+
+    <script>
+        // API 서버 주소
+        const API_BASE = 'http://localhost:8002';
+        
+        // 도매처 목록 로드
+        async function loadSources() {
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/product-collector/sources`);
+                const data = await response.json();
+                
+                if (data.sources) {
+                    const select = document.getElementById('source');
+                    select.innerHTML = '<option value="">선택하세요</option>';
+                    
+                    data.sources.forEach(source => {
+                        const option = document.createElement('option');
+                        option.value = source.id;
+                        option.textContent = `${source.name} - ${source.description}`;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('도매처 목록 로드 실패:', error);
+            }
+        }
+        
+        // 폼 제출 처리
+        document.getElementById('collectionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('collectBtn');
+            const resultsDiv = document.getElementById('results');
+            
+            // 버튼 비활성화
+            btn.disabled = true;
+            btn.textContent = '수집 중...';
+            
+            // 폼 데이터 수집
+            const formData = new FormData(e.target);
+            
+            try {
+                // API 호출
+                const response = await fetch(`${API_BASE}/api/v1/product-collector/collect`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 성공 메시지
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            ✅ ${data.message}
+                        </div>
+                        <div class="stats">
+                            <strong>수집 통계</strong><br>
+                            - 배치 ID: ${data.batch_id}<br>
+                            - 수집된 상품: ${data.total_collected}개<br>
+                            - 저장된 상품: ${data.total_saved}개<br>
+                            - 수집 시간: ${new Date(data.search_info.collected_at).toLocaleString()}
+                        </div>
+                    `;
+                    
+                    // 상품 목록 표시
+                    if (data.products && data.products.length > 0) {
+                        resultsDiv.innerHTML += '<h2>수집된 상품</h2><div class="product-grid" id="productGrid"></div>';
+                        const grid = document.getElementById('productGrid');
+                        
+                        data.products.forEach(product => {
+                            const card = document.createElement('div');
+                            card.className = 'product-card';
+                            card.innerHTML = `
+                                <h3>${product.name}</h3>
+                                <div class="product-price">₩${product.price.toLocaleString()}</div>
+                                <div class="product-info">
+                                    재고: ${product.stock_quantity}개<br>
+                                    카테고리: ${product.category}<br>
+                                    도매처: ${product.source}
+                                </div>
+                            `;
+                            grid.appendChild(card);
+                        });
+                    }
+                } else {
+                    throw new Error(data.message || '수집 실패');
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="error">
+                        ❌ 오류: ${error.message}
+                    </div>
+                `;
+            } finally {
+                // 버튼 복원
+                btn.disabled = false;
+                btn.textContent = '상품 수집 시작';
+            }
+        });
+        
+        // 페이지 로드 시 도매처 목록 로드
+        loadSources();
+    </script>
+</body>
+</html>

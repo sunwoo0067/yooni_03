@@ -4,10 +4,10 @@ Pipeline execution and workflow management models
 from datetime import datetime
 from enum import Enum
 from typing import Optional, Dict, Any, List
-from sqlalchemy import Column, String, Integer, Text, DateTime, Boolean, ForeignKey, JSON, Float
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy import Column, String, Integer, Text, DateTime, Boolean, ForeignKey, Numeric
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from .base import BaseModel
+from .base import BaseModel, get_json_type
 
 
 class WorkflowStatus(str, Enum):
@@ -54,18 +54,18 @@ class PipelineExecution(BaseModel):
     products_failed = Column(Integer, default=0)
     
     # Performance metrics
-    success_rate = Column(Float, default=0.00)
-    processing_rate = Column(Float, default=0.00)  # products per minute
-    error_rate = Column(Float, default=0.00)
+    success_rate = Column(Numeric(5, 2), default=0.00)
+    processing_rate = Column(Numeric(10, 2), default=0.00)  # products per minute
+    error_rate = Column(Numeric(5, 2), default=0.00)
     
     # Configuration and results
-    execution_config = Column(JSONB, nullable=True)  # Original config used
-    results_summary = Column(JSONB, nullable=True)   # Final results
+    execution_config = Column(get_json_type(), nullable=True)  # Original config used
+    results_summary = Column(get_json_type(), nullable=True)   # Final results
     error_log = Column(Text, nullable=True)
     
     # Resource usage
-    cpu_usage_avg = Column(Float, nullable=True)
-    memory_usage_avg = Column(Float, nullable=True)  # MB
+    cpu_usage_avg = Column(Numeric(5, 2), nullable=True)
+    memory_usage_avg = Column(Numeric(10, 2), nullable=True)  # MB
     
     # Relationships
     steps = relationship("PipelineStep", back_populates="execution", cascade="all, delete-orphan")
@@ -115,13 +115,13 @@ class PipelineStep(BaseModel):
     failed_items = Column(Integer, default=0)
     
     # Configuration and results
-    step_config = Column(JSONB, nullable=True)
-    step_results = Column(JSONB, nullable=True)
+    step_config = Column(get_json_type(), nullable=True)
+    step_results = Column(get_json_type(), nullable=True)
     error_details = Column(Text, nullable=True)
     
     # Performance
-    processing_rate = Column(Float, default=0.00)
-    resource_usage = Column(JSONB, nullable=True)
+    processing_rate = Column(Numeric(10, 2), default=0.00)
+    resource_usage = Column(get_json_type(), nullable=True)
     
     # Relationships
     execution = relationship("PipelineExecution", back_populates="steps")
@@ -152,14 +152,14 @@ class PipelineProductResult(BaseModel):
     registration_completed_at = Column(DateTime, nullable=True)
     
     # Results for each stage
-    sourcing_score = Column(Float, nullable=True)
-    sourcing_reasons = Column(JSONB, nullable=True)
+    sourcing_score = Column(Numeric(5, 2), nullable=True)
+    sourcing_reasons = Column(get_json_type(), nullable=True)
     
-    processing_changes = Column(JSONB, nullable=True)
-    processing_quality_score = Column(Float, nullable=True)
+    processing_changes = Column(get_json_type(), nullable=True)
+    processing_quality_score = Column(Numeric(5, 2), nullable=True)
     
-    registration_platforms = Column(JSONB, nullable=True)
-    registration_results = Column(JSONB, nullable=True)
+    registration_platforms = Column(get_json_type(), nullable=True)
+    registration_results = Column(get_json_type(), nullable=True)
     
     # Overall result
     final_status = Column(String(20), default="pending")
@@ -179,12 +179,12 @@ class WorkflowTemplate(BaseModel):
     version = Column(String(20), default="1.0")
     
     # Template configuration
-    steps_config = Column(JSONB, nullable=False)  # Step definitions
-    default_config = Column(JSONB, nullable=True)  # Default parameters
+    steps_config = Column(get_json_type(), nullable=False)  # Step definitions
+    default_config = Column(get_json_type(), nullable=True)  # Default parameters
     
     # Metadata
     category = Column(String(50), nullable=True)
-    tags = Column(JSONB, nullable=True)
+    tags = Column(get_json_type(), nullable=True)
     
     # Status
     is_active = Column(Boolean, default=True)
@@ -227,7 +227,7 @@ class PipelineAlert(BaseModel):
     resolved_at = Column(DateTime, nullable=True)
     
     # Additional data
-    alert_data = Column(JSONB, nullable=True)
+    alert_data = Column(get_json_type(), nullable=True)
     
     # Relationships
     execution = relationship("PipelineExecution")
@@ -261,7 +261,7 @@ class PipelineSchedule(BaseModel):
     timeout_minutes = Column(Integer, default=120)
     
     # Configuration
-    execution_config = Column(JSONB, nullable=True)
+    execution_config = Column(get_json_type(), nullable=True)
     
     # Status tracking
     last_execution_at = Column(DateTime, nullable=True)

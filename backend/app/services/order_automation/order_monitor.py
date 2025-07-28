@@ -9,13 +9,13 @@ from typing import List, Dict, Optional, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_
 
-from app.models.order import Order, OrderStatus, PaymentStatus
+from app.models.order_core import Order, OrderStatus, PaymentStatus
 from app.models.order_automation import OrderProcessingLog, ExceptionCase
 from app.models.platform_account import PlatformAccount
 from app.services.platforms.coupang_api import CoupangAPI
 from app.services.platforms.naver_api import NaverAPI
 from app.services.platforms.eleventh_street_api import EleventhStreetAPI
-from app.services.realtime.websocket_manager import WebSocketManager
+from app.services.realtime.websocket_manager import ConnectionManager as WebSocketManager
 from app.services.dashboard.notification_service import NotificationService
 
 logger = logging.getLogger(__name__)

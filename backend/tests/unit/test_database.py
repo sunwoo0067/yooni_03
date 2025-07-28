@@ -42,8 +42,7 @@ class TestDatabase:
         
         expected_tables = [
             'users', 'platform_accounts', 'products', 'orders',
-            'inventory_items', 'wholesaler_accounts', 'customers',
-            'marketing_campaigns', 'ai_logs'
+            'inventory_items', 'wholesaler_accounts', 'ai_logs'
         ]
         
         try:

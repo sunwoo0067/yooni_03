@@ -932,7 +932,7 @@ async def get_shipping_tracking(
     """배송 추적 정보 조회"""
     try:
         from app.services.shipping.shipping_tracker import ShippingTracker
-        from app.models.order import DropshippingOrder, Order
+        from app.models.order_core import DropshippingOrder, Order
         
         # 드롭쉬핑 주문 조회
         dropshipping_order = db.query(DropshippingOrder).join(Order).filter(
@@ -966,7 +966,7 @@ async def get_delivery_estimate(
     """배송 예상 시간 조회"""
     try:
         from app.services.shipping.delivery_estimator import DeliveryEstimator
-        from app.models.order import DropshippingOrder, Order
+        from app.models.order_core import DropshippingOrder, Order
         
         # 드롭쉬핑 주문 조회
         dropshipping_order = db.query(DropshippingOrder).join(Order).filter(
@@ -1001,7 +1001,7 @@ async def cancel_dropshipping_order(
     """드롭쉬핑 주문 취소"""
     try:
         from app.services.ordering.order_manager import OrderManager
-        from app.models.order import DropshippingOrder, Order
+        from app.models.order_core import DropshippingOrder, Order
         
         # 드롭쉬핑 주문 조회
         dropshipping_order = db.query(DropshippingOrder).join(Order).filter(
@@ -1089,7 +1089,7 @@ async def process_refund(
     """환불 처리"""
     try:
         from app.services.exception_handling.refund_processor import RefundProcessor, RefundReason, RefundType
-        from app.models.order import DropshippingOrder, Order
+        from app.models.order_core import DropshippingOrder, Order
         from decimal import Decimal
         
         # 드롭쉬핑 주문 조회

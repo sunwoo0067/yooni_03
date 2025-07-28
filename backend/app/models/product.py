@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID, JSONB, ARRAY
 import enum
 
-from .base import BaseModel
+from .base import BaseModel, get_json_type
 
 
 class ProductStatus(enum.Enum):
@@ -76,7 +76,7 @@ class Product(BaseModel):
     
     # Physical Properties
     weight = Column(Numeric(8, 3), nullable=True)  # Weight in kg
-    dimensions = Column(JSONB, nullable=True)  # length, width, height
+    dimensions = Column(get_json_type(), nullable=True)  # length, width, height
     
     # Status and Visibility
     status = Column(SQLEnum(ProductStatus), default=ProductStatus.ACTIVE, nullable=False, index=True)
@@ -90,8 +90,8 @@ class Product(BaseModel):
     
     # Images and Media
     main_image_url = Column(String(1000), nullable=True)
-    image_urls = Column(JSONB, nullable=True)  # Array of image URLs
-    video_urls = Column(JSONB, nullable=True)  # Array of video URLs
+    image_urls = Column(get_json_type(), nullable=True)  # Array of image URLs
+    video_urls = Column(get_json_type(), nullable=True)  # Array of video URLs
     
     # Inventory Information
     stock_quantity = Column(Integer, default=0, nullable=False)
@@ -102,7 +102,7 @@ class Product(BaseModel):
     # Shipping
     requires_shipping = Column(Boolean, default=True, nullable=False)
     shipping_weight = Column(Numeric(8, 3), nullable=True)
-    shipping_dimensions = Column(JSONB, nullable=True)
+    shipping_dimensions = Column(get_json_type(), nullable=True)
     
     # AI and Analytics
     ai_optimized = Column(Boolean, default=False, nullable=False)
@@ -111,7 +111,7 @@ class Product(BaseModel):
     
     # 드롭쉬핑 관련 필드
     is_dropshipping = Column(Boolean, default=False, nullable=False, index=True)
-    wholesaler_id = Column(Integer, ForeignKey("wholesalers.id"), nullable=True, index=True)
+    wholesaler_id = Column(Integer, ForeignKey("wholesaler_accounts.id"), nullable=True, index=True)
     wholesaler_product_id = Column(String(100), nullable=True, index=True)
     selling_price = Column(Numeric(12, 2), nullable=True)  # 실제 판매가
     deactivated_at = Column(DateTime, nullable=True)
@@ -119,7 +119,7 @@ class Product(BaseModel):
     price_updated_at = Column(DateTime, nullable=True)
     
     # Additional Data
-    attributes = Column(JSONB, nullable=True)  # Flexible product attributes
+    attributes = Column(get_json_type(), nullable=True)  # Flexible product attributes
     
     # Relationships
     platform_account = relationship("PlatformAccount", back_populates="products")
@@ -130,21 +130,21 @@ class Product(BaseModel):
     order_items = relationship("OrderItem", back_populates="product")
     price_history = relationship("ProductPriceHistory", back_populates="product", cascade="all, delete-orphan")
     
-    # 드롭쉬핑 관련 관계
-    outofstock_history = relationship("OutOfStockHistory", back_populates="product")
-    restock_history = relationship("RestockHistory", back_populates="product")
-    stock_check_logs = relationship("StockCheckLog", back_populates="product")
-    dropshipping_price_history = relationship("PriceHistory", back_populates="product")
-    profit_protection_logs = relationship("ProfitProtectionLog", back_populates="product")
-    stockout_predictions = relationship("StockoutPredictionHistory", back_populates="product")
-    demand_analyses = relationship("DemandAnalysisHistory", back_populates="product")
-    automation_executions = relationship("AutomationExecution", back_populates="product")
+    # 드롭쉬핑 관련 관계 - Temporarily disabled (models not implemented)
+    # outofstock_history = relationship("OutOfStockHistory", back_populates="product")
+    # restock_history = relationship("RestockHistory", back_populates="product")
+    # stock_check_logs = relationship("StockCheckLog", back_populates="product")
+    # dropshipping_price_history = relationship("PriceHistory", back_populates="product")
+    # profit_protection_logs = relationship("ProfitProtectionLog", back_populates="product")
+    # stockout_predictions = relationship("StockoutPredictionHistory", back_populates="product")
+    # demand_analyses = relationship("DemandAnalysisHistory", back_populates="product")
+    # automation_executions = relationship("AutomationExecution", back_populates="product")
     
-    # 상품가공 관련 관계
-    image_processing_history = relationship("ImageProcessingHistory", back_populates="product")
-    name_generations = relationship("ProductNameGeneration", back_populates="product")
-    purpose_analyses = relationship("ProductPurposeAnalysis", back_populates="product")
-    competitor_analyses = relationship("CompetitorAnalysis", back_populates="product")
+    # 상품가공 관련 관계 - Temporarily disabled (models not implemented)
+    # image_processing_history = relationship("ImageProcessingHistory", back_populates="product")
+    # name_generations = relationship("ProductNameGeneration", back_populates="product")
+    # purpose_analyses = relationship("ProductPurposeAnalysis", back_populates="product")
+    # competitor_analyses = relationship("CompetitorAnalysis", back_populates="product")
     
     def __repr__(self):
         return f"<Product(sku={self.sku}, name={self.name[:50]})>"
@@ -179,7 +179,7 @@ class ProductVariant(BaseModel):
     
     # Variant Attributes
     name = Column(String(200), nullable=False)
-    attributes = Column(JSONB, nullable=False)  # color, size, etc.
+    attributes = Column(get_json_type(), nullable=False)  # color, size, etc.
     
     # Pricing
     cost_price = Column(Numeric(12, 2), nullable=True)
@@ -191,10 +191,10 @@ class ProductVariant(BaseModel):
     
     # Physical Properties
     weight = Column(Numeric(8, 3), nullable=True)
-    dimensions = Column(JSONB, nullable=True)
+    dimensions = Column(get_json_type(), nullable=True)
     
     # Images
-    image_urls = Column(JSONB, nullable=True)
+    image_urls = Column(get_json_type(), nullable=True)
     
     # Status
     is_active = Column(Boolean, default=True, nullable=False)
@@ -240,7 +240,7 @@ class PlatformListing(BaseModel):
     conversion_rate = Column(Numeric(5, 4), nullable=True)
     
     # Platform-specific settings
-    platform_settings = Column(JSONB, nullable=True)
+    platform_settings = Column(get_json_type(), nullable=True)
     
     # Sync information
     last_synced_at = Column(DateTime, nullable=True, index=True)
@@ -270,10 +270,10 @@ class ProductPriceHistory(BaseModel):
     # Change information
     changed_by = Column(String(50), nullable=True)  # user, system, ai
     change_reason = Column(String(200), nullable=True)
-    previous_prices = Column(JSONB, nullable=True)
+    previous_prices = Column(get_json_type(), nullable=True)
     
     # Market data
-    competitor_prices = Column(JSONB, nullable=True)
+    competitor_prices = Column(get_json_type(), nullable=True)
     market_average = Column(Numeric(12, 2), nullable=True)
     
     # Relationships

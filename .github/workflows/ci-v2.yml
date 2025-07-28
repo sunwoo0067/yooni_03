@@ -1,0 +1,677 @@
+name: CI/CD Pipeline V2
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+  POETRY_VERSION: '1.6.1'
+
+jobs:
+  # 변경 감지 및 영향 분석
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.changes.outputs.backend }}
+      frontend: ${{ steps.changes.outputs.frontend }}
+      infrastructure: ${{ steps.changes.outputs.infrastructure }}
+      tests_required: ${{ steps.changes.outputs.tests_required }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Detect changes
+      id: changes
+      uses: dorny/paths-filter@v2
+      with:
+        filters: |
+          backend:
+            - 'backend/**'
+            - 'requirements*.txt'
+            - 'pyproject.toml'
+          frontend:
+            - 'frontend/**'
+            - 'package*.json'
+          infrastructure:
+            - 'docker-compose*.yml'
+            - 'Dockerfile*'
+            - '.github/workflows/**'
+          tests_required:
+            - 'backend/app/**/*.py'
+            - 'frontend/src/**/*.{ts,tsx,js,jsx}'
+
+  # 코드 품질 검사 (병렬 실행)
+  quality-backend:
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: ${{ env.POETRY_VERSION }}
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: backend/.venv
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        poetry install --with dev
+
+    - name: Run code quality checks
+      run: |
+        cd backend
+        poetry run black . --check
+        poetry run isort . --check-only
+        poetry run flake8 .
+        poetry run mypy app --ignore-missing-imports
+        poetry run bandit -r app -f json -o bandit-report.json
+
+    - name: Upload quality reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: backend-quality-reports
+        path: backend/bandit-report.json
+
+  quality-frontend:
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci --no-audit
+
+    - name: Run quality checks
+      run: |
+        cd frontend
+        npm run lint
+        npm run prettier:check
+        npx tsc --noEmit
+
+  # 단위 테스트 (병렬 실행)
+  test-backend:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, quality-backend]
+    if: needs.detect-changes.outputs.tests_required == 'true'
+    strategy:
+      matrix:
+        test-group: [unit, integration, benchmark]
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_PASSWORD: test123
+          POSTGRES_USER: test
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        poetry install --with dev,test
+
+    - name: Run ${{ matrix.test-group }} tests
+      env:
+        DATABASE_URL: postgresql://test:test123@localhost:5432/test_db
+        REDIS_URL: redis://localhost:6379/0
+        SECRET_KEY: test-secret-key
+        ENVIRONMENT: testing
+        USE_V2_SERVICES: true
+      run: |
+        cd backend
+        if [ "${{ matrix.test-group }}" = "unit" ]; then
+          poetry run pytest tests/unit -v --cov=app --cov-report=xml --cov-report=html -m "not slow"
+        elif [ "${{ matrix.test-group }}" = "integration" ]; then
+          poetry run pytest tests/integration -v --cov=app --cov-report=xml -m "not slow"
+        elif [ "${{ matrix.test-group }}" = "benchmark" ]; then
+          poetry run pytest tests/benchmarks -v -m benchmark
+        fi
+
+    - name: Upload coverage
+      if: matrix.test-group != 'benchmark'
+      uses: codecov/codecov-action@v3
+      with:
+        file: backend/coverage.xml
+        flags: backend-${{ matrix.test-group }}
+        name: backend-${{ matrix.test-group }}
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, quality-frontend]
+    if: needs.detect-changes.outputs.tests_required == 'true'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci --no-audit
+
+    - name: Run tests
+      run: |
+        cd frontend
+        npm run test:coverage -- --run
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        directory: frontend/coverage
+        flags: frontend
+        name: frontend-coverage
+
+  # 보안 스캔
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.frontend == 'true'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run GitLeaks
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Run Semgrep
+      uses: returntocorp/semgrep-action@v1
+      with:
+        config: >-
+          p/security-audit
+          p/python
+          p/javascript
+          p/typescript
+          p/react
+
+    - name: OWASP Dependency Check
+      if: needs.detect-changes.outputs.backend == 'true'
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: 'dropshipping-backend'
+        path: './backend'
+        format: 'HTML'
+        args: >
+          --enableRetired
+
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          reports/
+          dependency-check-report.html
+
+  # Docker 이미지 빌드 및 스캔
+  build:
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    if: |
+      always() &&
+      (needs.test-backend.result == 'success' || needs.test-backend.result == 'skipped') &&
+      (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped')
+    strategy:
+      matrix:
+        component: [backend, frontend]
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.component }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./${{ matrix.component }}
+        push: false
+        load: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          BUILD_DATE=${{ github.event.head_commit.timestamp }}
+          VCS_REF=${{ github.sha }}
+          VERSION=${{ steps.meta.outputs.version }}
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        severity: 'CRITICAL,HIGH'
+
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+    - name: Push Docker image
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+      uses: docker/build-push-action@v5
+      with:
+        context: ./${{ matrix.component }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        platforms: linux/amd64,linux/arm64
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  # E2E 테스트
+  e2e-test:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install test dependencies
+      run: |
+        pip install playwright pytest-playwright pytest-asyncio
+
+    - name: Install Playwright browsers
+      run: |
+        playwright install --with-deps chromium
+
+    - name: Start services
+      run: |
+        cp .env.development .env
+        docker compose -f docker-compose.dev.yml up -d --wait
+        sleep 30
+
+    - name: Run E2E tests
+      run: |
+        cd backend
+        pytest tests/e2e -v --html=e2e-report.html --self-contained-html
+
+    - name: Upload E2E results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: e2e-results
+        path: |
+          backend/e2e-report.html
+          backend/screenshots/
+
+    - name: Stop services
+      if: always()
+      run: |
+        docker compose -f docker-compose.dev.yml down -v
+
+  # 성능 테스트
+  performance-test:
+    runs-on: ubuntu-latest
+    needs: e2e-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up k6
+      run: |
+        sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+        echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+        sudo apt-get update
+        sudo apt-get install k6
+
+    - name: Run performance tests
+      run: |
+        k6 run \
+          --out json=performance-results.json \
+          --out influxdb=http://localhost:8086/k6 \
+          scripts/performance/load-test.js
+
+    - name: Analyze performance results
+      run: |
+        python scripts/analyze-performance.py performance-results.json
+
+    - name: Upload performance results
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-results
+        path: |
+          performance-results.json
+          performance-report.html
+
+  # 배포 (Staging)
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: [build, security-scan]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    environment: staging
+    concurrency:
+      group: staging-deployment
+      cancel-in-progress: false
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Kubernetes
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig --name dropshipping-staging --region ap-northeast-2
+
+    - name: Deploy to staging
+      run: |
+        helm upgrade --install dropshipping ./helm/dropshipping \
+          --namespace staging \
+          --create-namespace \
+          --values helm/dropshipping/values-staging.yaml \
+          --set image.backend.tag=${{ github.sha }} \
+          --set image.frontend.tag=${{ github.sha }} \
+          --wait \
+          --timeout 10m
+
+    - name: Run smoke tests
+      run: |
+        kubectl run smoke-test --image=curlimages/curl:latest --rm -i --restart=Never -- \
+          curl -f http://dropshipping-backend.staging.svc.cluster.local:8000/health
+
+    - name: Notify deployment
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        text: |
+          Staging 배포가 ${{ job.status }}했습니다.
+          커밋: ${{ github.sha }}
+          배포자: ${{ github.actor }}
+
+  # 배포 (Production)
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: [build, security-scan, performance-test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: 
+      name: production
+      url: https://api.dropshipping.com
+    concurrency:
+      group: production-deployment
+      cancel-in-progress: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: Blue-Green Deployment
+      run: |
+        # 현재 활성 환경 확인
+        CURRENT_ENV=$(aws elbv2 describe-target-groups --names dropshipping-tg-active --query 'TargetGroups[0].TargetGroupArn' --output text)
+        
+        if [[ $CURRENT_ENV == *"blue"* ]]; then
+          DEPLOY_ENV="green"
+          INACTIVE_ENV="blue"
+        else
+          DEPLOY_ENV="blue"
+          INACTIVE_ENV="green"
+        fi
+        
+        echo "Deploying to $DEPLOY_ENV environment"
+        
+        # 새 환경에 배포
+        helm upgrade --install dropshipping-$DEPLOY_ENV ./helm/dropshipping \
+          --namespace production \
+          --values helm/dropshipping/values-production.yaml \
+          --set environment=$DEPLOY_ENV \
+          --set image.backend.tag=${{ github.sha }} \
+          --set image.frontend.tag=${{ github.sha }} \
+          --wait \
+          --timeout 15m
+        
+        # 헬스체크
+        kubectl run health-check --image=curlimages/curl:latest --rm -i --restart=Never -- \
+          curl -f http://dropshipping-backend-$DEPLOY_ENV.production.svc.cluster.local:8000/health
+        
+        # 트래픽 전환
+        aws elbv2 modify-listener-rule \
+          --rule-arn ${{ secrets.ALB_LISTENER_RULE_ARN }} \
+          --actions Type=forward,TargetGroupArn=$(aws elbv2 describe-target-groups --names dropshipping-tg-$DEPLOY_ENV --query 'TargetGroups[0].TargetGroupArn' --output text)
+        
+        # 이전 환경 정리 (5분 대기 후)
+        sleep 300
+        kubectl scale deployment dropshipping-backend-$INACTIVE_ENV -n production --replicas=0
+        kubectl scale deployment dropshipping-frontend-$INACTIVE_ENV -n production --replicas=0
+
+    - name: Create release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release v${{ github.run_number }}
+        body: |
+          ## 변경사항
+          - 커밋: ${{ github.sha }}
+          - 배포 시간: ${{ github.event.head_commit.timestamp }}
+          
+          ## 배포 정보
+          - 환경: Production
+          - 이미지 태그: ${{ github.sha }}
+        draft: false
+        prerelease: false
+
+    - name: Notify deployment
+      uses: 8398a7/action-slack@v3
+      if: always()
+      with:
+        status: ${{ job.status }}
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        text: |
+          🚀 Production 배포가 ${{ job.status }}했습니다.
+          버전: v${{ github.run_number }}
+          커밋: ${{ github.sha }}
+          배포자: ${{ github.actor }}
+          환경: ${{ env.DEPLOY_ENV }}
+
+  # 배포 후 검증
+  post-deployment-validation:
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    if: success()
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run synthetic monitoring
+      run: |
+        # Datadog Synthetics 테스트 실행
+        curl -X POST "https://api.datadoghq.com/api/v1/synthetics/tests/trigger" \
+          -H "Content-Type: application/json" \
+          -H "DD-API-KEY: ${{ secrets.DATADOG_API_KEY }}" \
+          -H "DD-APPLICATION-KEY: ${{ secrets.DATADOG_APP_KEY }}" \
+          -d '{
+            "tests": [
+              {"public_id": "abc-123-def"},
+              {"public_id": "ghi-456-jkl"}
+            ]
+          }'
+
+    - name: Check error rates
+      run: |
+        # CloudWatch 메트릭 확인
+        ERROR_RATE=$(aws cloudwatch get-metric-statistics \
+          --namespace AWS/ApplicationELB \
+          --metric-name HTTPCode_Target_5XX_Count \
+          --dimensions Name=LoadBalancer,Value=app/dropshipping-alb/1234567890abcdef \
+          --start-time $(date -u -d '5 minutes ago' +%Y-%m-%dT%H:%M:%S) \
+          --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
+          --period 300 \
+          --statistics Sum \
+          --query 'Datapoints[0].Sum' \
+          --output text)
+        
+        if [ "$ERROR_RATE" -gt "10" ]; then
+          echo "Error rate is too high: $ERROR_RATE"
+          exit 1
+        fi
+
+    - name: Performance validation
+      run: |
+        # 응답 시간 확인
+        RESPONSE_TIME=$(curl -w "%{time_total}\n" -o /dev/null -s https://api.dropshipping.com/health)
+        
+        if (( $(echo "$RESPONSE_TIME > 1.0" | bc -l) )); then
+          echo "Response time is too slow: ${RESPONSE_TIME}s"
+          exit 1
+        fi
+
+  # 자동 롤백
+  auto-rollback:
+    runs-on: ubuntu-latest
+    needs: post-deployment-validation
+    if: failure()
+    steps:
+    - name: Rollback deployment
+      run: |
+        # 이전 버전으로 롤백
+        helm rollback dropshipping 0 -n production
+        
+    - name: Notify rollback
+      uses: 8398a7/action-slack@v3
+      with:
+        status: custom
+        custom_payload: |
+          {
+            text: "⚠️ Production 배포가 롤백되었습니다.",
+            attachments: [{
+              color: 'danger',
+              text: '배포 후 검증 실패로 인한 자동 롤백'
+            }]
+          }
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}

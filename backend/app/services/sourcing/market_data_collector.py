@@ -1,4 +1,4 @@
-"""마켓플레이스 판매 데이터 수집 서비스"""
+"""마켓플레이스 판매 데이터 수집 서비스 (벤치마크 테이블 연동)"""
 import asyncio
 import aiohttp
 from typing import Dict, List, Any, Optional
@@ -9,17 +9,20 @@ import json
 from sqlalchemy.orm import Session
 
 from ...models.market import MarketProduct, MarketSalesData, MarketCategory
+from ...models.benchmark import BenchmarkProduct, BenchmarkPriceHistory, BenchmarkKeyword
+from ...services.benchmark.benchmark_manager import BenchmarkManager
 from ...models.base import Base
 from ...core.config import settings
 
 
 class MarketDataCollector:
-    """마켓플레이스 데이터 수집기"""
+    """마켓플레이스 데이터 수집기 (벤치마크 테이블 통합)"""
     
     def __init__(self, db: Session, logger: logging.Logger = None):
         self.db = db
         self.logger = logger or logging.getLogger(__name__)
         self.session = None
+        self.benchmark_manager = BenchmarkManager(db)
         
     async def __aenter__(self):
         self.session = aiohttp.ClientSession()
@@ -64,22 +67,35 @@ class MarketDataCollector:
                 # 데이터 정규화 및 저장
                 for rank, product in enumerate(products, 1):
                     normalized = {
-                        'marketplace': 'coupang',
-                        'category': category,
-                        'rank': rank,
-                        'product_name': product.get('name', ''),
-                        'price': self._parse_price(product.get('price', 0)),
+                        'product_id': product.get('product_id', ''),
+                        'name': product.get('name', ''),
+                        'brand': product.get('brand', ''),
+                        'main_category': category,
+                        'sub_category': product.get('sub_category', ''),
                         'original_price': self._parse_price(product.get('original_price', 0)),
+                        'sale_price': self._parse_price(product.get('price', 0)),
                         'discount_rate': product.get('discount_rate', 0),
+                        'delivery_fee': product.get('delivery_fee', 0),
                         'review_count': product.get('review_count', 0),
                         'rating': product.get('rating', 0),
-                        'is_rocket': product.get('is_rocket', False),
                         'monthly_sales': self._estimate_sales(product),
-                        'collected_at': datetime.now()
+                        'bestseller_rank': rank,
+                        'seller_name': product.get('seller_name', ''),
+                        'seller_grade': product.get('seller_grade', ''),
+                        'is_power_seller': product.get('is_rocket', False),
+                        'keywords': self._extract_keywords(product.get('name', '')),
+                        'options': product.get('options', []),
+                        'attributes': {
+                            'is_rocket': product.get('is_rocket', False),
+                            'is_fresh': product.get('is_fresh', False),
+                            'has_coupon': product.get('has_coupon', False)
+                        }
                     }
                     
                     all_products.append(normalized)
-                    await self._save_market_product(normalized)
+                    
+                    # 벤치마크 테이블에 저장
+                    await self.benchmark_manager.save_product_data(normalized, 'coupang')
                     
             except Exception as e:
                 self.logger.error(f"쿠팡 {category} 수집 실패: {str(e)}")
@@ -103,22 +119,41 @@ class MarketDataCollector:
                 
                 for rank, product in enumerate(products, 1):
                     normalized = {
-                        'marketplace': 'naver',
-                        'category': category,
-                        'rank': rank,
-                        'product_name': product.get('title', ''),
-                        'price': self._parse_price(product.get('lprice', 0)),
-                        'mall_count': product.get('mallCount', 0),
-                        'review_count': product.get('reviewCount', 0),
-                        'purchase_count': product.get('purchaseCnt', 0),
                         'product_id': product.get('productId', ''),
+                        'name': product.get('title', ''),
                         'brand': product.get('brand', ''),
-                        'maker': product.get('maker', ''),
-                        'collected_at': datetime.now()
+                        'main_category': category,
+                        'sub_category': product.get('category2', ''),
+                        'original_price': self._parse_price(product.get('hprice', 0)),
+                        'sale_price': self._parse_price(product.get('lprice', 0)),
+                        'discount_rate': self._calculate_discount_rate(
+                            product.get('hprice', 0), 
+                            product.get('lprice', 0)
+                        ),
+                        'delivery_fee': 0,  # 네이버는 판매처별로 다름
+                        'review_count': product.get('reviewCount', 0),
+                        'rating': 0,  # 네이버는 평점 제공 안함
+                        'monthly_sales': product.get('purchaseCnt', 0) * 30,  # 구매수 기반 추정
+                        'bestseller_rank': rank,
+                        'seller_name': '',  # 여러 판매처
+                        'seller_grade': '',
+                        'is_power_seller': False,
+                        'keywords': self._extract_keywords(product.get('title', '')),
+                        'options': [],
+                        'attributes': {
+                            'mall_count': product.get('mallCount', 0),
+                            'maker': product.get('maker', ''),
+                            'category1': product.get('category1', ''),
+                            'category2': product.get('category2', ''),
+                            'category3': product.get('category3', ''),
+                            'category4': product.get('category4', '')
+                        }
                     }
                     
                     all_products.append(normalized)
-                    await self._save_market_product(normalized)
+                    
+                    # 벤치마크 테이블에 저장
+                    await self.benchmark_manager.save_product_data(normalized, 'naver')
                     
             except Exception as e:
                 self.logger.error(f"네이버 {category} 수집 실패: {str(e)}")
@@ -141,21 +176,35 @@ class MarketDataCollector:
                 
                 for rank, product in enumerate(products, 1):
                     normalized = {
-                        'marketplace': '11st',
-                        'category': category,
-                        'rank': rank,
-                        'product_name': product.get('name', ''),
-                        'price': self._parse_price(product.get('price', 0)),
+                        'product_id': product.get('product_no', ''),
+                        'name': product.get('name', ''),
+                        'brand': product.get('brand', ''),
+                        'main_category': category,
+                        'sub_category': product.get('sub_category', ''),
+                        'original_price': self._parse_price(product.get('original_price', 0)),
+                        'sale_price': self._parse_price(product.get('price', 0)),
                         'discount_rate': product.get('discount', 0),
+                        'delivery_fee': self._parse_price(product.get('delivery_fee', 0)),
                         'review_count': product.get('review_count', 0),
                         'rating': product.get('rating', 0),
+                        'monthly_sales': self._estimate_sales(product),
+                        'bestseller_rank': rank,
+                        'seller_name': product.get('seller_name', ''),
                         'seller_grade': product.get('seller_grade', ''),
-                        'delivery_type': product.get('delivery', ''),
-                        'collected_at': datetime.now()
+                        'is_power_seller': product.get('is_best_shop', False),
+                        'keywords': self._extract_keywords(product.get('name', '')),
+                        'options': product.get('options', []),
+                        'attributes': {
+                            'delivery_type': product.get('delivery', ''),
+                            'is_shocking_deal': product.get('is_shocking_deal', False),
+                            'benefit_badge': product.get('benefit_badge', [])
+                        }
                     }
                     
                     all_products.append(normalized)
-                    await self._save_market_product(normalized)
+                    
+                    # 벤치마크 테이블에 저장
+                    await self.benchmark_manager.save_product_data(normalized, '11st')
                     
             except Exception as e:
                 self.logger.error(f"11번가 {category} 수집 실패: {str(e)}")
@@ -207,6 +256,15 @@ class MarketDataCollector:
             return int(''.join(numbers))
         return 0
         
+    def _calculate_discount_rate(self, original: Any, sale: Any) -> float:
+        """할인율 계산"""
+        original_price = self._parse_price(original)
+        sale_price = self._parse_price(sale)
+        
+        if original_price > 0 and sale_price < original_price:
+            return round((original_price - sale_price) / original_price * 100, 1)
+        return 0.0
+        
     def _estimate_sales(self, product: Dict[str, Any]) -> int:
         """리뷰 수와 평점을 기반으로 월 판매량 추정"""
         review_count = product.get('review_count', 0)
@@ -227,194 +285,62 @@ class MarketDataCollector:
             
         return int(estimated_sales)
         
-    async def _save_market_product(self, product_data: Dict[str, Any]):
-        """마켓 상품 데이터 저장"""
-        try:
-            market_product = MarketProduct(
-                marketplace=product_data['marketplace'],
-                category=product_data['category'],
-                rank=product_data['rank'],
-                product_name=product_data['product_name'],
-                price=product_data.get('price', 0),
-                review_count=product_data.get('review_count', 0),
-                rating=product_data.get('rating', 0),
-                raw_data=product_data,
-                collected_at=product_data['collected_at']
-            )
-            
-            self.db.add(market_product)
-            self.db.commit()
-            
-            # 판매 데이터 추적
-            sales_data = MarketSalesData(
-                market_product_id=market_product.id,
-                estimated_monthly_sales=product_data.get('monthly_sales', 0),
-                price=product_data.get('price', 0),
-                discount_rate=product_data.get('discount_rate', 0),
-                recorded_at=datetime.now()
-            )
-            
-            self.db.add(sales_data)
-            self.db.commit()
-            
-        except Exception as e:
-            self.logger.error(f"상품 데이터 저장 실패: {str(e)}")
-            self.db.rollback()
-            
+    def _extract_keywords(self, product_name: str) -> List[str]:
+        """상품명에서 키워드 추출"""
+        import re
+        # 특수문자 제거
+        clean_name = re.sub(r'[^\w\s]', ' ', product_name)
+        # 단어 분리
+        words = clean_name.split()
+        # 2글자 이상 키워드만 추출
+        keywords = [w.lower() for w in words if len(w) >= 2]
+        # 중복 제거
+        return list(set(keywords))[:10]  # 최대 10개
+        
     async def _analyze_collected_data(self, market_data: Dict[str, List]) -> Dict[str, Any]:
         """수집된 데이터 분석"""
-        analysis = {
-            'total_products': 0,
-            'top_categories': {},
-            'price_ranges': {},
-            'high_potential_products': [],
-            'market_trends': {}
+        total_products = sum(len(products) for products in market_data.values())
+        
+        # 카테고리별 베스트 상품
+        category_best = {}
+        for market, products in market_data.items():
+            for product in products[:10]:  # 상위 10개만
+                category = product.get('main_category', 'Unknown')
+                if category not in category_best:
+                    category_best[category] = []
+                category_best[category].append({
+                    'market': market,
+                    'name': product.get('name', ''),
+                    'price': product.get('sale_price', 0),
+                    'sales': product.get('monthly_sales', 0)
+                })
+        
+        # 가격대별 분포
+        price_ranges = {
+            'under_10k': 0,
+            '10k_30k': 0,
+            '30k_50k': 0,
+            '50k_100k': 0,
+            'over_100k': 0
         }
         
-        # 전체 상품 수 계산
-        for market, products in market_data.items():
-            analysis['total_products'] += len(products)
-            
-            # 카테고리별 분석
-            category_stats = {}
+        for products in market_data.values():
             for product in products:
-                category = product.get('category', 'unknown')
-                if category not in category_stats:
-                    category_stats[category] = {
-                        'count': 0,
-                        'avg_price': 0,
-                        'avg_review': 0,
-                        'top_product': None
-                    }
-                    
-                stats = category_stats[category]
-                stats['count'] += 1
-                stats['avg_price'] += product.get('price', 0)
-                stats['avg_review'] += product.get('review_count', 0)
-                
-                # 최고 순위 상품
-                if not stats['top_product'] or product.get('rank', 999) < stats['top_product'].get('rank', 999):
-                    stats['top_product'] = product
-                    
-            # 평균 계산
-            for category, stats in category_stats.items():
-                if stats['count'] > 0:
-                    stats['avg_price'] /= stats['count']
-                    stats['avg_review'] /= stats['count']
-                    
-            analysis['top_categories'][market] = category_stats
-            
-        # 고잠재력 상품 식별
-        analysis['high_potential_products'] = await self._identify_high_potential_products(market_data)
+                price = product.get('sale_price', 0)
+                if price < 10000:
+                    price_ranges['under_10k'] += 1
+                elif price < 30000:
+                    price_ranges['10k_30k'] += 1
+                elif price < 50000:
+                    price_ranges['30k_50k'] += 1
+                elif price < 100000:
+                    price_ranges['50k_100k'] += 1
+                else:
+                    price_ranges['over_100k'] += 1
         
-        return analysis
-        
-    async def _identify_high_potential_products(self, market_data: Dict[str, List]) -> List[Dict[str, Any]]:
-        """고잠재력 상품 식별"""
-        potential_products = []
-        
-        for market, products in market_data.items():
-            for product in products:
-                score = 0
-                
-                # 순위 점수 (1-10위: 10점, 11-20위: 8점...)
-                rank = product.get('rank', 100)
-                if rank <= 10:
-                    score += 10
-                elif rank <= 20:
-                    score += 8
-                elif rank <= 50:
-                    score += 5
-                elif rank <= 100:
-                    score += 3
-                    
-                # 리뷰 수 점수
-                reviews = product.get('review_count', 0)
-                if reviews >= 1000:
-                    score += 8
-                elif reviews >= 500:
-                    score += 6
-                elif reviews >= 100:
-                    score += 4
-                elif reviews >= 50:
-                    score += 2
-                    
-                # 가격대 점수 (중저가 선호)
-                price = product.get('price', 0)
-                if 10000 <= price <= 50000:
-                    score += 5
-                elif 5000 <= price < 10000:
-                    score += 4
-                elif 50000 < price <= 100000:
-                    score += 3
-                    
-                # 할인율 점수
-                discount = product.get('discount_rate', 0)
-                if discount >= 30:
-                    score += 3
-                elif discount >= 20:
-                    score += 2
-                elif discount >= 10:
-                    score += 1
-                    
-                # 평점 점수
-                rating = product.get('rating', 0)
-                if rating >= 4.5:
-                    score += 5
-                elif rating >= 4.0:
-                    score += 3
-                elif rating >= 3.5:
-                    score += 1
-                    
-                product['potential_score'] = score
-                
-                # 점수가 15점 이상인 상품을 고잠재력으로 분류
-                if score >= 15:
-                    potential_products.append(product)
-                    
-        # 점수 순으로 정렬
-        potential_products.sort(key=lambda x: x['potential_score'], reverse=True)
-        
-        return potential_products[:50]  # 상위 50개 반환
-        
-    async def track_product_history(self, product_id: str, marketplace: str) -> Dict[str, Any]:
-        """특정 상품의 이력 추적"""
-        history = self.db.query(MarketSalesData).join(
-            MarketProduct
-        ).filter(
-            MarketProduct.product_id == product_id,
-            MarketProduct.marketplace == marketplace
-        ).order_by(
-            MarketSalesData.recorded_at.desc()
-        ).limit(30).all()  # 최근 30일
-        
-        if not history:
-            return {}
-            
         return {
-            'product_id': product_id,
-            'marketplace': marketplace,
-            'price_trend': [{'date': h.recorded_at, 'price': h.price} for h in history],
-            'sales_trend': [{'date': h.recorded_at, 'sales': h.estimated_monthly_sales} for h in history],
-            'avg_price': sum(h.price for h in history) / len(history),
-            'price_volatility': self._calculate_volatility([h.price for h in history]),
-            'growth_rate': self._calculate_growth_rate(history)
+            'total_products_collected': total_products,
+            'category_best_products': category_best,
+            'price_distribution': price_ranges,
+            'collection_timestamp': datetime.now()
         }
-        
-    def _calculate_volatility(self, prices: List[float]) -> float:
-        """가격 변동성 계산"""
-        if len(prices) < 2:
-            return 0
-            
-        import numpy as np
-        return float(np.std(prices) / np.mean(prices) * 100)
-        
-    def _calculate_growth_rate(self, history: List) -> float:
-        """성장률 계산"""
-        if len(history) < 2:
-            return 0
-            
-        initial_sales = history[-1].estimated_monthly_sales or 1
-        current_sales = history[0].estimated_monthly_sales or 1
-        
-        return ((current_sales - initial_sales) / initial_sales) * 100

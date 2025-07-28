@@ -1,0 +1,59 @@
+{
+  "timestamp": "2025-07-27T19:03:51.080238",
+  "marketplaces": {
+    "coupang": [
+      {
+        "id": "CP001",
+        "name": "쿠팡 테스트 상품 1",
+        "price": 25000,
+        "stock": 100,
+        "status": "ACTIVE"
+      },
+      {
+        "id": "CP002",
+        "name": "쿠팡 테스트 상품 2",
+        "price": 35000,
+        "stock": 50,
+        "status": "ACTIVE"
+      }
+    ],
+    "naver": [
+      {
+        "id": "NV001",
+        "name": "네이버 테스트 상품 1",
+        "price": 28000,
+        "stock": 80,
+        "status": "SALE"
+      },
+      {
+        "id": "NV002",
+        "name": "네이버 테스트 상품 2",
+        "price": 42000,
+        "stock": 30,
+        "status": "SALE"
+      }
+    ],
+    "11st": [
+      {
+        "id": "11ST001",
+        "name": "11번가 테스트 상품 1",
+        "price": 32000,
+        "stock": 60,
+        "status": "SELLING"
+      },
+      {
+        "id": "11ST002",
+        "name": "11번가 테스트 상품 2",
+        "price": 48000,
+        "stock": 20,
+        "status": "SELLING"
+      }
+    ]
+  },
+  "summary": {
+    "coupang": 2,
+    "naver": 2,
+    "11st": 2,
+    "total": 6
+  }
+}

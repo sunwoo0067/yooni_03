@@ -7,7 +7,8 @@ from sqlalchemy.orm import Session
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 
-from app.core.dependencies import get_db, get_current_user
+from app.api.v1.dependencies.database import get_db
+from app.api.v1.dependencies.auth import get_current_user
 from app.schemas.marketing import (
     # Campaign schemas
     MarketingCampaignCreate, MarketingCampaignUpdate, MarketingCampaignResponse,

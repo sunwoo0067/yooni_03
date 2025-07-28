@@ -5,13 +5,13 @@ from datetime import datetime
 import logging
 
 from .base_wholesaler import BaseWholesaler, CollectionType, ProductData
-from .zentrade_api import ZentradeAPI
-from .ownerclan_api import OwnerClanAPI
-from .domeggook_api import DomeggookAPI
+from .zentrade_api import ZentradeAPIFixed as ZentradeAPI
+from .ownerclan_api import OwnerClanAPIFixed as OwnerClanAPI
+from .domeggook_api import DomeggookAPIFixed as DomeggookAPI
 from ...models.wholesaler import WholesalerType
 from ...core.config import settings
-from ...crud.wholesaler import crud_wholesaler
-from ...schemas.wholesaler import WholesalerCreate, WholesalerUpdate
+from ...crud.wholesaler import crud_wholesaler_account
+from ...schemas.wholesaler import WholesalerAccountCreate, WholesalerAccountUpdate
 from sqlalchemy.orm import Session
 
 

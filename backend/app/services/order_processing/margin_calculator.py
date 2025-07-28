@@ -7,7 +7,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 
-from app.models.order import DropshippingOrder, MarginProtectionRule
+from app.models.order_core import DropshippingOrder, MarginProtectionRule
 from app.models.product import Product
 from app.models.wholesaler import Wholesaler
 

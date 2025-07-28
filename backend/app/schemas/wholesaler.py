@@ -171,6 +171,28 @@ class WholesalerProductBase(BaseModel):
     shipping_info: Optional[Dict[str, Any]] = None
 
 
+class WholesalerProductCreate(WholesalerProductBase):
+    wholesaler_account_id: int
+
+
+class WholesalerProductUpdate(BaseModel):
+    wholesaler_sku: Optional[str] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+    category_path: Optional[str] = None
+    wholesale_price: Optional[int] = None
+    retail_price: Optional[int] = None
+    discount_rate: Optional[int] = None
+    stock_quantity: Optional[int] = None
+    is_in_stock: Optional[bool] = None
+    main_image_url: Optional[str] = None
+    additional_images: Optional[List[str]] = None
+    options: Optional[Dict[str, Any]] = None
+    variants: Optional[List[Dict[str, Any]]] = None
+    shipping_info: Optional[Dict[str, Any]] = None
+    is_active: Optional[bool] = None
+
+
 class WholesalerProductResponse(WholesalerProductBase):
     id: int
     wholesaler_account_id: int

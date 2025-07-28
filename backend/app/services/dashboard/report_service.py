@@ -19,7 +19,7 @@ from reportlab.lib.units import inch
 import asyncio
 
 from app.models.product import Product
-from app.models.order import Order, OrderItem
+from app.models.order_core import Order, OrderItem
 from app.models.inventory import Inventory
 from app.models.platform import Platform
 from app.services.dashboard.dashboard_service import DashboardService

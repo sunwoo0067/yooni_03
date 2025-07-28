@@ -9,7 +9,7 @@ from typing import List, Dict, Optional, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_, func
 
-from app.models.order import Order, OrderItem, OrderStatus
+from app.models.order_core import Order, OrderItem, OrderStatus
 from app.models.order_automation import (
     WholesaleOrder, WholesaleOrderStatus,
     ExceptionCase, OrderProcessingLog

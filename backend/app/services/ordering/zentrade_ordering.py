@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from sqlalchemy.orm import Session
 
-from app.models.order import DropshippingOrder, OrderItem
+from app.models.order_core import DropshippingOrder, OrderItem
 from app.models.wholesaler import Wholesaler
 from app.services.ordering.base_ordering import BaseOrderingService
 

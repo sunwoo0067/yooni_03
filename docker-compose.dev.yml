@@ -1,0 +1,178 @@
+version: '3.8'
+
+services:
+  # 백엔드 (개발 모드)
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: dropshipping_backend_dev
+    ports:
+      - "8000:8000"
+      - "5678:5678"  # 디버깅 포트
+    environment:
+      - DATABASE_URL=postgresql://dropshipping:dev123@db-dev:5432/dropshipping_dev
+      - REDIS_URL=redis://redis-dev:6379/0
+      - DEBUG=true
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - SECRET_KEY=dev-secret-key-for-development-only-not-for-production
+      - CORS_ORIGINS=["http://localhost:3000", "http://127.0.0.1:3000"]
+      - RATE_LIMIT_ENABLED=false
+      - PROMETHEUS_ENABLED=false
+      # 개발용 API 키 (테스트용)
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-test-key}
+      - SMTP_HOST=mailhog
+      - SMTP_PORT=1025
+      - SMTP_USER=""
+      - SMTP_PASSWORD=""
+      - SMTP_FROM_EMAIL=test@localhost
+    volumes:
+      - ./backend:/app
+      - ./backend/logs:/app/logs
+      - ./backend/uploads:/app/uploads
+    depends_on:
+      - db-dev
+      - redis-dev
+    networks:
+      - dropshipping_dev_network
+    restart: unless-stopped
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 프론트엔드 (개발 모드)
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: dropshipping_frontend_dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://localhost:8000
+      - VITE_WS_URL=ws://localhost:8000/ws
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - dropshipping_dev_network
+    restart: unless-stopped
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+
+  # PostgreSQL (개발용)
+  db-dev:
+    image: postgres:15-alpine
+    container_name: dropshipping_db_dev
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: dropshipping_dev
+      POSTGRES_USER: dropshipping
+      POSTGRES_PASSWORD: dev123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./backend/scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+    networks:
+      - dropshipping_dev_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dropshipping -d dropshipping_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis (개발용)
+  redis-dev:
+    image: redis:7-alpine
+    container_name: dropshipping_redis_dev
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - dropshipping_dev_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # MailHog (개발용 메일 서버)
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: dropshipping_mailhog
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - dropshipping_dev_network
+    restart: unless-stopped
+
+  # pgAdmin (데이터베이스 관리 도구)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: dropshipping_pgadmin
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@localhost.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - db-dev
+    networks:
+      - dropshipping_dev_network
+    restart: unless-stopped
+
+  # Redis Commander (Redis 관리 도구)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: dropshipping_redis_commander
+    ports:
+      - "8081:8081"
+    environment:
+      - REDIS_HOSTS=local:redis-dev:6379
+    depends_on:
+      - redis-dev
+    networks:
+      - dropshipping_dev_network
+    restart: unless-stopped
+
+  # Jaeger (분산 추적, 개발용)
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: dropshipping_jaeger
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "14268:14268"  # Jaeger collector
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - dropshipping_dev_network
+    restart: unless-stopped
+
+volumes:
+  postgres_dev_data:
+    driver: local
+  redis_dev_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  dropshipping_dev_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+          gateway: 172.21.0.1

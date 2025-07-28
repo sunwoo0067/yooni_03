@@ -1,0 +1,443 @@
+name: Continuous Deployment
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      version:
+        description: 'Version to deploy (leave empty for latest)'
+        required: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # 버전 정보 준비
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      environment: ${{ steps.env.outputs.environment }}
+      should_deploy_prod: ${{ steps.check.outputs.should_deploy_prod }}
+    steps:
+    - name: Determine version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=latest" >> $GITHUB_OUTPUT
+          fi
+        else
+          echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Determine environment
+      id: env
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+        else
+          # 태그 기반 배포는 production으로
+          echo "environment=production" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Check production deployment
+      id: check
+      run: |
+        if [ "${{ steps.env.outputs.environment }}" = "production" ]; then
+          echo "should_deploy_prod=true" >> $GITHUB_OUTPUT
+        else
+          echo "should_deploy_prod=false" >> $GITHUB_OUTPUT
+        fi
+
+  # Staging 배포
+  deploy-staging:
+    needs: prepare
+    if: needs.prepare.outputs.environment == 'staging' || needs.prepare.outputs.should_deploy_prod == 'true'
+    runs-on: ubuntu-latest
+    environment: staging
+    concurrency:
+      group: staging-deployment
+      cancel-in-progress: false
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: Login to ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: '3.12.0'
+
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig --name dropshipping-staging --region ap-northeast-2
+
+    - name: Deploy to Staging
+      run: |
+        VERSION="${{ needs.prepare.outputs.version }}"
+        
+        helm upgrade --install dropshipping ./helm/dropshipping \
+          --namespace staging \
+          --create-namespace \
+          --values helm/dropshipping/values-staging.yaml \
+          --set image.backend.tag=$VERSION \
+          --set image.frontend.tag=$VERSION \
+          --set-string appVersion=$VERSION \
+          --wait \
+          --timeout 10m
+
+    - name: Run smoke tests
+      run: |
+        ./scripts/smoke-test.sh staging
+
+    - name: Run integration tests
+      run: |
+        ./scripts/integration-test.sh staging
+
+    - name: Collect deployment info
+      id: deployment
+      run: |
+        kubectl get deployment -n staging -o json > deployment-info.json
+        kubectl get pods -n staging -o wide > pods-info.txt
+        
+        echo "url=https://staging.dropshipping.com" >> $GITHUB_OUTPUT
+
+    - name: Upload deployment artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: staging-deployment-info
+        path: |
+          deployment-info.json
+          pods-info.txt
+
+  # Production 승인 게이트
+  approve-production:
+    needs: [prepare, deploy-staging]
+    if: needs.prepare.outputs.should_deploy_prod == 'true'
+    runs-on: ubuntu-latest
+    environment: production-approval
+    steps:
+    - name: Production deployment approval
+      run: |
+        echo "Production deployment approved for version ${{ needs.prepare.outputs.version }}"
+
+  # Production 배포
+  deploy-production:
+    needs: [prepare, deploy-staging, approve-production]
+    if: needs.prepare.outputs.should_deploy_prod == 'true'
+    runs-on: ubuntu-latest
+    environment: 
+      name: production
+      url: https://api.dropshipping.com
+    concurrency:
+      group: production-deployment
+      cancel-in-progress: false
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig --name dropshipping-production --region ap-northeast-2
+
+    - name: Pre-deployment backup
+      run: |
+        ./scripts/backup-production.sh
+
+    - name: Blue-Green Deployment
+      run: |
+        VERSION="${{ needs.prepare.outputs.version }}"
+        
+        # 현재 활성 환경 확인
+        CURRENT_ENV=$(kubectl get service dropshipping-active -n production -o jsonpath='{.spec.selector.environment}' 2>/dev/null || echo "blue")
+        
+        if [ "$CURRENT_ENV" = "blue" ]; then
+          DEPLOY_ENV="green"
+          INACTIVE_ENV="blue"
+        else
+          DEPLOY_ENV="blue"
+          INACTIVE_ENV="green"
+        fi
+        
+        echo "Current active environment: $CURRENT_ENV"
+        echo "Deploying to: $DEPLOY_ENV"
+        
+        # 새 환경에 배포
+        helm upgrade --install dropshipping-$DEPLOY_ENV ./helm/dropshipping \
+          --namespace production \
+          --values helm/dropshipping/values-production.yaml \
+          --set environment=$DEPLOY_ENV \
+          --set image.backend.tag=$VERSION \
+          --set image.frontend.tag=$VERSION \
+          --set-string appVersion=$VERSION \
+          --wait \
+          --timeout 15m
+        
+        # 배포 확인
+        kubectl wait --for=condition=ready pod -l app=dropshipping,environment=$DEPLOY_ENV -n production --timeout=600s
+        
+        # 헬스체크
+        ./scripts/health-check.sh production $DEPLOY_ENV
+        
+        # Canary 배포 (10% 트래픽)
+        kubectl patch service dropshipping-canary -n production -p '{"spec":{"selector":{"environment":"'$DEPLOY_ENV'"}}}'
+        
+        echo "DEPLOY_ENV=$DEPLOY_ENV" >> $GITHUB_ENV
+        echo "INACTIVE_ENV=$INACTIVE_ENV" >> $GITHUB_ENV
+
+    - name: Canary validation (10% traffic)
+      run: |
+        echo "Monitoring canary deployment for 10 minutes..."
+        ./scripts/monitor-canary.sh 600 # 10분 모니터링
+        
+        # 메트릭 확인
+        ERROR_RATE=$(./scripts/get-error-rate.sh production $DEPLOY_ENV)
+        if (( $(echo "$ERROR_RATE > 5" | bc -l) )); then
+          echo "❌ High error rate detected: $ERROR_RATE%"
+          exit 1
+        fi
+
+    - name: Progressive rollout
+      run: |
+        # 25% 트래픽
+        kubectl apply -f - <<EOF
+        apiVersion: networking.istio.io/v1beta1
+        kind: VirtualService
+        metadata:
+          name: dropshipping
+          namespace: production
+        spec:
+          http:
+          - match:
+            - headers:
+                canary:
+                  exact: "true"
+            route:
+            - destination:
+                host: dropshipping-$DEPLOY_ENV
+              weight: 100
+          - route:
+            - destination:
+                host: dropshipping-$INACTIVE_ENV
+              weight: 75
+            - destination:
+                host: dropshipping-$DEPLOY_ENV
+              weight: 25
+        EOF
+        
+        sleep 300 # 5분 대기
+        
+        # 50% 트래픽
+        kubectl patch virtualservice dropshipping -n production --type merge -p '
+        {"spec":{"http":[{"route":[{"destination":{"host":"dropshipping-'$INACTIVE_ENV'"},"weight":50},{"destination":{"host":"dropshipping-'$DEPLOY_ENV'"},"weight":50}]}]}}'
+        
+        sleep 300 # 5분 대기
+        
+        # 에러율 재확인
+        ERROR_RATE=$(./scripts/get-error-rate.sh production $DEPLOY_ENV)
+        if (( $(echo "$ERROR_RATE > 3" | bc -l) )); then
+          echo "⚠️ Elevated error rate: $ERROR_RATE%"
+        fi
+
+    - name: Full traffic switch
+      run: |
+        # 100% 트래픽 전환
+        kubectl patch service dropshipping-active -n production -p '{"spec":{"selector":{"environment":"'$DEPLOY_ENV'"}}}'
+        
+        # Virtual Service 업데이트
+        kubectl patch virtualservice dropshipping -n production --type merge -p '
+        {"spec":{"http":[{"route":[{"destination":{"host":"dropshipping-'$DEPLOY_ENV'"},"weight":100}]}]}}'
+        
+        echo "✅ Traffic fully switched to $DEPLOY_ENV"
+
+    - name: Post-deployment validation
+      run: |
+        # 5분간 모니터링
+        ./scripts/monitor-production.sh 300
+        
+        # 성능 테스트
+        ./scripts/performance-test.sh production quick
+
+    - name: Cleanup old environment
+      if: success()
+      run: |
+        echo "Scaling down $INACTIVE_ENV environment in 10 minutes..."
+        
+        # 10분 후 이전 환경 스케일 다운 (백그라운드)
+        (sleep 600 && kubectl scale deployment dropshipping-backend-$INACTIVE_ENV dropshipping-frontend-$INACTIVE_ENV -n production --replicas=0) &
+
+    - name: Create release notes
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const version = '${{ needs.prepare.outputs.version }}';
+          const deployEnv = '${{ env.DEPLOY_ENV }}';
+          
+          const { data: commits } = await github.rest.repos.compareCommits({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            base: 'v1.0.0', // 이전 버전
+            head: version
+          });
+          
+          const releaseNotes = `
+          ## 🚀 Production Deployment
+          
+          - **Version**: ${version}
+          - **Environment**: ${deployEnv}
+          - **Deployed at**: ${new Date().toISOString()}
+          - **Deployed by**: @${context.actor}
+          
+          ### 📋 Changes
+          ${commits.commits.map(c => `- ${c.commit.message} (${c.sha.substring(0, 7)})`).join('\n')}
+          
+          ### 🔗 Links
+          - [Staging Environment](https://staging.dropshipping.com)
+          - [Production Environment](https://api.dropshipping.com)
+          - [Monitoring Dashboard](https://monitoring.dropshipping.com)
+          `;
+          
+          // 배포 완료 이슈 생성
+          await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `Deployment: ${version} to Production`,
+            body: releaseNotes,
+            labels: ['deployment', 'production']
+          });
+
+  # 롤백 (실패 시)
+  rollback:
+    needs: [deploy-production]
+    if: failure()
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: Automatic rollback
+      run: |
+        echo "🔄 Initiating automatic rollback..."
+        
+        # Helm 롤백
+        helm rollback dropshipping 0 -n production
+        
+        # 트래픽 즉시 전환
+        kubectl patch service dropshipping-active -n production -p '{"spec":{"selector":{"environment":"'$INACTIVE_ENV'"}}}'
+        
+        # 알림
+        curl -X POST ${{ secrets.SLACK_WEBHOOK }} \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "text": "⚠️ Production deployment failed and was automatically rolled back.",
+            "attachments": [{
+              "color": "danger",
+              "fields": [{
+                "title": "Version",
+                "value": "'${{ needs.prepare.outputs.version }}'",
+                "short": true
+              }, {
+                "title": "Rollback Time",
+                "value": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'",
+                "short": true
+              }]
+            }]
+          }'
+
+  # 배포 알림
+  notify:
+    needs: [prepare, deploy-staging, deploy-production]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Send notification
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        custom_payload: |
+          {
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "🚀 Deployment Status"
+                }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Version:*\n${{ needs.prepare.outputs.version }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Environment:*\n${{ needs.prepare.outputs.environment }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Status:*\n${{ job.status }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Actor:*\n${{ github.actor }}"
+                  }
+                ]
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>"
+                }
+              }
+            ]
+          }

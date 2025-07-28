@@ -244,7 +244,8 @@ def check_database_health():
         db.execute(text("SELECT 1"))
         db.close()
         return True
-    except:
+    except Exception as e:
+        logger.error(f"Database health check failed: {e}")
         return False
 
 
@@ -253,7 +254,8 @@ def check_cache_health():
     try:
         redis_client.ping()
         return True
-    except:
+    except Exception as e:
+        logger.warning(f"Cache health check failed: {e}")
         return False
 
 
@@ -263,8 +265,12 @@ def check_memory_health():
         import psutil
         memory_percent = psutil.virtual_memory().percent
         return memory_percent < 85  # 85% 미만이면 건강
-    except:
+    except ImportError:
+        logger.debug("psutil not installed, skipping memory check")
         return True  # psutil이 없으면 건강하다고 가정
+    except Exception as e:
+        logger.warning(f"Memory health check failed: {e}")
+        return True  # 체크 실패 시 계속 진행
 
 
 # 시작 작업 등록

@@ -1,0 +1,15 @@
+{
+  "ownerclan": {
+    "status": "failed",
+    "error": "Authentication failed"
+  },
+  "domeggook": {
+    "status": "partial",
+    "categories": 0,
+    "products": []
+  },
+  "zentrade": {
+    "status": "failed",
+    "products": []
+  }
+}
