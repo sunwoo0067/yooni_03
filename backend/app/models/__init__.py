@@ -57,17 +57,7 @@ from .dropshipping import (
 from .collected_product import CollectedProduct, CollectionBatch, CollectionStatus as CollectedProductStatus, WholesalerSource
 from .collected_product_history import CollectedProductHistory, PriceAlert, ChangeType
 
-# Import security and audit models
-from .security_audit import (
-    SecurityAuditLog, TokenBlacklist, LoginAttempt, PasswordResetToken
-)
-
-# Import RBAC models
-from .rbac import (
-    Permission, Role, PermissionCategory, PermissionAction, ResourceScope,
-    PermissionCondition, UserPermissionAudit, AccessRequest, PermissionDelegation,
-    role_permission_association, user_permission_override
-)
+# Security and audit models temporarily removed for refactoring
 
 # Import CRM models - TEMPORARILY DISABLED FOR REFACTORING
 # from .crm import (
@@ -211,24 +201,7 @@ __all__ = [
     "PriceAlert",
     "ChangeType",
     
-    # Security and audit models
-    "SecurityAuditLog",
-    "TokenBlacklist", 
-    "LoginAttempt",
-    "PasswordResetToken",
-    
-    # RBAC models
-    "Permission",
-    "Role",
-    "PermissionCategory",
-    "PermissionAction",
-    "ResourceScope",
-    "PermissionCondition",
-    "UserPermissionAudit",
-    "AccessRequest",
-    "PermissionDelegation",
-    "role_permission_association",
-    "user_permission_override",
+    # Security and audit models temporarily removed for refactoring
     
     # Additional models will be added in Phase 2.4
 ]
@@ -313,18 +286,7 @@ MODELS = [
     CollectedProductHistory,
     PriceAlert,
     
-    # Security and audit models
-    SecurityAuditLog,
-    TokenBlacklist,
-    LoginAttempt,
-    PasswordResetToken,
-    
-    # RBAC models
-    Permission,
-    Role,
-    UserPermissionAudit,
-    AccessRequest,
-    PermissionDelegation,
+    # Security and audit models temporarily removed for refactoring
     
     # Additional models will be added in Phase 2.4
 ]

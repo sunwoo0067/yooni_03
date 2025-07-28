@@ -1588,3 +1588,475 @@ Passed: 3/3
 2025-07-28 16:56:36,702 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 2025-07-28 16:57:36,750 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 2025-07-28 16:58:36,777 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 16:59:33,193 - app.services.cache.cache_refresh_service - INFO - Starting cache refresh cycle
+2025-07-28 16:59:33,194 - app.services.cache.cache_refresh_service - ERROR - Failed to refresh popular products cache: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 16:59:33,194 - app.services.cache.cache_refresh_service - ERROR - Failed to refresh latest products cache: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 16:59:33,195 - app.services.cache.cache_refresh_service - ERROR - Failed to refresh low stock products cache: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 16:59:33,195 - app.services.cache.cache_refresh_service - INFO - Cache refresh completed. Refreshed 3 caches
+2025-07-28 16:59:36,821 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 16:59:36,821 - app.services.collection.realtime_stock_monitor - ERROR - 일반 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:00:36,869 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:01:36,914 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:02:36,960 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:03:36,988 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:04:33,209 - app.services.cache.cache_refresh_service - INFO - Starting cache refresh cycle
+2025-07-28 17:04:33,210 - app.services.cache.cache_refresh_service - ERROR - Failed to refresh popular products cache: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:04:33,210 - app.services.cache.cache_refresh_service - ERROR - Failed to refresh latest products cache: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:04:33,210 - app.services.cache.cache_refresh_service - ERROR - Failed to refresh low stock products cache: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:04:33,210 - app.services.cache.cache_refresh_service - INFO - Cache refresh completed. Refreshed 3 caches
+2025-07-28 17:04:37,036 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:04:37,036 - app.services.collection.realtime_stock_monitor - ERROR - 일반 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:05:37,084 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:06:37,124 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:07:37,164 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:08:37,207 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:09:33,222 - app.services.cache.cache_refresh_service - INFO - Starting cache refresh cycle
+2025-07-28 17:09:33,222 - app.services.cache.cache_refresh_service - ERROR - Failed to refresh popular products cache: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:09:33,223 - app.services.cache.cache_refresh_service - ERROR - Failed to refresh latest products cache: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:09:33,224 - app.services.cache.cache_refresh_service - ERROR - Failed to refresh low stock products cache: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:09:33,224 - app.services.cache.cache_refresh_service - INFO - Cache refresh completed. Refreshed 3 caches
+2025-07-28 17:09:37,249 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:09:37,249 - app.services.collection.realtime_stock_monitor - ERROR - 일반 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:10:30,971 - main - INFO - === Registered Routes ===
+2025-07-28 17:10:30,972 - main - INFO -  1. {'GET', 'HEAD'} /openapi.json
+2025-07-28 17:10:30,972 - main - INFO -  2. {'GET', 'HEAD'} /docs
+2025-07-28 17:10:30,972 - main - INFO -  3. {'GET', 'HEAD'} /docs/oauth2-redirect
+2025-07-28 17:10:30,972 - main - INFO -  4. {'GET', 'HEAD'} /redoc
+2025-07-28 17:10:30,972 - main - INFO -  6. {'GET'} /health
+2025-07-28 17:10:30,972 - main - INFO -  7. {'GET'} /
+2025-07-28 17:10:30,972 - main - INFO -  8. {'GET'} /api/v1/health/database
+2025-07-28 17:10:30,972 - main - INFO -  9. {'GET'} /api/v1/status
+2025-07-28 17:10:30,972 - main - INFO - Total routes registered: 9
+2025-07-28 17:10:37,283 - app.services.collection.realtime_stock_monitor - ERROR - 우선순위 상품 재고 확인 실패: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[RestockHistory(restock_history)]'. Original exception was: Mapper 'Mapper[Product(products)]' has no property 'restock_history'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-07-28 17:10:57,219 - __main__ - INFO - === Registered Routes ===
+2025-07-28 17:10:57,219 - __main__ - INFO -  1. {'HEAD', 'GET'} /openapi.json
+2025-07-28 17:10:57,219 - __main__ - INFO -  2. {'HEAD', 'GET'} /docs
+2025-07-28 17:10:57,220 - __main__ - INFO -  3. {'HEAD', 'GET'} /docs/oauth2-redirect
+2025-07-28 17:10:57,220 - __main__ - INFO -  4. {'HEAD', 'GET'} /redoc
+2025-07-28 17:10:57,220 - __main__ - INFO -  6. {'GET'} /health
+2025-07-28 17:10:57,220 - __main__ - INFO -  7. {'GET'} /
+2025-07-28 17:10:57,220 - __main__ - INFO -  8. {'GET'} /api/v1/health/database
+2025-07-28 17:10:57,220 - __main__ - INFO -  9. {'GET'} /api/v1/status
+2025-07-28 17:10:57,220 - __main__ - INFO - Total routes registered: 9
+2025-07-28 17:10:58,428 - __mp_main__ - INFO - === Registered Routes ===
+2025-07-28 17:10:58,428 - __mp_main__ - INFO -  1. {'GET', 'HEAD'} /openapi.json
+2025-07-28 17:10:58,428 - __mp_main__ - INFO -  2. {'GET', 'HEAD'} /docs
+2025-07-28 17:10:58,428 - __mp_main__ - INFO -  3. {'GET', 'HEAD'} /docs/oauth2-redirect
+2025-07-28 17:10:58,428 - __mp_main__ - INFO -  4. {'GET', 'HEAD'} /redoc
+2025-07-28 17:10:58,429 - __mp_main__ - INFO -  6. {'GET'} /health
+2025-07-28 17:10:58,429 - __mp_main__ - INFO -  7. {'GET'} /
+2025-07-28 17:10:58,429 - __mp_main__ - INFO -  8. {'GET'} /api/v1/health/database
+2025-07-28 17:10:58,429 - __mp_main__ - INFO -  9. {'GET'} /api/v1/status
+2025-07-28 17:10:58,429 - __mp_main__ - INFO - Total routes registered: 9
+2025-07-28 17:10:58,472 - main - INFO - === Registered Routes ===
+2025-07-28 17:10:58,472 - main - INFO -  1. {'GET', 'HEAD'} /openapi.json
+2025-07-28 17:10:58,472 - main - INFO -  2. {'GET', 'HEAD'} /docs
+2025-07-28 17:10:58,472 - main - INFO -  3. {'GET', 'HEAD'} /docs/oauth2-redirect
+2025-07-28 17:10:58,472 - main - INFO -  4. {'GET', 'HEAD'} /redoc
+2025-07-28 17:10:58,472 - main - INFO -  6. {'GET'} /health
+2025-07-28 17:10:58,472 - main - INFO -  7. {'GET'} /
+2025-07-28 17:10:58,472 - main - INFO -  8. {'GET'} /api/v1/health/database
+2025-07-28 17:10:58,472 - main - INFO -  9. {'GET'} /api/v1/status
+2025-07-28 17:10:58,473 - main - INFO - Total routes registered: 9
+2025-07-28 17:10:58,473 - main - INFO - Starting Yooni Dropshipping System v1.0.0
+2025-07-28 17:10:58,473 - main - INFO - Checking database connection...
+2025-07-28 17:10:58,500 - watchfiles.main - INFO - 1 change detected
+2025-07-28 17:10:58,600 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-07-28 17:10:58,601 - sqlalchemy.engine.Engine - INFO - [raw sql] {}
+2025-07-28 17:10:58,602 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-07-28 17:10:58,602 - sqlalchemy.engine.Engine - INFO - [raw sql] {}
+2025-07-28 17:10:58,603 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-07-28 17:10:58,603 - sqlalchemy.engine.Engine - INFO - [raw sql] {}
+2025-07-28 17:10:58,604 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-07-28 17:10:58,605 - sqlalchemy.engine.Engine - INFO - SELECT 1
+2025-07-28 17:10:58,605 - sqlalchemy.engine.Engine - INFO - [generated in 0.00027s] {}
+2025-07-28 17:10:58,605 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-07-28 17:10:58,605 - app.services.database.database - INFO - Database connection successful
+2025-07-28 17:10:58,605 - main - INFO - Creating database tables...
+2025-07-28 17:10:58,715 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-07-28 17:10:58,715 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-07-28 17:10:58,716 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-07-28 17:10:58,716 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-07-28 17:10:58,717 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-07-28 17:10:58,717 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-07-28 17:10:58,718 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-07-28 17:10:58,720 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,721 - sqlalchemy.engine.Engine - INFO - [generated in 0.00021s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,728 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,728 - sqlalchemy.engine.Engine - INFO - [cached since 0.007537s ago] ('user_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,728 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,729 - sqlalchemy.engine.Engine - INFO - [cached since 0.00813s ago] ('user_api_keys', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,729 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,729 - sqlalchemy.engine.Engine - INFO - [cached since 0.008687s ago] ('platform_accounts', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,730 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,730 - sqlalchemy.engine.Engine - INFO - [cached since 0.009238s ago] ('platform_sync_logs', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,730 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,730 - sqlalchemy.engine.Engine - INFO - [cached since 0.009797s ago] ('wholesale_accounts', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,731 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,731 - sqlalchemy.engine.Engine - INFO - [cached since 0.01044s ago] ('products', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,731 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,731 - sqlalchemy.engine.Engine - INFO - [cached since 0.01089s ago] ('product_variants', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,732 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,732 - sqlalchemy.engine.Engine - INFO - [cached since 0.01134s ago] ('platform_listings', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,732 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,732 - sqlalchemy.engine.Engine - INFO - [cached since 0.0119s ago] ('product_price_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,733 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,733 - sqlalchemy.engine.Engine - INFO - [cached since 0.01258s ago] ('product_categories', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,733 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,734 - sqlalchemy.engine.Engine - INFO - [cached since 0.01315s ago] ('orders', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,734 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,734 - sqlalchemy.engine.Engine - INFO - [cached since 0.01372s ago] ('order_items', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,734 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,735 - sqlalchemy.engine.Engine - INFO - [cached since 0.01419s ago] ('order_payments', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,735 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,735 - sqlalchemy.engine.Engine - INFO - [cached since 0.01467s ago] ('order_shipments', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,735 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,736 - sqlalchemy.engine.Engine - INFO - [cached since 0.01514s ago] ('order_shipment_items', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,736 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,736 - sqlalchemy.engine.Engine - INFO - [cached since 0.01568s ago] ('order_status_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,736 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,737 - sqlalchemy.engine.Engine - INFO - [cached since 0.0162s ago] ('warehouses', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,737 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,737 - sqlalchemy.engine.Engine - INFO - [cached since 0.01669s ago] ('inventory_items', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,737 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,738 - sqlalchemy.engine.Engine - INFO - [cached since 0.01717s ago] ('inventory_movements', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,738 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,738 - sqlalchemy.engine.Engine - INFO - [cached since 0.01762s ago] ('stock_adjustments', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,738 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,738 - sqlalchemy.engine.Engine - INFO - [cached since 0.01807s ago] ('stock_adjustment_items', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,739 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,739 - sqlalchemy.engine.Engine - INFO - [cached since 0.01855s ago] ('stock_counts', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,739 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,739 - sqlalchemy.engine.Engine - INFO - [cached since 0.01901s ago] ('stock_count_items', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,740 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,740 - sqlalchemy.engine.Engine - INFO - [cached since 0.01949s ago] ('ai_logs', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,740 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,740 - sqlalchemy.engine.Engine - INFO - [cached since 0.01994s ago] ('ai_training_data', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,741 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,741 - sqlalchemy.engine.Engine - INFO - [cached since 0.0204s ago] ('ai_models', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,741 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,741 - sqlalchemy.engine.Engine - INFO - [cached since 0.02084s ago] ('ai_predictions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,742 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,742 - sqlalchemy.engine.Engine - INFO - [cached since 0.02142s ago] ('ai_experiments', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,742 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,742 - sqlalchemy.engine.Engine - INFO - [cached since 0.02199s ago] ('wholesaler_accounts', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,743 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,743 - sqlalchemy.engine.Engine - INFO - [cached since 0.02254s ago] ('collection_logs', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,743 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,743 - sqlalchemy.engine.Engine - INFO - [cached since 0.02304s ago] ('scheduled_collections', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,744 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,744 - sqlalchemy.engine.Engine - INFO - [cached since 0.02352s ago] ('wholesaler_products', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,744 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,744 - sqlalchemy.engine.Engine - INFO - [cached since 0.02409s ago] ('excel_upload_logs', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,745 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,745 - sqlalchemy.engine.Engine - INFO - [cached since 0.0246s ago] ('outofstock_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,745 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,745 - sqlalchemy.engine.Engine - INFO - [cached since 0.02508s ago] ('supplier_reliability', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,746 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,746 - sqlalchemy.engine.Engine - INFO - [cached since 0.02556s ago] ('restock_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,746 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,746 - sqlalchemy.engine.Engine - INFO - [cached since 0.02606s ago] ('stock_check_log', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,747 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,747 - sqlalchemy.engine.Engine - INFO - [cached since 0.02652s ago] ('price_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,747 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,747 - sqlalchemy.engine.Engine - INFO - [cached since 0.02696s ago] ('profit_protection_log', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,748 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,748 - sqlalchemy.engine.Engine - INFO - [cached since 0.02739s ago] ('stockout_prediction_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,748 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,748 - sqlalchemy.engine.Engine - INFO - [cached since 0.02783s ago] ('demand_analysis_history', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,749 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,749 - sqlalchemy.engine.Engine - INFO - [cached since 0.02836s ago] ('automation_rules', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,749 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,749 - sqlalchemy.engine.Engine - INFO - [cached since 0.02893s ago] ('automation_executions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,750 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,750 - sqlalchemy.engine.Engine - INFO - [cached since 0.02942s ago] ('alternative_recommendations', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,750 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,750 - sqlalchemy.engine.Engine - INFO - [cached since 0.02991s ago] ('dropshipping_settings', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,751 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,751 - sqlalchemy.engine.Engine - INFO - [cached since 0.03038s ago] ('duplicate_product_groups', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,751 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,751 - sqlalchemy.engine.Engine - INFO - [cached since 0.03086s ago] ('duplicate_products', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,752 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,752 - sqlalchemy.engine.Engine - INFO - [cached since 0.03131s ago] ('collected_products', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,752 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,752 - sqlalchemy.engine.Engine - INFO - [cached since 0.03178s ago] ('collection_batches', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,752 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,753 - sqlalchemy.engine.Engine - INFO - [cached since 0.03223s ago] ('collected_product_histories', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,753 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,753 - sqlalchemy.engine.Engine - INFO - [cached since 0.03275s ago] ('price_alerts', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,753 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,754 - sqlalchemy.engine.Engine - INFO - [cached since 0.03321s ago] ('pipeline_executions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,754 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,754 - sqlalchemy.engine.Engine - INFO - [cached since 0.03365s ago] ('pipeline_steps', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,754 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,754 - sqlalchemy.engine.Engine - INFO - [cached since 0.03409s ago] ('pipeline_product_results', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,755 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,755 - sqlalchemy.engine.Engine - INFO - [cached since 0.03462s ago] ('workflow_templates', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,755 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,755 - sqlalchemy.engine.Engine - INFO - [cached since 0.03508s ago] ('pipeline_alerts', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,756 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-07-28 17:10:58,756 - sqlalchemy.engine.Engine - INFO - [cached since 0.03551s ago] ('pipeline_schedules', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-07-28 17:10:58,757 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,757 - sqlalchemy.engine.Engine - INFO - [generated in 0.00022s] ('userrole', 'pg_catalog')
+2025-07-28 17:10:58,759 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,759 - sqlalchemy.engine.Engine - INFO - [cached since 0.001472s ago] ('userstatus', 'pg_catalog')
+2025-07-28 17:10:58,759 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,759 - sqlalchemy.engine.Engine - INFO - [cached since 0.002312s ago] ('platformtype', 'pg_catalog')
+2025-07-28 17:10:58,760 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,760 - sqlalchemy.engine.Engine - INFO - [cached since 0.003138s ago] ('accountstatus', 'pg_catalog')
+2025-07-28 17:10:58,761 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,761 - sqlalchemy.engine.Engine - INFO - [cached since 0.003981s ago] ('producttype', 'pg_catalog')
+2025-07-28 17:10:58,762 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,762 - sqlalchemy.engine.Engine - INFO - [cached since 0.00477s ago] ('pricingstrategy', 'pg_catalog')
+2025-07-28 17:10:58,763 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,763 - sqlalchemy.engine.Engine - INFO - [cached since 0.005751s ago] ('productstatus', 'pg_catalog')
+2025-07-28 17:10:58,764 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,764 - sqlalchemy.engine.Engine - INFO - [cached since 0.006578s ago] ('orderstatus', 'pg_catalog')
+2025-07-28 17:10:58,764 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,764 - sqlalchemy.engine.Engine - INFO - [cached since 0.007289s ago] ('paymentstatus', 'pg_catalog')
+2025-07-28 17:10:58,765 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,765 - sqlalchemy.engine.Engine - INFO - [cached since 0.007961s ago] ('shippingstatus', 'pg_catalog')
+2025-07-28 17:10:58,766 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,766 - sqlalchemy.engine.Engine - INFO - [cached since 0.008759s ago] ('inventorystatus', 'pg_catalog')
+2025-07-28 17:10:58,767 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,767 - sqlalchemy.engine.Engine - INFO - [cached since 0.009482s ago] ('movementtype', 'pg_catalog')
+2025-07-28 17:10:58,767 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,767 - sqlalchemy.engine.Engine - INFO - [cached since 0.01018s ago] ('aioperationtype', 'pg_catalog')
+2025-07-28 17:10:58,768 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,768 - sqlalchemy.engine.Engine - INFO - [cached since 0.01086s ago] ('aimodeltype', 'pg_catalog')
+2025-07-28 17:10:58,769 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,769 - sqlalchemy.engine.Engine - INFO - [cached since 0.01153s ago] ('executionstatus', 'pg_catalog')
+2025-07-28 17:10:58,769 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,770 - sqlalchemy.engine.Engine - INFO - [cached since 0.01239s ago] ('wholesalertype', 'pg_catalog')
+2025-07-28 17:10:58,770 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,770 - sqlalchemy.engine.Engine - INFO - [cached since 0.01308s ago] ('connectionstatus', 'pg_catalog')
+2025-07-28 17:10:58,771 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,771 - sqlalchemy.engine.Engine - INFO - [cached since 0.01374s ago] ('collectionstatus', 'pg_catalog')
+2025-07-28 17:10:58,771 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,772 - sqlalchemy.engine.Engine - INFO - [cached since 0.01442s ago] ('wholesalersource', 'pg_catalog')
+2025-07-28 17:10:58,772 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-07-28 17:10:58,773 - sqlalchemy.engine.Engine - INFO - [cached since 0.01537s ago] ('changetype', 'pg_catalog')
+2025-07-28 17:10:58,773 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-07-28 17:10:58,773 - app.services.database.database - INFO - Database tables created successfully (async)
+2025-07-28 17:10:58,774 - main - INFO - Upload directory created: uploads
+2025-07-28 17:10:58,774 - main - INFO - Logs directory created: logs
+2025-07-28 17:10:58,774 - main - INFO - Starting scheduler service...
+2025-07-28 17:10:59,612 - watchfiles.main - INFO - 1 change detected
+2025-07-28 17:10:59,718 - apscheduler.scheduler - INFO - Scheduler started
+2025-07-28 17:10:59,718 - app.services.wholesale.scheduler_service - INFO - 스케줄러가 시작되었습니다.
+2025-07-28 17:10:59,719 - app.services.wholesale.scheduler_service - ERROR - 스케줄 복원 실패: When initializing mapper Mapper[User(users)], expression 'Role' failed to locate a name ('Role'). If this is a class name, consider adding this relationship() to the <class 'app.models.user.User'> class after both dependent classes have been defined.
+2025-07-28 17:10:59,719 - main - INFO - Scheduler service started successfully
+2025-07-28 17:10:59,719 - main - INFO - Starting task queue...
+2025-07-28 17:10:59,721 - app.services.tasks.task_queue - INFO - 핸들러 등록: send_email
+2025-07-28 17:10:59,722 - app.services.tasks.task_queue - INFO - 핸들러 등록: process_image
+2025-07-28 17:10:59,722 - app.services.tasks.task_queue - INFO - 핸들러 등록: cleanup_old_files
+2025-07-28 17:10:59,722 - app.services.tasks.task_queue - INFO - 태스크 큐 시작 (workers: 5)
+2025-07-28 17:10:59,722 - main - INFO - Task queue started successfully
+2025-07-28 17:10:59,722 - main - INFO - Starting metrics collection...
+2025-07-28 17:10:59,778 - main - ERROR - Failed to start metrics collection: No module named 'app.models.payment'
+2025-07-28 17:10:59,779 - main - INFO - Starting cache warmup...
+2025-07-28 17:11:00,672 - watchfiles.main - INFO - 1 change detected
+2025-07-28 17:11:01,254 - app.services.ai.gemini_service - INFO - Gemini Flash 2.5 service initialized
+2025-07-28 17:11:01,255 - app.services.ai.langchain_service - INFO - LangChain service initialized
+2025-07-28 17:11:01,255 - main - INFO - Cache warmup started in background
+2025-07-28 17:11:01,255 - main - INFO - Starting cache refresh service...
+2025-07-28 17:11:01,255 - app.services.cache.cache_refresh_service - INFO - Cache refresh service started
+2025-07-28 17:11:01,255 - main - INFO - Cache refresh service started
+2025-07-28 17:11:01,256 - main - INFO - Starting collection scheduler...
+2025-07-28 17:11:01,259 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-07-28 17:11:01,259 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-07-28 17:11:01,259 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-07-28 17:11:01,259 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-07-28 17:11:01,259 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-07-28 17:11:01,260 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-07-28 17:11:01,260 - app.services.collection.collection_scheduler - INFO - 6개의 스케줄 작업 등록 완료
+2025-07-28 17:11:01,260 - apscheduler.scheduler - INFO - Added job "일일 전체 동기화" to job store "default"
+2025-07-28 17:11:01,260 - apscheduler.scheduler - INFO - Added job "인기 상품 업데이트" to job store "default"
+2025-07-28 17:11:01,260 - apscheduler.scheduler - INFO - Added job "신규 상품 수집" to job store "default"
+2025-07-28 17:11:01,260 - apscheduler.scheduler - INFO - Added job "만료 상품 정리" to job store "default"
+2025-07-28 17:11:01,260 - apscheduler.scheduler - INFO - Added job "가격 변동 확인" to job store "default"
+2025-07-28 17:11:01,260 - apscheduler.scheduler - INFO - Added job "캐시 워밍업" to job store "default"
+2025-07-28 17:11:01,261 - apscheduler.scheduler - INFO - Scheduler started
+2025-07-28 17:11:01,261 - app.services.collection.realtime_stock_monitor - INFO - 실시간 재고 모니터링 시작
+2025-07-28 17:11:01,261 - app.services.collection.collection_scheduler - INFO - 상품 수집 스케줄러 시작
+2025-07-28 17:11:01,261 - main - INFO - Collection scheduler started
+2025-07-28 17:11:01,261 - main - INFO - Application startup completed successfully
+2025-07-28 17:11:01,261 - app.services.tasks.task_queue - INFO - 워커 0 시작
+2025-07-28 17:11:01,261 - app.services.tasks.task_queue - INFO - 워커 1 시작
+2025-07-28 17:11:01,261 - app.services.tasks.task_queue - INFO - 워커 2 시작
+2025-07-28 17:11:01,261 - app.services.tasks.task_queue - INFO - 워커 3 시작
+2025-07-28 17:11:01,261 - app.services.tasks.task_queue - INFO - 워커 4 시작
+2025-07-28 17:11:01,261 - app.services.cache.cache_warmup_service - INFO - Starting cache warmup...
+2025-07-28 17:11:01,262 - app.services.cache.cache_warmup_service - ERROR - Product cache warmup failed: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[User(users)]'. Original exception was: When initializing mapper Mapper[User(users)], expression 'Role' failed to locate a name ('Role'). If this is a class name, consider adding this relationship() to the <class 'app.models.user.User'> class after both dependent classes have been defined.
+2025-07-28 17:11:01,262 - app.services.cache.cache_warmup_service - INFO - Prepared 5 AI cache entries for warmup
+2025-07-28 17:11:01,262 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-07-28 17:11:01,263 - app.services.cache.cache_warmup_service - ERROR - Platform cache warmup failed: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[User(users)]'. Original exception was: When initializing mapper Mapper[User(users)], expression 'Role' failed to locate a name ('Role'). If this is a class name, consider adding this relationship() to the <class 'app.models.user.User'> class after both dependent classes have been defined.
+2025-07-28 17:11:01,263 - app.services.cache.cache_warmup_service - INFO - Cache warmup completed in 0.00 seconds
+2025-07-28 17:11:01,263 - app.services.cache.cache_warmup_service - INFO - Cache warmup results: {'product_cache': {'warmed_count': 0, 'error': "One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[User(users)]'. Original exception was: When initializing mapper Mapper[User(users)], expression 'Role' failed to locate a name ('Role'). If this is a class name, consider adding this relationship() to the <class 'app.models.user.User'> class after both dependent classes have been defined."}, 'ai_cache': {'prepared_count': 5}, 'platform_cache': {'warmed_count': 0, 'error': "One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[User(users)]'. Original exception was: When initializing mapper Mapper[User(users)], expression 'Role' failed to locate a name ('Role'). If this is a class name, consider adding this relationship() to the <class 'app.models.user.User'> class after both dependent classes have been defined."}, 'duration': 0.001928}
+2025-07-28 17:11:01,264 - app.services.cache.cache_refresh_service - INFO - Starting cache refresh cycle
+2025-07-28 17:11:01,264 - app.services.cache.cache_refresh_service - ERROR - Failed to refresh popular products cache: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[User(users)]'. Original exception was: When initializing mapper Mapper[User(users)], expression 'Role' failed to locate a name ('Role'). If this is a class name, consider adding this relationship() to the <class 'app.models.user.User'> class after both dependent classes have been defined.
+2025-07-28 17:11:01,264 - app.services.cache.cache_refresh_service - ERROR - Failed to refresh latest products cache: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[User(users)]'. Original exception was: When initializing mapper Mapper[User(users)], expression 'Role' failed to locate a name ('Role'). If this is a class name, consider adding this relationship() to the <class 'app.models.user.User'> class after both dependent classes have been defined.
+2025-07-28 17:11:01,264 - app.services.cache.cache_refresh_service - ERROR - Failed to refresh low stock products cache: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[User(users)]'. Original exception was: When initializing mapper Mapper[User(users)], expression 'Role' failed to locate a name ('Role'). If this is a class name, consider adding this relationship() to the <class 'app.models.user.User'> class after both dependent classes have been defined.
+2025-07-28 17:11:01,264 - app.services.cache.cache_refresh_service - INFO - Cache refresh completed. Refreshed 3 caches
+2025-07-28 17:11:01,737 - watchfiles.main - INFO - 1 change detected
+2025-07-28 17:11:02,849 - watchfiles.main - INFO - 1 change detected
+2025-07-28 17:11:03,919 - watchfiles.main - INFO - 1 change detected
+2025-07-28 17:11:05,036 - watchfiles.main - INFO - 1 change detected
+2025-07-28 17:11:06,094 - watchfiles.main - INFO - 1 change detected
+2025-07-28 17:11:07,163 - watchfiles.main - INFO - 1 change detected

@@ -8,7 +8,6 @@ api_router = APIRouter()
 
 # Import and include endpoint routers - Core endpoints first
 from .endpoints import health
-from .endpoints import rbac_management
 # Temporarily disable other endpoints due to import issues
 # from .endpoints import platform_accounts, products, orders
 # Temporarily disable problematic endpoints
@@ -24,7 +23,6 @@ from .endpoints import rbac_management
 
 # Include routers - Core endpoints only
 api_router.include_router(health.router, prefix="/health", tags=["Health"])
-api_router.include_router(rbac_management.router, prefix="/rbac", tags=["RBAC Management"])
 # Temporarily disable other endpoints due to import issues
 # api_router.include_router(platform_accounts.router, prefix="/platform-accounts", tags=["Platform Accounts"])
 # api_router.include_router(products.router, prefix="/products", tags=["Products"])
