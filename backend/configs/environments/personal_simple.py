@@ -55,6 +55,14 @@ async def lifespan(app: FastAPI):
     print("🚀 Yooni 드롭쉬핑 시스템 - 개인 사용자용")
     print(f"🌍 환경: {settings.ENVIRONMENT}")
     print(f"👤 단일 사용자 모드: {settings.SINGLE_USER_MODE}")
+    
+    # 데이터베이스 초기화
+    try:
+        from app.services.database.personal_database_service import init_db
+        init_db()
+        print("💾 데이터베이스 초기화 완료")
+    except Exception as e:
+        print(f"❌ 데이터베이스 초기화 실패: {e}")
 
     yield
 
@@ -130,11 +138,8 @@ async def get_services_status():
     # 데이터베이스 연결 상태 확인
     database_connected = False
     try:
-        from app.db.session import get_db
-        db = next(get_db())
-        # 간단한 쿼리 실행으로 연결 확인
-        db.execute("SELECT 1")
-        database_connected = True
+        from app.services.database.personal_database_service import db_manager
+        database_connected = db_manager.check_connection(max_retries=1)
     except Exception:
         database_connected = False
 
