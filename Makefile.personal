@@ -1,0 +1,78 @@
+# Yooni Dropshipping System - Personal User Edition
+# 개인 사용자용 Makefile
+
+.PHONY: help setup run stop logs clean test
+
+# 기본 타겟
+help:
+	@echo "Yooni 드롭쉬핑 시스템 - 개인 사용자용 Makefile"
+	@echo ""
+	@echo "사용 가능한 명령어:"
+	@echo "  setup     - 개인 사용자용 환경 설정"
+	@echo "  run       - 개인 사용자용 서버 실행"
+	@echo "  stop      - 서버 중지"
+	@echo "  logs      - 로그 확인"
+	@echo "  clean     - 임시 파일 정리"
+	@echo "  test      - 테스트 실행"
+	@echo "  frontend  - 프론트엔드 개발 서버 실행"
+	@echo "  docker-up - Docker로 개인 사용자용 시스템 실행"
+	@echo "  docker-down - Docker 시스템 중지"
+
+# 개인 사용자용 환경 설정
+setup:
+	@echo "🔧 개인 사용자용 환경 설정 중..."
+	pip install -r requirements-personal.txt
+	cd frontend && npm install
+	@echo "✅ 환경 설정 완료"
+
+# 개인 사용자용 서버 실행
+run:
+	@echo "🚀 개인 사용자용 서버 실행 중..."
+	@echo "   접속 주소: http://localhost:8000"
+	@echo "   API 문서: http://localhost:8000/docs"
+	export YOONI_ENV_MODE=personal && python backend/main_personal.py
+
+# 서버 중지
+stop:
+	@echo "🛑 서버 중지 중..."
+	pkill -f "python backend/main_personal.py" || true
+	@echo "✅ 서버 중지 완료"
+
+# 로그 확인
+logs:
+	@echo "📋 로그 확인 중..."
+	tail -f backend/logs/personal_app.log
+
+# 임시 파일 정리
+clean:
+	@echo "🧹 임시 파일 정리 중..."
+	rm -rf backend/logs/*.log
+	rm -rf frontend/logs/*.log
+	rm -rf backend/__pycache__
+	rm -rf frontend/__pycache__
+	@echo "✅ 임시 파일 정리 완료"
+
+# 테스트 실행
+test:
+	@echo "🧪 테스트 실행 중..."
+	python -m pytest backend/tests/personal/ -v
+
+# 프론트엔드 개발 서버 실행
+frontend:
+	@echo "🎨 프론트엔드 개발 서버 실행 중..."
+	@echo "   접속 주소: http://localhost:3000"
+	cd frontend && npm run dev
+
+# Docker로 개인 사용자용 시스템 실행
+docker-up:
+	@echo "🐳 Docker로 개인 사용자용 시스템 실행 중..."
+	docker-compose -f docker-compose.personal.yml up -d
+	@echo "✅ Docker 시스템 실행 완료"
+	@echo "   백엔드: http://localhost:8000"
+	@echo "   프론트엔드: http://localhost:3000"
+
+# Docker 시스템 중지
+docker-down:
+	@echo "🛑 Docker 시스템 중지 중..."
+	docker-compose -f docker-compose.personal.yml down
+	@echo "✅ Docker 시스템 중지 완료"

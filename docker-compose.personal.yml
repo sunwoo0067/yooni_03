@@ -1,0 +1,89 @@
+version: '3.8'
+
+# Yooni Dropshipping System - Personal User Edition
+# 개인 사용자용 간소화된 Docker Compose 설정
+
+services:
+  # 개인 사용자용 백엔드 애플리케이션
+  backend-personal:
+    build:
+      context: .
+      dockerfile: Dockerfile.personal
+    ports:
+      - "8000:8000"
+    environment:
+      # 간소화된 설정
+      - YOONI_ENV_MODE=personal
+      - ENVIRONMENT=personal
+      - DATABASE_URL=sqlite:///./yooni_personal.db
+      
+      # 보안 설정
+      - SECRET_KEY=personal-user-secret-key-change-if-needed
+      - ENCRYPTION_KEY=personal-user-encryption-key-change-if-needed
+      
+      # 단일 사용자 모드
+      - SINGLE_USER_MODE=true
+      - SINGLE_USER_EMAIL=personal@yooni.local
+      
+      # 로깅
+      - LOG_LEVEL=INFO
+      - LOG_TO_FILE=true
+      - LOG_FILE=logs/personal_app.log
+      
+      # 기능 설정
+      - DEBUG=true
+      - DOCS_ENABLED=true
+      
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+      - ./backups:/app/backups
+      - ./yooni_personal.db:/app/yooni_personal.db
+    networks:
+      - yooni_personal_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # 개인 사용자용 프론트엔드 (선택사항)
+  frontend-personal:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.personal
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    volumes:
+      - ./frontend/logs:/var/log/nginx
+    networks:
+      - yooni_personal_network
+    restart: unless-stopped
+    depends_on:
+      - backend-personal
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# 볼륨 정의
+volumes:
+  personal_logs:
+    driver: local
+  personal_uploads:
+    driver: local
+  personal_backups:
+    driver: local
+
+# 네트워크 정의
+networks:
+  yooni_personal_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
